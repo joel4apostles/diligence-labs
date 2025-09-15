@@ -194,14 +194,14 @@ export default function Profile() {
           </Link>
           <div>
             <div className="flex items-center gap-4 mb-4">
-              <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <div className="text-2xl font-bold text-white">
                 Diligence Labs
               </div>
-              <div className="w-px h-8 bg-gradient-to-b from-blue-400 to-purple-400"></div>
+              <div className="w-px h-8 bg-gray-600"></div>
               <div className="text-lg text-gray-400">Profile Settings</div>
             </div>
             <h1 className="text-4xl font-light mb-2">
-              <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Account Management</span>
+              <span className="font-normal text-white">Account Management</span>
             </h1>
             <p className="text-gray-400 text-lg">Manage your account information and preferences</p>
           </div>

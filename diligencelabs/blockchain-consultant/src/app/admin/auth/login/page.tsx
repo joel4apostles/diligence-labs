@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
         <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/40 backdrop-blur-xl border-0 relative z-10">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-6">
-            <div className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+            <div className="text-2xl font-bold text-white">
               Diligence Labs
             </div>
           </div>

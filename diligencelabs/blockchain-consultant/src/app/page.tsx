@@ -223,7 +223,7 @@ export default function Home() {
 
       {/* Navigation */}
       <nav className="relative z-50 flex items-center justify-between p-6 sm:p-8">
-        <div className={`font-bold text-2xl transition-all duration-1000 ${isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+        <div className={`font-bold text-2xl text-white transition-all duration-1000 ${isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
           Diligence Labs
         </div>
         <div className={`flex items-center space-x-6 transition-all duration-1000 delay-300 ${isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}>
@@ -866,7 +866,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="relative z-10 py-8 px-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center px-4">
-          <div className="font-bold text-xl mb-4 sm:mb-0">Diligence Labs</div>
+          <div className="font-bold text-xl text-white mb-4 sm:mb-0">Diligence Labs</div>
           <div className="flex space-x-6 text-gray-400">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>

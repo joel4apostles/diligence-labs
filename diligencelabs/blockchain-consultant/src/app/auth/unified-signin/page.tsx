@@ -19,7 +19,6 @@ import { FormGridLines } from "@/components/ui/grid-lines"
 import { ProminentBorder } from "@/components/ui/border-effects"
 import { PageStructureLines } from "@/components/ui/page-structure"
 import { DynamicPageBackground } from "@/components/ui/dynamic-page-background"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -34,7 +33,6 @@ function UnifiedSignInContent() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [isPageLoaded, setIsPageLoaded] = useState(false)
-  const [activeTab, setActiveTab] = useState("web3")
   const [availableProviders, setAvailableProviders] = useState<any>(null)
   const [oAuthLoading, setOAuthLoading] = useState<string | false>(false)
   const router = useRouter()
@@ -281,7 +279,7 @@ function UnifiedSignInContent() {
         <Card className="bg-gradient-to-br from-gray-900/90 to-gray-800/50 backdrop-blur-xl border-0 shadow-2xl">
         <CardHeader className="space-y-1 text-center pb-6">
           <div className="flex justify-center mb-4">
-            <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            <div className="text-3xl font-bold text-white">
               Diligence Labs
             </div>
           </div>
@@ -305,53 +303,39 @@ function UnifiedSignInContent() {
             </div>
           )}
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-800/50 border border-gray-700 rounded-lg p-1 mb-6">
-              <TabsTrigger 
-                value="web3" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
-              >
-                Quick Sign In
-              </TabsTrigger>
-              <TabsTrigger 
-                value="traditional" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
-              >
-                Email & Password
-              </TabsTrigger>
-            </TabsList>
+          {/* Single Dropdown for All Sign-in Options */}
+          <div className="space-y-4">
 
-            <TabsContent value="web3" className="space-y-4">
-              {/* OAuth Providers */}
-              {availableProviders && Object.values(availableProviders)
-                .filter((provider: any) => provider.id !== 'credentials')
-                .length > 0 && (
-                <div className="space-y-3">
-                  {Object.values(availableProviders)
-                    .filter((provider: any) => provider.id !== 'credentials')
-                    .map((provider: any) => (
-                      <Button
-                        key={provider.id}
-                        onClick={() => handleOAuthSignIn(provider.id)}
-                        disabled={!!oAuthLoading}
-                        className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
-                      >
-                        {oAuthLoading === provider.id ? (
-                          <div className="flex items-center space-x-2">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            <span>Connecting...</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center space-x-3">
-                            <span className="text-xl">{getProviderIcon(provider.id)}</span>
-                            <span className="font-medium">Continue with {getProviderName(provider.id)}</span>
-                          </div>
-                        )}
-                      </Button>
-                    ))
-                  }
-                </div>
-              )}
+            {/* OAuth Providers */}
+            {availableProviders && Object.values(availableProviders)
+              .filter((provider: any) => provider.id !== 'credentials')
+              .length > 0 && (
+              <div className="space-y-3">
+                {Object.values(availableProviders)
+                  .filter((provider: any) => provider.id !== 'credentials')
+                  .map((provider: any) => (
+                    <Button
+                      key={provider.id}
+                      onClick={() => handleOAuthSignIn(provider.id)}
+                      disabled={!!oAuthLoading}
+                      className="w-full h-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 hover:border-gray-500 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+                    >
+                      {oAuthLoading === provider.id ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <span>Connecting...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-3">
+                          <span className="text-xl">{getProviderIcon(provider.id)}</span>
+                          <span className="font-medium">Continue with {getProviderName(provider.id)}</span>
+                        </div>
+                      )}
+                    </Button>
+                  ))
+                }
+              </div>
+            )}
 
               {/* Web3 Wallet Sign-In */}
               {!ready && (
@@ -367,52 +351,63 @@ function UnifiedSignInContent() {
                 </div>
               )}
 
-              {ready && !authenticated && (
-                <div className="space-y-3">
-                  {/* Divider if OAuth providers exist */}
-                  {availableProviders && Object.values(availableProviders).filter((provider: any) => provider.id !== 'credentials').length > 0 && (
-                    <div className="relative my-4">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-gray-700" />
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-gray-900 px-3 text-gray-500">or</span>
-                      </div>
+            {ready && !authenticated && (
+              <div className="space-y-3">
+                {/* Divider if OAuth providers exist */}
+                {availableProviders && Object.values(availableProviders).filter((provider: any) => provider.id !== 'credentials').length > 0 && (
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-gray-700" />
                     </div>
-                  )}
-                  
-                  <Button 
-                    onClick={handlePrivyLogin}
-                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🔗</span>
-                      <span className="font-medium">Connect Web3 Wallet</span>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-gray-900 px-3 text-gray-500">or</span>
                     </div>
-                  </Button>
-                </div>
-              )}
+                  </div>
+                )}
+                
+                <Button 
+                  onClick={handlePrivyLogin}
+                  className="w-full h-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 hover:border-gray-500 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-xl">🔗</span>
+                    <span className="font-medium">Connect Web3 Wallet</span>
+                  </div>
+                </Button>
+              </div>
+            )}
 
-              {ready && authenticated && (
-                <div className="text-center py-6">
-                  <div className="flex flex-col items-center space-y-3">
-                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center animate-pulse">
-                      <span className="text-2xl">✅</span>
-                    </div>
-                    <div className="text-green-400 font-medium">Wallet Connected</div>
-                    <div className="text-sm text-gray-400 font-mono bg-gray-800/50 px-3 py-1 rounded-lg">
-                      {user?.wallet?.address ? 
-                        `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 
-                        'Connected'
-                      }
-                    </div>
-                    <div className="text-xs text-gray-500">Redirecting to dashboard...</div>
+            {ready && authenticated && (
+              <div className="text-center py-6">
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center animate-pulse">
+                    <span className="text-2xl">✅</span>
+                  </div>
+                  <div className="text-green-400 font-medium">Wallet Connected</div>
+                  <div className="text-sm text-gray-400 font-mono bg-gray-800/50 px-3 py-1 rounded-lg">
+                    {user?.wallet?.address ? 
+                      `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 
+                      'Connected'
+                    }
+                  </div>
+                  <div className="text-xs text-gray-500">Redirecting to dashboard...</div>
+                </div>
+              </div>
+            )}
+            
+            {/* Email/Password Form */}
+            <div className="relative">
+              {availableProviders && Object.values(availableProviders).filter((provider: any) => provider.id !== 'credentials').length > 0 && (
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-gray-700" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-gray-900 px-3 text-gray-500">or continue with email</span>
                   </div>
                 </div>
               )}
-            </TabsContent>
-
-            <TabsContent value="traditional" className="space-y-6">
+              
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
@@ -425,7 +420,7 @@ function UnifiedSignInContent() {
                           <Input
                             placeholder="Enter your email"
                             type="email"
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
+                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-gray-400 focus:ring-gray-400 h-12 transition-all duration-200 hover:border-gray-500"
                             {...field}
                           />
                         </FormControl>
@@ -443,7 +438,7 @@ function UnifiedSignInContent() {
                           <Input
                             type="password"
                             placeholder="Enter your password"
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
+                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-gray-400 focus:ring-gray-400 h-12 transition-all duration-200 hover:border-gray-500"
                             {...field}
                           />
                         </FormControl>
@@ -454,7 +449,7 @@ function UnifiedSignInContent() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
+                    className="w-full h-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 hover:border-gray-500 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
                   >
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
@@ -468,22 +463,22 @@ function UnifiedSignInContent() {
                 </form>
               </Form>
 
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between text-sm mt-6">
                 <Link
                   href="/auth/forgot-password"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-gray-400 hover:text-gray-300 transition-colors"
                 >
                   Forgot password?
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-gray-400 hover:text-gray-300 transition-colors"
                 >
                   Create account
                 </Link>
               </div>
-            </TabsContent>
-          </Tabs>
+            </div>
+          </div>
         </CardContent>
         </Card>
       </ProminentBorder>

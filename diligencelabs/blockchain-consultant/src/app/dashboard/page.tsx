@@ -177,14 +177,14 @@ function DashboardContent() {
         <div className={`flex justify-between items-center mb-12 transition-all duration-1000 ${isPageLoaded ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'}`}>
           <div>
             <div className="flex items-center gap-4 mb-4">
-              <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <div className="text-2xl font-bold text-white">
                 Diligence Labs
               </div>
-              <div className="w-px h-8 bg-gradient-to-b from-blue-400 to-purple-400"></div>
+              <div className="w-px h-8 bg-gray-600"></div>
               <div className="text-lg text-gray-400">Dashboard</div>
             </div>
             <h1 className="text-4xl font-light mb-2">
-              Welcome back, <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{unifiedUser?.name || unifiedUser?.email}</span>
+              Welcome back, <span className="font-normal text-white">{unifiedUser?.name || unifiedUser?.email}</span>
             </h1>
             <p className="text-gray-400 text-lg">Manage your consulting services and subscriptions</p>
           </div>

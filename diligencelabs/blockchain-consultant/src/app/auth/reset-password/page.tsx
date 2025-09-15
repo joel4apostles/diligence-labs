@@ -152,7 +152,7 @@ function ResetPasswordContent() {
         <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/40 backdrop-blur border-0">
           <CardHeader className="space-y-1 text-center">
             <div className="flex justify-center mb-6">
-              <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <div className="text-2xl font-bold text-white">
                 Diligence Labs
               </div>
             </div>

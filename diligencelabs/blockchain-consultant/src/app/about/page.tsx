@@ -69,7 +69,7 @@ export default function AboutPage() {
           </nav>
 
           <h1 className="text-5xl font-light mb-6">
-            About <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Diligence Labs</span>
+            About <span className="font-normal text-white">Diligence Labs</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-4xl mx-auto leading-relaxed mb-8">
             Diligence Labs stands at the forefront of blockchain consulting, bridging the gap between complex Web3 technologies and practical business solutions. Founded with the vision of democratizing access to expert blockchain guidance, we specialize in transforming innovative ideas into sustainable, scalable blockchain ventures.
