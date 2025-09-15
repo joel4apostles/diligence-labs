@@ -33,9 +33,11 @@ export default function RootLayout({
       >
         <DiligencePrivyProvider>
           <AuthProvider>
-            <UnifiedAuthProvider>
-              {children}
-            </UnifiedAuthProvider>
+            <WalletProvider>
+              <UnifiedAuthProvider>
+                {children}
+              </UnifiedAuthProvider>
+            </WalletProvider>
           </AuthProvider>
         </DiligencePrivyProvider>
       </body>

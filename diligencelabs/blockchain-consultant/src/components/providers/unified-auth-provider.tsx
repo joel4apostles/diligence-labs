@@ -121,7 +121,10 @@ export function UnifiedAuthProvider({ children }: { children: React.ReactNode })
         
         // Force a complete page reload to ensure clean state
         console.log('Force reloading page to ensure clean state...')
-        window.location.href = '/'
+        // Add a small delay to ensure all async operations complete
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 100)
         
       } catch (error) {
         console.error('Logout error:', error)
@@ -130,7 +133,9 @@ export function UnifiedAuthProvider({ children }: { children: React.ReactNode })
         localStorage.clear()
         sessionStorage.clear()
         sessionStorage.setItem('justLoggedOut', 'true')
-        window.location.href = '/'
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 100)
       }
     }
   }
