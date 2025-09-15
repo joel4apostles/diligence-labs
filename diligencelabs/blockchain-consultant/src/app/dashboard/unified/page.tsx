@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { useAccount } from "wagmi"
+import dynamic from "next/dynamic"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,7 +15,7 @@ import { PageStructureLines } from "@/components/ui/page-structure"
 import { HorizontalDivider } from "@/components/ui/section-divider"
 import { useUnifiedAuth } from "@/components/providers/unified-auth-provider"
 
-export default function UnifiedDashboard() {
+function UnifiedDashboardContent() {
   const { user, isLoading, isAuthenticated, logout } = useUnifiedAuth()
   const { address } = useAccount()
   const [isPageLoaded, setIsPageLoaded] = useState(false)
@@ -208,4 +209,11 @@ export default function UnifiedDashboard() {
       </div>
     </div>
   )
+}
+
+// Create a dynamic import to avoid SSR issues with wagmi
+const UnifiedDashboardWrapper = dynamic(() => Promise.resolve(UnifiedDashboardContent), { ssr: false })
+
+export default function UnifiedDashboard() {
+  return <UnifiedDashboardWrapper />
 }

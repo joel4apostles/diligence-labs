@@ -26,7 +26,7 @@ const SubscriptionForm = dynamic(() => import("@/components/subscription").then(
   ssr: false
 })
 
-export default function Dashboard() {
+function DashboardContent() {
   const { data: session, status } = useSession()
   const { user: unifiedUser, isLoading: unifiedLoading, isAuthenticated, logout } = useUnifiedAuth()
   // Enable wallet functionality
@@ -644,4 +644,11 @@ export default function Dashboard() {
       </div>
     </div>
   )
+}
+
+// Create a dynamic import to avoid SSR issues with wagmi
+const DashboardWrapper = dynamic(() => Promise.resolve(DashboardContent), { ssr: false })
+
+export default function Dashboard() {
+  return <DashboardWrapper />
 }
