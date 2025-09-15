@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FloatingElements } from "@/components/ui/animated-background"
 import { ParallaxBackground } from "@/components/ui/parallax-background"
 import { FormGridLines } from "@/components/ui/grid-lines"
@@ -35,6 +37,8 @@ function UnifiedSignInContent() {
   const [isPageLoaded, setIsPageLoaded] = useState(false)
   const [availableProviders, setAvailableProviders] = useState<any>(null)
   const [oAuthLoading, setOAuthLoading] = useState<string | false>(false)
+  const [activeTab, setActiveTab] = useState("social")
+  const [selectedProvider, setSelectedProvider] = useState<string>("")
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: session, status } = useSession()
@@ -267,7 +271,7 @@ function UnifiedSignInContent() {
 
       {/* Navigation */}
       <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-6 sm:p-8">
-        <Link href="/" className={`font-bold text-2xl transition-all duration-1000 ${isPageLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+        <Link href="/" className={`font-bold text-2xl text-white transition-all duration-1000 ${isPageLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
           Diligence Labs
         </Link>
       </nav>
@@ -303,39 +307,76 @@ function UnifiedSignInContent() {
             </div>
           )}
 
-          {/* Single Dropdown for All Sign-in Options */}
-          <div className="space-y-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-gray-800/50 border border-gray-700 rounded-lg p-1 mb-6">
+              <TabsTrigger 
+                value="social" 
+                className="data-[state=active]:bg-gray-700 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
+              >
+                Social Login
+              </TabsTrigger>
+              <TabsTrigger 
+                value="traditional" 
+                className="data-[state=active]:bg-gray-700 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
+              >
+                Email & Password
+              </TabsTrigger>
+            </TabsList>
 
-            {/* OAuth Providers */}
-            {availableProviders && Object.values(availableProviders)
-              .filter((provider: any) => provider.id !== 'credentials')
-              .length > 0 && (
-              <div className="space-y-3">
-                {Object.values(availableProviders)
-                  .filter((provider: any) => provider.id !== 'credentials')
-                  .map((provider: any) => (
+            <TabsContent value="social" className="space-y-6">
+              {/* Social Login Dropdown */}
+              {availableProviders && Object.values(availableProviders)
+                .filter((provider: any) => provider.id !== 'credentials')
+                .length > 0 && (
+                <div className="space-y-4">
+                  <div className="text-center text-sm text-gray-400 mb-4">
+                    Choose your preferred social login method
+                  </div>
+                  
+                  <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+                    <SelectTrigger className="w-full h-12 bg-gray-800/50 border-gray-600 text-white hover:border-gray-500 focus:border-gray-400">
+                      <SelectValue placeholder="Select a sign-in method" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-600">
+                      {Object.values(availableProviders)
+                        .filter((provider: any) => provider.id !== 'credentials')
+                        .map((provider: any) => (
+                          <SelectItem 
+                            key={provider.id} 
+                            value={provider.id}
+                            className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <span className="text-lg">{getProviderIcon(provider.id)}</span>
+                              <span>Continue with {getProviderName(provider.id)}</span>
+                            </div>
+                          </SelectItem>
+                        ))
+                      }
+                    </SelectContent>
+                  </Select>
+                  
+                  {selectedProvider && (
                     <Button
-                      key={provider.id}
-                      onClick={() => handleOAuthSignIn(provider.id)}
+                      onClick={() => handleOAuthSignIn(selectedProvider)}
                       disabled={!!oAuthLoading}
                       className="w-full h-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 hover:border-gray-500 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
                     >
-                      {oAuthLoading === provider.id ? (
+                      {oAuthLoading === selectedProvider ? (
                         <div className="flex items-center space-x-2">
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                           <span>Connecting...</span>
                         </div>
                       ) : (
                         <div className="flex items-center space-x-3">
-                          <span className="text-xl">{getProviderIcon(provider.id)}</span>
-                          <span className="font-medium">Continue with {getProviderName(provider.id)}</span>
+                          <span className="text-xl">{getProviderIcon(selectedProvider)}</span>
+                          <span className="font-medium">Sign in with {getProviderName(selectedProvider)}</span>
                         </div>
                       )}
                     </Button>
-                  ))
-                }
-              </div>
-            )}
+                  )}
+                </div>
+              )}
 
               {/* Web3 Wallet Sign-In */}
               {!ready && (
@@ -351,63 +392,55 @@ function UnifiedSignInContent() {
                 </div>
               )}
 
-            {ready && !authenticated && (
-              <div className="space-y-3">
-                {/* Divider if OAuth providers exist */}
-                {availableProviders && Object.values(availableProviders).filter((provider: any) => provider.id !== 'credentials').length > 0 && (
-                  <div className="relative my-4">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-gray-700" />
+              {ready && !authenticated && (
+                <div className="space-y-4">
+                  {/* Divider if OAuth providers exist */}
+                  {availableProviders && Object.values(availableProviders).filter((provider: any) => provider.id !== 'credentials').length > 0 && (
+                    <div className="relative my-6">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-gray-700" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-gray-900 px-3 text-gray-500">or</span>
+                      </div>
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-gray-900 px-3 text-gray-500">or</span>
+                  )}
+                  
+                  <div className="text-center text-sm text-gray-400 mb-4">
+                    Connect your Web3 wallet
+                  </div>
+                  <Button 
+                    onClick={handlePrivyLogin}
+                    className="w-full h-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 hover:border-gray-500 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <span className="text-xl">🔗</span>
+                      <span className="font-medium">Connect Web3 Wallet</span>
                     </div>
-                  </div>
-                )}
-                
-                <Button 
-                  onClick={handlePrivyLogin}
-                  className="w-full h-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 hover:border-gray-500 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-xl">🔗</span>
-                    <span className="font-medium">Connect Web3 Wallet</span>
-                  </div>
-                </Button>
-              </div>
-            )}
-
-            {ready && authenticated && (
-              <div className="text-center py-6">
-                <div className="flex flex-col items-center space-y-3">
-                  <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center animate-pulse">
-                    <span className="text-2xl">✅</span>
-                  </div>
-                  <div className="text-green-400 font-medium">Wallet Connected</div>
-                  <div className="text-sm text-gray-400 font-mono bg-gray-800/50 px-3 py-1 rounded-lg">
-                    {user?.wallet?.address ? 
-                      `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 
-                      'Connected'
-                    }
-                  </div>
-                  <div className="text-xs text-gray-500">Redirecting to dashboard...</div>
+                  </Button>
                 </div>
-              </div>
-            )}
-            
-            {/* Email/Password Form */}
-            <div className="relative">
-              {availableProviders && Object.values(availableProviders).filter((provider: any) => provider.id !== 'credentials').length > 0 && (
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-700" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-gray-900 px-3 text-gray-500">or continue with email</span>
+              )}
+
+              {ready && authenticated && (
+                <div className="text-center py-6">
+                  <div className="flex flex-col items-center space-y-3">
+                    <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center animate-pulse">
+                      <span className="text-2xl">✅</span>
+                    </div>
+                    <div className="text-green-400 font-medium">Wallet Connected</div>
+                    <div className="text-sm text-gray-400 font-mono bg-gray-800/50 px-3 py-1 rounded-lg">
+                      {user?.wallet?.address ? 
+                        `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 
+                        'Connected'
+                      }
+                    </div>
+                    <div className="text-xs text-gray-500">Redirecting to dashboard...</div>
                   </div>
                 </div>
               )}
-              
+            </TabsContent>
+
+            <TabsContent value="traditional" className="space-y-6">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
@@ -477,8 +510,8 @@ function UnifiedSignInContent() {
                   Create account
                 </Link>
               </div>
-            </div>
-          </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
         </Card>
       </ProminentBorder>
