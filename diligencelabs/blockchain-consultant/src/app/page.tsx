@@ -238,7 +238,7 @@ export default function Home() {
           </Link>
           <Button asChild className="bg-white text-black hover:bg-gray-200">
             <Link href={isAuthenticated ? "/dashboard" : "/auth/unified-signin"}>
-              {isAuthenticated ? "Go to Dashboard" : "Get Started"}
+              Get Started
             </Link>
           </Button>
         </div>

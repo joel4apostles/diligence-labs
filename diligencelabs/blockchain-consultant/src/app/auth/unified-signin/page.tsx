@@ -135,12 +135,14 @@ function UnifiedSignInContent() {
       console.log('Valid NextAuth session found, redirecting...', session.user.id)
       // Clear any logout flags since we have a valid session
       sessionStorage.removeItem('justLoggedOut')
-      handlePostAuthRedirect()
+      // Add a small delay to show the success state before redirecting
+      setTimeout(() => handlePostAuthRedirect(), 1000)
     } else if (authenticated && user?.id && status !== "authenticated") {
       // Only Privy authenticated, no NextAuth session - redirect
       console.log('Privy authenticated, no NextAuth session, redirecting...', user.id)
       sessionStorage.removeItem('justLoggedOut')
-      handlePostAuthRedirect()
+      // Add a small delay to show the success state before redirecting
+      setTimeout(() => handlePostAuthRedirect(), 1000)
     } else {
       // Check if user just logged out (prevent immediate redirect only when no valid session)
       const justLoggedOut = sessionStorage.getItem('justLoggedOut')
@@ -276,53 +278,55 @@ function UnifiedSignInContent() {
         className={`w-full max-w-lg relative z-10 rounded-2xl overflow-hidden transition-all duration-1000 delay-300 ${isPageLoaded ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}
         animated={true}
       >
-        <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/40 backdrop-blur border-0">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-6">
-            <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+        <Card className="bg-gradient-to-br from-gray-900/90 to-gray-800/50 backdrop-blur-xl border-0 shadow-2xl">
+        <CardHeader className="space-y-1 text-center pb-6">
+          <div className="flex justify-center mb-4">
+            <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
               Diligence Labs
             </div>
           </div>
-          <CardTitle className="text-2xl font-light mb-4">
-            Sign In
+          <CardTitle className="text-3xl font-light mb-2">
+            Welcome Back
           </CardTitle>
-          <CardDescription className="text-gray-400">
-            Choose your preferred sign-in method
+          <CardDescription className="text-gray-400 text-lg">
+            Sign in to continue to your dashboard
           </CardDescription>
         </CardHeader>
         
-        <CardContent className="p-8">
+        <CardContent className="px-8 pb-8">
           {error && (
-            <div className="bg-red-500/20 border border-red-500/30 text-red-300 text-sm p-4 rounded-lg backdrop-blur mb-6">
-              {error}
+            <div className="bg-red-500/20 border border-red-500/30 text-red-300 text-sm p-4 rounded-xl backdrop-blur mb-6 animate-in slide-in-from-top-2">
+              <div className="flex items-center space-x-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{error}</span>
+              </div>
             </div>
           )}
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-800/50 border border-gray-700 rounded-lg p-1 mb-8">
+            <TabsList className="grid w-full grid-cols-2 bg-gray-800/50 border border-gray-700 rounded-lg p-1 mb-6">
               <TabsTrigger 
                 value="web3" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400 transition-all duration-300"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
               >
-                Web3 & OAuth
+                Quick Sign In
               </TabsTrigger>
               <TabsTrigger 
                 value="traditional" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400 transition-all duration-300"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
               >
                 Email & Password
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="web3" className="space-y-6">
+            <TabsContent value="web3" className="space-y-4">
               {/* OAuth Providers */}
               {availableProviders && Object.values(availableProviders)
                 .filter((provider: any) => provider.id !== 'credentials')
                 .length > 0 && (
-                <div className="space-y-4">
-                  <div className="text-center text-sm text-gray-400 mb-4">
-                    Sign in with your preferred platform
-                  </div>
+                <div className="space-y-3">
                   {Object.values(availableProviders)
                     .filter((provider: any) => provider.id !== 'credentials')
                     .map((provider: any) => (
@@ -330,7 +334,7 @@ function UnifiedSignInContent() {
                         key={provider.id}
                         onClick={() => handleOAuthSignIn(provider.id)}
                         disabled={!!oAuthLoading}
-                        className="w-full h-12 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white border border-gray-600 hover:border-gray-400 transition-all duration-300"
+                        className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
                       >
                         {oAuthLoading === provider.id ? (
                           <div className="flex items-center space-x-2">
@@ -340,7 +344,7 @@ function UnifiedSignInContent() {
                         ) : (
                           <div className="flex items-center space-x-3">
                             <span className="text-xl">{getProviderIcon(provider.id)}</span>
-                            <span>Continue with {getProviderName(provider.id)}</span>
+                            <span className="font-medium">Continue with {getProviderName(provider.id)}</span>
                           </div>
                         )}
                       </Button>
@@ -351,51 +355,58 @@ function UnifiedSignInContent() {
 
               {/* Web3 Wallet Sign-In */}
               {!ready && (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-pulse flex items-center space-x-2 text-gray-400">
-                    <div className="h-4 w-4 bg-gray-600 rounded-full animate-bounce"></div>
-                    <span>Initializing Web3...</span>
+                <div className="flex items-center justify-center py-6">
+                  <div className="flex flex-col items-center space-y-3">
+                    <div className="flex space-x-1">
+                      <div className="h-2 w-2 bg-blue-400 rounded-full animate-bounce"></div>
+                      <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="h-2 w-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                    <span className="text-sm text-gray-400">Initializing Web3...</span>
                   </div>
                 </div>
               )}
 
               {ready && !authenticated && (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {/* Divider if OAuth providers exist */}
                   {availableProviders && Object.values(availableProviders).filter((provider: any) => provider.id !== 'credentials').length > 0 && (
-                    <div className="relative my-6">
+                    <div className="relative my-4">
                       <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-gray-600" />
+                        <span className="w-full border-t border-gray-700" />
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-gray-900 px-2 text-gray-400">Or</span>
+                        <span className="bg-gray-900 px-3 text-gray-500">or</span>
                       </div>
                     </div>
                   )}
                   
-                  <div className="text-center text-sm text-gray-400 mb-4">
-                    Connect your Web3 wallet
-                  </div>
                   <Button 
                     onClick={handlePrivyLogin}
-                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all duration-300"
+                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
                   >
-                    <div className="flex items-center space-x-2">
-                      <span>🔗</span>
-                      <span>Connect Wallet</span>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-xl">🔗</span>
+                      <span className="font-medium">Connect Web3 Wallet</span>
                     </div>
                   </Button>
                 </div>
               )}
 
               {ready && authenticated && (
-                <div className="text-center py-4">
-                  <div className="text-green-400 mb-2">✅ Web3 Wallet Connected</div>
-                  <div className="text-sm text-gray-400">
-                    {user?.wallet?.address ? 
-                      `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 
-                      'Connected'
-                    }
+                <div className="text-center py-6">
+                  <div className="flex flex-col items-center space-y-3">
+                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center animate-pulse">
+                      <span className="text-2xl">✅</span>
+                    </div>
+                    <div className="text-green-400 font-medium">Wallet Connected</div>
+                    <div className="text-sm text-gray-400 font-mono bg-gray-800/50 px-3 py-1 rounded-lg">
+                      {user?.wallet?.address ? 
+                        `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 
+                        'Connected'
+                      }
+                    </div>
+                    <div className="text-xs text-gray-500">Redirecting to dashboard...</div>
                   </div>
                 </div>
               )}
@@ -414,7 +425,7 @@ function UnifiedSignInContent() {
                           <Input
                             placeholder="Enter your email"
                             type="email"
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
                             {...field}
                           />
                         </FormControl>
@@ -432,7 +443,7 @@ function UnifiedSignInContent() {
                           <Input
                             type="password"
                             placeholder="Enter your password"
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
                             {...field}
                           />
                         </FormControl>
@@ -443,7 +454,7 @@ function UnifiedSignInContent() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300"
+                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
                   >
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
@@ -451,7 +462,7 @@ function UnifiedSignInContent() {
                         <span>Signing in...</span>
                       </div>
                     ) : (
-                      "Sign In"
+                      <span className="font-medium">Sign In</span>
                     )}
                   </Button>
                 </form>
