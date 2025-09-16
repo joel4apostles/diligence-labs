@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd diligencelabs/blockchain-consultant && npm run build",
+  "outputDirectory": "diligencelabs/blockchain-consultant/.next",
+  "installCommand": "cd diligencelabs/blockchain-consultant && npm install --legacy-peer-deps"
+}
