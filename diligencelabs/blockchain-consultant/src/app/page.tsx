@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
@@ -9,6 +10,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { SubtleBorder, ProminentBorder } from "@/components/ui/border-effects"
+import { SUBSCRIPTION_PLANS } from "@/lib/subscription-plans"
+import { Logo } from "@/components/ui/logo"
 
 // Dynamically import heavy background components for better initial load
 const FloatingElements = dynamic(() => import("@/components/ui/animated-background").then(mod => ({ default: mod.FloatingElements })), {
@@ -45,9 +48,6 @@ const DynamicPageBackground = dynamic(() => import("@/components/ui/dynamic-page
   ssr: false,
   loading: () => null
 })
-import { SUBSCRIPTION_PLANS } from "@/lib/subscription-plans"
-import { Logo } from "@/components/ui/logo"
-import dynamic from "next/dynamic"
 
 // Dynamically import heavy components for better performance
 const ContactForm = dynamic(() => import("@/components/contact-form").then(mod => ({ default: mod.ContactForm })), {

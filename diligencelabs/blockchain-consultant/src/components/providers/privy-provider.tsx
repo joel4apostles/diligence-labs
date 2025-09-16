@@ -13,6 +13,12 @@ export function DiligencePrivyProvider({ children }: { children: React.ReactNode
     return <>{children}</>
   }
 
+  // Additional validation for the app ID format
+  if (!privyAppId.startsWith('cm') || privyAppId.length < 20) {
+    console.log('Privy disabled: Invalid app ID format')
+    return <>{children}</>
+  }
+
   try {
     return (
       <ErrorBoundary fallback={<>{children}</>}>
