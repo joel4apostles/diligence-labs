@@ -46,6 +46,7 @@ const DynamicPageBackground = dynamic(() => import("@/components/ui/dynamic-page
   loading: () => null
 })
 import { SUBSCRIPTION_PLANS } from "@/lib/subscription-plans"
+import { Logo } from "@/components/ui/logo"
 import dynamic from "next/dynamic"
 
 // Dynamically import heavy components for better performance
@@ -70,6 +71,7 @@ export default function Home() {
   const [showSuccess, setShowSuccess] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<any>(null)
   const [showSubscriptionForm, setShowSubscriptionForm] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
 
   const services = [
     {
@@ -222,26 +224,68 @@ export default function Home() {
       <FloatingElements />
 
       {/* Navigation */}
-      <nav className="relative z-50 flex items-center justify-between p-6 sm:p-8">
-        <div className={`font-bold text-2xl text-white transition-all duration-1000 ${isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
-          Diligence Labs
+      <nav className="relative z-50 flex items-center justify-between p-4 sm:p-6 lg:p-8">
+        <div className={`transition-all duration-1000 ${isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+          <Logo size="xl" />
         </div>
-        <div className={`flex items-center space-x-6 transition-all duration-1000 delay-300 ${isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}>
-          <Link href="#services" className="text-gray-300 hover:text-white transition-colors">
+        <div className={`flex items-center space-x-2 sm:space-x-4 lg:space-x-6 transition-all duration-1000 delay-300 ${isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}>
+          {/* Desktop Navigation */}
+          <Link href="#services" className="hidden md:block text-gray-300 hover:text-white transition-colors text-sm lg:text-base">
             Services
           </Link>
-          <Link href="#subscription" className="text-gray-300 hover:text-white transition-colors">
+          <Link href="#subscription" className="hidden md:block text-gray-300 hover:text-white transition-colors text-sm lg:text-base">
             Pricing
           </Link>
-          <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
+          <Link href="/about" className="hidden md:block text-gray-300 hover:text-white transition-colors text-sm lg:text-base">
             About
           </Link>
-          <Button asChild className="bg-white text-black hover:bg-gray-200">
+          
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden text-gray-300 hover:text-white p-2"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            aria-label="Toggle mobile menu"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          
+          <Button asChild className="bg-white text-black hover:bg-gray-200 text-sm px-3 py-2 sm:px-4 sm:py-2 lg:px-6 lg:py-3">
             <Link href={isAuthenticated ? "/dashboard" : "/auth/unified-signin"}>
               Get Started
             </Link>
           </Button>
         </div>
+        
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-xl border-t border-gray-800 z-40">
+            <div className="flex flex-col py-4 px-6 space-y-4">
+              <Link 
+                href="#services" 
+                className="text-gray-300 hover:text-white transition-colors py-2"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Services
+              </Link>
+              <Link 
+                href="#subscription" 
+                className="text-gray-300 hover:text-white transition-colors py-2"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Pricing
+              </Link>
+              <Link 
+                href="/about" 
+                className="text-gray-300 hover:text-white transition-colors py-2"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                About
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section with Enhanced Border Grid */}
@@ -253,8 +297,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(6,182,212,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(6,182,212,0.06)_1px,transparent_1px)] bg-[size:16rem_16rem]" />
         </div>
         
-        <div className={`space-y-8 max-w-6xl transition-all duration-1000 delay-500 relative z-20 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-light leading-tight relative">
+        <div className={`space-y-6 sm:space-y-8 max-w-6xl px-4 transition-all duration-1000 delay-500 relative z-20 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <h1 className="text-3xl sm:text-5xl lg:text-7xl xl:text-8xl font-light leading-tight relative">
             <span className="block">Expert</span>
             <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent font-normal relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 via-purple-400/10 to-cyan-400/10 blur-xl rounded-lg transform scale-110" />
@@ -263,34 +307,36 @@ export default function Home() {
             <span className="block">Consulting</span>
           </h1>
           
-          <p className="text-xl sm:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl lg:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed px-2">
             Strategic guidance, due diligence, and technical expertise for your blockchain ventures.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mt-12">
-            <Button asChild size="lg" className="group relative bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 text-lg px-10 py-6 rounded-full shadow-2xl shadow-green-500/25 hover:scale-105 transition-all duration-300 overflow-hidden">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mt-8 sm:mt-12 px-4">
+            <Button asChild size="lg" className="group relative bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 text-base sm:text-lg px-6 sm:px-10 py-4 sm:py-6 rounded-full shadow-2xl shadow-green-500/25 hover:scale-105 transition-all duration-300 overflow-hidden min-h-[3rem] sm:min-h-[3.5rem]">
               <Link href="/guest-booking" className="relative z-10 flex items-center justify-center">
                 <span className="relative flex items-center">
-                  <span className="bg-white text-green-600 text-xs px-2 py-1 rounded-full mr-3 font-bold">FREE</span>
-                  Start With Free Consultation
+                  <span className="bg-white text-green-600 text-xs px-2 py-1 rounded-full mr-2 sm:mr-3 font-bold">FREE</span>
+                  <span className="hidden sm:inline">Start With Free Consultation</span>
+                  <span className="sm:hidden">Free Consultation</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700 ease-out" />
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-green-400/0 via-emerald-400/30 to-green-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 opacity-0 group-hover:opacity-100 scale-110 group-hover:scale-100 transition-all duration-500" />
-                <svg className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="group relative border-white/30 text-white hover:bg-white/10 hover:border-white/50 text-lg px-10 py-6 rounded-full backdrop-blur transition-all duration-300 hover:scale-105 overflow-hidden">
+            <Button asChild variant="outline" size="lg" className="group relative border-white/30 text-white hover:bg-white/10 hover:border-white/50 text-base sm:text-lg px-6 sm:px-10 py-4 sm:py-6 rounded-full backdrop-blur transition-all duration-300 hover:scale-105 overflow-hidden min-h-[3rem] sm:min-h-[3.5rem]">
               <Link href="#subscription" className="relative z-10 flex items-center justify-center">
                 <span className="relative">
-                  View Pricing Plans
+                  <span className="hidden sm:inline">View Pricing Plans</span>
+                  <span className="sm:hidden">Pricing</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700 ease-out" />
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/20 to-cyan-500/10 opacity-0 group-hover:opacity-100 rounded-full transition-all duration-500" />
                 <div className="absolute inset-0 border border-white/50 rounded-full opacity-0 group-hover:opacity-100 scale-110 group-hover:scale-100 transition-all duration-500" />
-                <svg className="ml-2 w-5 h-5 transform group-hover:rotate-12 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="ml-2 w-4 h-4 sm:w-5 sm:h-5 transform group-hover:rotate-12 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </svg>
               </Link>
@@ -324,7 +370,7 @@ export default function Home() {
           </div>
 
           {/* Enhanced Service Cards with Sophisticated Borders */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 max-w-7xl mx-auto">
             {services.map((service, index) => (
               <SubtleBorder
                 key={index}
@@ -335,7 +381,7 @@ export default function Home() {
                 movingBorder={true}
               >
                 <div
-                  className={`relative group p-10 bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-blue-500/20 ${
+                  className={`relative group p-6 sm:p-8 lg:p-10 bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-blue-500/20 ${
                     index === currentService ? 'bg-gradient-to-br from-blue-900/20 to-gray-800/30' : ''
                   }`}
                   style={{
@@ -356,9 +402,9 @@ export default function Home() {
                 
                 <div className="relative z-10">
                   {/* Service Image */}
-                  <div className="flex items-center mb-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center mb-6">
                     <div 
-                      className="w-20 h-20 rounded-2xl p-4 flex items-center justify-center mr-6"
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl p-3 sm:p-4 flex items-center justify-center mb-4 sm:mb-0 sm:mr-6"
                       style={{
                         background: service.color === 'from-blue-500 to-cyan-500' ? 'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))' :
                                    service.color === 'from-purple-500 to-pink-500' ? 'linear-gradient(135deg, rgb(168 85 247), rgb(236 72 153))' :
@@ -367,10 +413,10 @@ export default function Home() {
                                    'linear-gradient(135deg, rgb(59 130 246), rgb(6 182 212))'
                       }}
                     >
-                      <div className="w-12 h-12 bg-white/20 rounded-xl" />
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-white/20 rounded-xl" />
                     </div>
                     <div>
-                      <h3 className="text-3xl font-light mb-2">{service.title}</h3>
+                      <h3 className="text-2xl sm:text-3xl font-light mb-2">{service.title}</h3>
                       <div 
                         className="w-16 h-1 rounded-full"
                         style={{
@@ -384,7 +430,7 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  <p className="text-gray-300 leading-relaxed mb-4 text-lg">{service.description}</p>
+                  <p className="text-gray-300 leading-relaxed mb-4 text-base sm:text-lg">{service.description}</p>
                   <p className="text-gray-500 leading-relaxed text-sm">{service.details}</p>
                   
                   {/* Learn More Link */}
@@ -669,7 +715,7 @@ export default function Home() {
           )}
 
           {/* Pricing Cards with Perfect Horizontal Alignment */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto px-2 sm:px-4">
             {SUBSCRIPTION_PLANS.map((plan, index) => {
               const isCurrentPlan = currentSubscription?.planType === plan.id
               const isSubscribing = subscribing === plan.id
@@ -865,9 +911,11 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="relative z-10 py-8 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center px-4">
-          <div className="font-bold text-xl text-white mb-4 sm:mb-0">Diligence Labs</div>
-          <div className="flex space-x-6 text-gray-400">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
+          <div>
+            <Logo size="large" />
+          </div>
+          <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6 text-gray-400 text-sm sm:text-base">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
             <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>

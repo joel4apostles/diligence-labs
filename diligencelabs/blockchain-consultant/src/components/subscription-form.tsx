@@ -116,18 +116,18 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
       password: undefined,
       confirmPassword: undefined,
       company: undefined,
-      primaryService: "STRATEGIC_ADVISORY" as any,
+      primaryService: "STRATEGIC_ADVISORY",
       additionalServices: [],
       projectName: "",
       projectDescription: "",
       primaryGoals: "",
-      timeline: "3_MONTHS" as any,
-      budgetRange: "10K_50K" as any,
-      teamSize: "2_5" as any,
+      timeline: "3_MONTHS",
+      budgetRange: "10K_50K",
+      teamSize: "2_5",
       industryFocus: "",
       specificChallenges: "",
-      preferredSchedule: "FLEXIBLE" as any,
-      communicationPreference: "EMAIL" as any,
+      preferredSchedule: "FLEXIBLE",
+      communicationPreference: "EMAIL",
     },
   })
 
@@ -280,30 +280,30 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto">
+      <div className="w-full max-w-4xl max-h-[98vh] sm:max-h-[90vh] overflow-y-auto my-2 sm:my-4">
         <ProminentBorder className="rounded-2xl overflow-hidden" animated={true} movingBorder={true}>
           <Card className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl border-0">
-            <CardHeader className="text-center pb-6">
+            <CardHeader className="text-center pb-4 sm:pb-6 px-4 sm:px-6">
               <div className="flex items-center justify-between mb-4">
                 <Badge className={`${
                   plan.popular 
                     ? 'bg-gradient-to-r from-blue-500 to-cyan-500' 
                     : 'bg-gradient-to-r from-gray-600 to-gray-700'
-                } text-white px-4 py-1`}>
+                } text-white px-3 py-1 text-sm`}>
                   {plan.name} Plan
                 </Badge>
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={onClose}
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white h-8 w-8 p-0"
                 >
                   ✕
                 </Button>
               </div>
               <CardTitle className="text-2xl text-white">
-                Let's Get Started with {plan.name}
+                Let&apos;s Get Started with {plan.name}
               </CardTitle>
               <CardDescription className="text-gray-400 text-lg">
                 Tell us about your project so we can provide the best consultation experience
@@ -316,13 +316,13 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
               </div>
             </CardHeader>
 
-            <CardContent className="px-8 pb-8">
+            <CardContent className="px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit, (errors) => {
                   console.log("Form validation errors:", errors)
                   const errorList = Object.entries(errors).map(([field, error]) => `${field}: ${error.message}`).join('\n')
                   alert(`Please fix these errors:\n\n${errorList}`)
-                })} className="space-y-8">
+                })} className="space-y-6 sm:space-y-8">
                   {/* Account Information Section (for non-authenticated users on homepage only) */}
                   {!session && context === 'homepage' && (
                     <div className="space-y-6">
@@ -694,7 +694,7 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
 
                   {/* Plan Features Preview */}
                   <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg p-6 border border-blue-500/20">
-                    <h4 className="text-lg font-semibold text-white mb-4">What's Included in {plan.name}:</h4>
+                    <h4 className="text-lg font-semibold text-white mb-4">What&apos;s Included in {plan.name}:</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {plan.features.slice(0, 6).map((feature, index) => (
                         <div key={index} className="flex items-center space-x-2 text-sm">

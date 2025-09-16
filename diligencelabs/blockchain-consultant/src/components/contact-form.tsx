@@ -108,7 +108,7 @@ export function ContactForm() {
                   Message Sent Successfully!
                 </CardTitle>
                 <CardDescription className="text-gray-400 mt-2">
-                  Thank you for reaching out. We'll get back to you soon.
+                  Thank you for reaching out. We&apos;ll get back to you soon.
                 </CardDescription>
               </CardHeader>
 
@@ -144,15 +144,15 @@ export function ContactForm() {
                 Get In <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Touch</span>
               </CardTitle>
               <CardDescription className="text-gray-400 text-lg">
-                Have questions? We'd love to hear from you.
+                Have questions? We&apos;d love to hear from you.
               </CardDescription>
             </CardHeader>
 
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+            <CardContent className="px-4 sm:px-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name" className="text-gray-300">Full Name *</Label>
+                    <Label htmlFor="name" className="text-gray-300 text-sm">Full Name *</Label>
                     <Input
                       id="name"
                       name="name"
@@ -160,13 +160,13 @@ export function ContactForm() {
                       required
                       value={formData.name}
                       onChange={handleChange}
-                      className="mt-1 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400"
+                      className="mt-1 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400 h-12 text-base"
                       placeholder="Your full name"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="email" className="text-gray-300">Email Address *</Label>
+                    <Label htmlFor="email" className="text-gray-300 text-sm">Email Address *</Label>
                     <Input
                       id="email"
                       name="email"
@@ -174,16 +174,16 @@ export function ContactForm() {
                       required
                       value={formData.email}
                       onChange={handleChange}
-                      className="mt-1 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400"
+                      className="mt-1 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400 h-12 text-base"
                       placeholder="your@email.com"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="subject" className="text-gray-300">Subject</Label>
+                  <Label htmlFor="subject" className="text-gray-300 text-sm">Subject</Label>
                   <Select onValueChange={handleSelectChange}>
-                    <SelectTrigger className="mt-1 bg-gray-800/50 border-gray-600 text-white">
+                    <SelectTrigger className="mt-1 bg-gray-800/50 border-gray-600 text-white h-12">
                       <SelectValue placeholder="Select a subject" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-700 text-white">
@@ -191,7 +191,7 @@ export function ContactForm() {
                         <SelectItem 
                           key={subject.value} 
                           value={subject.value}
-                          className="hover:bg-gray-700"
+                          className="hover:bg-gray-700 py-3"
                         >
                           {subject.label}
                         </SelectItem>
@@ -201,14 +201,14 @@ export function ContactForm() {
                 </div>
 
                 <div>
-                  <Label htmlFor="message" className="text-gray-300">Message *</Label>
+                  <Label htmlFor="message" className="text-gray-300 text-sm">Message *</Label>
                   <Textarea
                     id="message"
                     name="message"
                     required
                     value={formData.message}
                     onChange={handleChange}
-                    className="mt-1 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400 min-h-[120px]"
+                    className="mt-1 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400 min-h-[120px] text-base"
                     placeholder="Tell us about your project or question (minimum 10 characters)..."
                   />
                 </div>
@@ -222,7 +222,7 @@ export function ContactForm() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transition-all duration-300 hover:scale-105"
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transition-all duration-300 hover:scale-105 h-12 text-base font-medium"
                 >
                   {isLoading ? (
                     <>

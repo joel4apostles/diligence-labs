@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import Link from "next/link"
 import { useUnifiedAuth } from "@/components/providers/unified-auth-provider"
 import { useAccount, useConnect, useDisconnect } from "wagmi"
@@ -18,12 +18,24 @@ import { PageStructureLines } from "@/components/ui/page-structure"
 import { DynamicPageBackground } from "@/components/ui/dynamic-page-background"
 import { HorizontalDivider } from "@/components/ui/section-divider"
 import { PAID_SUBSCRIPTION_PLANS } from "@/lib/subscription-plans"
+import { Logo } from "@/components/ui/logo"
 import dynamic from "next/dynamic"
 
-// Dynamically import heavy components
+// Dynamically import heavy components with React.memo optimization
 const SubscriptionForm = dynamic(() => import("@/components/subscription").then(mod => ({ default: mod.SubscriptionForm })), {
   loading: () => <div className="h-64 animate-pulse bg-gray-800/50 rounded-xl" />,
   ssr: false
+})
+
+// Lazy load background components for better initial load
+const FloatingElementsLazy = dynamic(() => import("@/components/ui/animated-background").then(mod => ({ default: mod.FloatingElements })), {
+  ssr: false,
+  loading: () => null
+})
+
+const ParallaxBackgroundLazy = dynamic(() => import("@/components/ui/parallax-background").then(mod => ({ default: mod.ParallaxBackground })), {
+  ssr: false,
+  loading: () => null
 })
 
 function DashboardContent() {
@@ -69,7 +81,7 @@ function DashboardContent() {
     // If still loading or in transition state, wait
   }, [session, status, isAuthenticated, unifiedLoading, router])
 
-  const fetchSubscriptionData = async () => {
+  const fetchSubscriptionData = useCallback(async () => {
     if (!session) return
     
     try {
@@ -90,7 +102,7 @@ function DashboardContent() {
     } catch (error) {
       console.error("Failed to fetch subscription data:", error)
     }
-  }
+  }, [session])
 
   // Handle wallet connection sync
   useEffect(() => {
@@ -117,7 +129,7 @@ function DashboardContent() {
     syncWalletAddress()
   }, [isConnected, address, session?.user?.id])
 
-  const handleDisconnectWallet = async () => {
+  const handleDisconnectWallet = useCallback(async () => {
     try {
       // Disconnect from wagmi
       disconnect()
@@ -133,23 +145,23 @@ function DashboardContent() {
     } catch (error) {
       console.error('Failed to disconnect wallet:', error)
     }
-  }
+  }, [disconnect])
 
-  const openSubscriptionModal = (plan: any) => {
+  const openSubscriptionModal = useCallback((plan: any) => {
     setSelectedPlan(plan)
     setIsSubscriptionModalOpen(true)
-  }
+  }, [])
 
-  const closeSubscriptionModal = () => {
+  const closeSubscriptionModal = useCallback(() => {
     setSelectedPlan(null)
     setIsSubscriptionModalOpen(false)
-  }
+  }, [])
 
-  const onSubscriptionSuccess = () => {
+  const onSubscriptionSuccess = useCallback(() => {
     closeSubscriptionModal()
     // Refresh subscription data
     fetchSubscriptionData()
-  }
+  }, [closeSubscriptionModal, fetchSubscriptionData])
 
   if (status === "loading" || unifiedLoading) {
     return (
@@ -170,16 +182,14 @@ function DashboardContent() {
       
       <PageStructureLines />
       <SectionGridLines />
-      <ParallaxBackground />
-      <FloatingElements />
+      <ParallaxBackgroundLazy />
+      <FloatingElementsLazy />
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         <div className={`flex justify-between items-center mb-12 transition-all duration-1000 ${isPageLoaded ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'}`}>
           <div>
             <div className="flex items-center gap-4 mb-4">
-              <div className="text-2xl font-bold text-white">
-                Diligence Labs
-              </div>
+              <Logo size="xl" href={null} />
               <div className="w-px h-8 bg-gray-600"></div>
               <div className="text-lg text-gray-400">Dashboard</div>
             </div>
@@ -333,7 +343,7 @@ function DashboardContent() {
         {/* Section Divider */}
         <HorizontalDivider style="subtle" />
 
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12 transition-all duration-1000 delay-300 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-12 transition-all duration-1000 delay-300 px-4 sm:px-0 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           {/* 1. Strategic Advisory - Book Consultation */}
           <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
             <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-blue-500/20 h-full rounded-xl">
@@ -453,7 +463,7 @@ function DashboardContent() {
               <p className="text-gray-400">Subscribe to unlock premium consultation services</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-0">
               {PAID_SUBSCRIPTION_PLANS.map((plan, index) => (
                 <SubtleBorder key={plan.id} className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
                   <div className={`relative group bg-gradient-to-br ${
@@ -530,7 +540,7 @@ function DashboardContent() {
             <p className="text-gray-400">Manage your account information and preferences</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 px-4 sm:px-0">
             {/* Account Information - Strategic Advisory Theme (Blue-Cyan) */}
             <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
               <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-blue-500/20 h-full rounded-xl">

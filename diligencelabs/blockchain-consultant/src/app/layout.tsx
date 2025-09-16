@@ -19,6 +19,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Diligence Labs - Blockchain Consulting & Advisory",
   description: "Diligence Labs provides expert blockchain consulting, advisory services, due diligence, and strategic guidance for blockchain projects.",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
