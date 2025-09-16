@@ -3,25 +3,37 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { usePrivy, useLogin } from "@privy-io/react-auth"
+import dynamic from "next/dynamic"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FloatingElements } from "@/components/ui/animated-background"
 
-export default function PrivySignIn() {
+// Component that uses Privy hooks
+function PrivySignInContent() {
+  // Dynamically import Privy hooks to ensure they only run client-side
+  const [PrivyHooks, setPrivyHooks] = useState<any>(null)
+
+  useEffect(() => {
+    import("@privy-io/react-auth").then((module) => {
+      setPrivyHooks(module)
+    })
+  }, [])
+
+  const router = useRouter()
   const [isPageLoaded, setIsPageLoaded] = useState(false)
-  const { ready, authenticated, user } = usePrivy()
-  const { login } = useLogin({
-    onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {
+
+  // Only use Privy hooks once they're loaded
+  const { ready, authenticated, user } = PrivyHooks?.usePrivy() || { ready: false, authenticated: false, user: null }
+  const { login } = PrivyHooks?.useLogin({
+    onComplete: (user: any, isNewUser: boolean, wasAlreadyAuthenticated: boolean) => {
       console.log('🔥 User authenticated!', { user, isNewUser, wasAlreadyAuthenticated })
       router.push('/dashboard')
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Login error:', error)
     }
-  })
-  const router = useRouter()
+  }) || { login: () => {} }
 
   useEffect(() => {
     setIsPageLoaded(true)
@@ -67,14 +79,21 @@ export default function PrivySignIn() {
         </CardHeader>
         
         <CardContent className="space-y-6 p-8">
-          {!ready && (
+          {!PrivyHooks && (
             <div className="text-center py-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
               <p className="text-gray-400 mt-2">Loading authentication...</p>
             </div>
           )}
 
-          {ready && !authenticated && (
+          {PrivyHooks && !ready && (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
+              <p className="text-gray-400 mt-2">Loading authentication...</p>
+            </div>
+          )}
+
+          {PrivyHooks && ready && !authenticated && (
             <>
               <div className="text-center mb-6">
                 <p className="text-gray-400 text-sm">
@@ -102,7 +121,7 @@ export default function PrivySignIn() {
               </div>
 
               <div className="grid gap-3">
-                <Link href="/auth/signin">
+                <Link href="/auth/unified-signin">
                   <Button 
                     variant="outline" 
                     className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300"
@@ -115,7 +134,7 @@ export default function PrivySignIn() {
             </>
           )}
 
-          {ready && authenticated && (
+          {PrivyHooks && ready && authenticated && (
             <div className="text-center py-4">
               <div className="text-green-400 text-4xl mb-4 animate-bounce">✓</div>
               <p className="text-gray-400">Redirecting to dashboard...</p>
@@ -132,4 +151,21 @@ export default function PrivySignIn() {
       </Card>
     </div>
   )
+}
+
+// Export the main component using dynamic import with no SSR
+const PrivySignInPage = dynamic(() => Promise.resolve(PrivySignInContent), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center p-4">
+      <div className="text-center py-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
+        <p className="text-gray-400 mt-2">Loading...</p>
+      </div>
+    </div>
+  )
+})
+
+export default function PrivySignIn() {
+  return <PrivySignInPage />
 }
