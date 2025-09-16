@@ -63,3 +63,25 @@ export function verifyAdminPermission(request: Request, requiredRole: string = '
 export function forbiddenResponse() {
   return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 })
 }
+
+export interface AdminAuthResult {
+  success: boolean
+  admin?: AdminTokenPayload
+  error?: string
+}
+
+export async function verifyAdminAuth(request: Request): Promise<AdminAuthResult> {
+  const adminData = verifyAdminToken(request)
+  
+  if (!adminData) {
+    return {
+      success: false,
+      error: "Invalid or missing authentication token"
+    }
+  }
+  
+  return {
+    success: true,
+    admin: adminData
+  }
+}
