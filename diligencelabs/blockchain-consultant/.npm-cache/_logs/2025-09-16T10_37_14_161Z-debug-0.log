@@ -7,9 +7,9 @@
 6 silly config load:file:/usr/local/etc/npmrc
 7 verbose title npm run build
 8 verbose argv "run" "build"
-9 verbose logfile logs-max:10 dir:/Users/joel/vibe-code/diligencelabs/blockchain-consultant/.npm-cache/_logs/2025-09-16T10_18_41_990Z-
-10 verbose logfile /Users/joel/vibe-code/diligencelabs/blockchain-consultant/.npm-cache/_logs/2025-09-16T10_18_41_990Z-debug-0.log
-11 silly logfile start cleaning logs, removing 2 files
+9 verbose logfile logs-max:10 dir:/Users/joel/vibe-code/diligencelabs/blockchain-consultant/.npm-cache/_logs/2025-09-16T10_37_14_161Z-
+10 verbose logfile /Users/joel/vibe-code/diligencelabs/blockchain-consultant/.npm-cache/_logs/2025-09-16T10_37_14_161Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
 12 silly logfile done cleaning log files
 13 verbose cwd /Users/joel/vibe-code/diligencelabs/blockchain-consultant
 14 verbose os Darwin 24.6.0

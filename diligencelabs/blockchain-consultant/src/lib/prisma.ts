@@ -8,6 +8,8 @@ const globalForPrisma = globalThis as unknown as {
 
 // Create Prisma client with enhanced configuration
 const createPrismaClient = () => {
+  // Use dummy database URL for builds when actual DATABASE_URL is not available
+  const databaseUrl = process.env.DATABASE_URL || 'postgresql://dummy:dummy@dummy:5432/dummy'
 
   const client = new PrismaClient({
     log: process.env.NODE_ENV === 'development' 
@@ -16,7 +18,7 @@ const createPrismaClient = () => {
     errorFormat: 'minimal',
     datasources: {
       db: {
-        url: process.env.DATABASE_URL,
+        url: databaseUrl,
       },
     },
   })
