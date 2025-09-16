@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { v4 as uuidv4 } from 'uuid'
+import { sendEmail, getEmailVerificationTemplate } from '@/lib/email'
 
 export async function GET(request: Request) {
   try {
@@ -86,7 +88,6 @@ export async function POST(request: Request) {
     }
 
     // Generate new verification token
-    const { v4: uuidv4 } = require('uuid')
     const verificationToken = uuidv4()
     const expiryDate = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
@@ -100,7 +101,6 @@ export async function POST(request: Request) {
     })
 
     // Send verification email
-    const { sendEmail, getEmailVerificationTemplate } = require('@/lib/email')
     const verificationUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/verify-email?token=${verificationToken}`
     const emailTemplate = getEmailVerificationTemplate(verificationUrl, user.name || 'User')
     

@@ -11,7 +11,7 @@ const updateSessionSchema = z.object({
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const adminData = verifyAdminToken(request)
@@ -20,11 +20,12 @@ export async function PATCH(
       return unauthorizedResponse()
     }
 
+    const resolvedParams = await params
     const body = await request.json()
     const data = updateSessionSchema.parse(body)
 
     const updatedSession = await prisma.session.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: {
         status: data.status,
         ...(data.notes && { notes: data.notes }),

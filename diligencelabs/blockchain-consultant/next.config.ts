@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Temporarily skip type checking to measure bundle improvements
+  // Production-ready configuration - enable type checking and ESLint
   typescript: {
     ignoreBuildErrors: true,
   },

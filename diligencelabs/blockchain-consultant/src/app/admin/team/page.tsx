@@ -54,7 +54,7 @@ export default function AdminTeamPage() {
   })
   const [isAddingMember, setIsAddingMember] = useState(false)
   const [addMemberStatus, setAddMemberStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
-  const [availableUsers, setAvailableUsers] = useState<any[]>([])
+  const [availableUsers, setAvailableUsers] = useState<Array<{id: string, name: string | null, email: string}>>([])
   const [loadingUsers, setLoadingUsers] = useState(false)
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export default function AdminTeamPage() {
       if (response.ok) {
         const data = await response.json()
         const existingMemberIds = teamMembers.map(member => member.user.id)
-        const availableUsers = data.users.filter((user: any) => 
+        const availableUsers = data.users.filter((user: {id: string, name: string | null, email: string}) => 
           !existingMemberIds.includes(user.id)
         )
         setAvailableUsers(availableUsers)
