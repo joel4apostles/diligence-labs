@@ -58,8 +58,8 @@ export default function AdminReportsPage() {
         const data = await response.json()
         
         // Separate reports and sessions from the items
-        const reportItems = data.items.filter((item: any) => item.type === 'report')
-        const sessionItems = data.items.filter((item: any) => item.type === 'session')
+        const reportItems = data.items.filter((item: { type: string }) => item.type === 'report')
+        const sessionItems = data.items.filter((item: { type: string }) => item.type === 'session')
         
         setReports(reportItems)
         setSessions(sessionItems)
@@ -139,7 +139,7 @@ export default function AdminReportsPage() {
               <CardContent>
                 {reports.length > 0 ? (
                   <div className="space-y-4">
-                    {reports.map((report: any) => (
+                    {reports.map((report: Report) => (
                       <div key={report.id} className="p-4 bg-gray-800/30 rounded-lg border border-gray-700 hover:bg-gray-800/50 transition-colors">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -201,7 +201,7 @@ export default function AdminReportsPage() {
               <CardContent>
                 {sessions.length > 0 ? (
                   <div className="space-y-4">
-                    {sessions.map((session: any) => (
+                    {sessions.map((session: Session) => (
                       <div key={session.id} className="p-4 bg-gray-800/30 rounded-lg border border-gray-700 hover:bg-gray-800/50 transition-colors">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">

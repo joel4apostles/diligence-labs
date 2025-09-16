@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DynamicPageBackground } from "@/components/ui/dynamic-page-background"
 import { PageStructureLines } from "@/components/ui/page-structure"
 import { ProminentBorder } from "@/components/ui/border-effects"
+import { Logo } from "@/components/ui/logo"
 
 export default function AdminLoginPage() {
   const [formData, setFormData] = useState({
@@ -60,9 +61,7 @@ export default function AdminLoginPage() {
         <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/40 backdrop-blur-xl border-0 relative z-10">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-6">
-            <div className="text-2xl font-bold text-white">
-              Diligence Labs
-            </div>
+            <Logo size="xl" href={null} />
           </div>
           <div className="flex justify-center mb-4">
             <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">

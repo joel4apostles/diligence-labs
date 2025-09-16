@@ -20,6 +20,7 @@ import { PageStructureLines } from "@/components/ui/page-structure"
 import { HorizontalDivider } from "@/components/ui/section-divider"
 import { ChangePasswordModal } from "@/components/profile/ChangePasswordModal"
 import { PrivacySettingsModal } from "@/components/profile/PrivacySettingsModal"
+import { Logo } from "@/components/ui/logo"
 
 export default function Profile() {
   const { data: session, update } = useSession()
@@ -194,9 +195,7 @@ export default function Profile() {
           </Link>
           <div>
             <div className="flex items-center gap-4 mb-4">
-              <div className="text-2xl font-bold text-white">
-                Diligence Labs
-              </div>
+              <Logo size="xl" href={null} />
               <div className="w-px h-8 bg-gray-600"></div>
               <div className="text-lg text-gray-400">Profile Settings</div>
             </div>

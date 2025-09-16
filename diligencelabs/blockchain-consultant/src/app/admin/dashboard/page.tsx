@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ProminentBorder } from "@/components/ui/border-effects"
 import { HorizontalDivider } from "@/components/ui/section-divider"
 import { MinimalBackground } from "@/components/ui/minimal-background"
+import { Logo } from "@/components/ui/logo"
 import dynamic from "next/dynamic"
 
 // Lazy load heavy components to improve initial load time
@@ -173,9 +174,7 @@ export default function AdminDashboardPage() {
       <div className={`flex justify-between items-center mb-12 transition-all duration-1000 ${isPageLoaded ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'}`}>
         <div>
           <div className="flex items-center gap-4 mb-4">
-            <div className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
-              Diligence Labs
-            </div>
+            <Logo size="xl" href={null} />
             <div className="w-px h-8 bg-gradient-to-b from-orange-400 to-red-400"></div>
             <div className="text-lg text-gray-400">Admin Dashboard</div>
           </div>

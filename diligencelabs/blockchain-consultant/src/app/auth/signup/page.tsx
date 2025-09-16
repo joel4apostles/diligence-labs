@@ -17,6 +17,7 @@ import { FormGridLines } from "@/components/ui/grid-lines"
 import { ProminentBorder } from "@/components/ui/border-effects"
 import { PageStructureLines } from "@/components/ui/page-structure"
 import { DynamicPageBackground } from "@/components/ui/dynamic-page-background"
+import { Logo } from "@/components/ui/logo"
 import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator"
 
 const formSchema = z.object({
@@ -133,9 +134,9 @@ export default function SignUp() {
       <FloatingElements />
 
       <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-6 sm:p-8">
-        <Link href="/" className={`font-bold text-2xl transition-all duration-1000 ${isPageLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
-          Diligence Labs
-        </Link>
+        <div className={`transition-all duration-1000 ${isPageLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+          <Logo size="large" />
+        </div>
       </nav>
 
       <ProminentBorder 
@@ -145,9 +146,7 @@ export default function SignUp() {
         <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/40 backdrop-blur border-0">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-6">
-            <div className="text-2xl font-bold text-white">
-              Diligence Labs
-            </div>
+            <Logo size="xl" href={null} />
           </div>
           <CardTitle className="text-3xl font-light mb-2">
             Join Our Platform

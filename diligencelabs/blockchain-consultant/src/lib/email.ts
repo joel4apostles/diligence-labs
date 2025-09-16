@@ -1,4 +1,4 @@
-import * as nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer'
 
 interface EmailConfig {
   to: string
@@ -11,7 +11,7 @@ interface EmailConfig {
 const createTransporter = () => {
   if (process.env.NODE_ENV === 'production') {
     // For production, use SendGrid, AWS SES, or other email service
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT || '587'),
       secure: false, // true for 465, false for other ports
@@ -22,7 +22,7 @@ const createTransporter = () => {
     })
   } else {
     // For development, use Ethereal Email (test account)
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       host: 'smtp.ethereal.email',
       port: 587,
       secure: false,

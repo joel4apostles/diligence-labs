@@ -21,6 +21,7 @@ import { FormGridLines } from "@/components/ui/grid-lines"
 import { ProminentBorder } from "@/components/ui/border-effects"
 import { PageStructureLines } from "@/components/ui/page-structure"
 import { HorizontalDivider } from "@/components/ui/section-divider"
+import { Logo } from "@/components/ui/logo"
 
 const bookingSchema = z.object({
   consultationType: z.enum(["STRATEGIC_ADVISORY", "DUE_DILIGENCE", "TOKENOMICS_DESIGN", "TOKEN_LAUNCH"], {
@@ -324,11 +325,15 @@ export default function BookConsultation() {
               ← Back to Home
             </Button>
           </Link>
-          <div>
-            <h1 className="text-4xl font-light mb-2">
-              Book <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Consultation</span>
-            </h1>
-            <p className="text-gray-400 text-lg">Schedule your blockchain advisory session</p>
+          <div className="flex items-center gap-4">
+            <Logo size="large" href={null} />
+            <div className="w-px h-8 bg-gray-600"></div>
+            <div>
+              <h1 className="text-4xl font-light mb-2">
+                Book <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Consultation</span>
+              </h1>
+              <p className="text-gray-400 text-lg">Schedule your blockchain advisory session</p>
+            </div>
           </div>
         </div>
 

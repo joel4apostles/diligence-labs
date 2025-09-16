@@ -6,6 +6,7 @@ import TwitterProvider from 'next-auth/providers/twitter'
 import { prisma } from './prisma'
 import bcrypt from 'bcryptjs'
 import { sendEmail, getPasswordResetTemplate } from './email'
+import { logger } from './logger'
 import crypto from 'crypto'
 
 const providers = [
@@ -26,15 +27,14 @@ const providers = [
         }
       })
 
-      console.log('Auth attempt:', { 
-        email: credentials.email.toLowerCase(), 
-        userFound: !!user, 
+      logger.auth('login_attempt', user?.id, !!user, {
+        email: credentials.email.toLowerCase(),
         hasPassword: !!user?.password,
-        accountStatus: user?.accountStatus 
+        accountStatus: user?.accountStatus
       })
 
       if (!user || !user.password) {
-        console.log('Login failed: User not found or no password')
+        logger.auth('login_failed', undefined, false, { reason: 'user_not_found_or_no_password' })
         return null
       }
 
@@ -70,7 +70,7 @@ const providers = [
         const failedAttempts = user.failedLoginAttempts + 1
         const maxAttempts = 5
         
-        let updateData: any = {
+        const updateData: Record<string, unknown> = {
           failedLoginAttempts: failedAttempts,
           lastFailedLogin: new Date()
         }
@@ -137,29 +137,47 @@ const providers = [
 ]
 
 // Only add OAuth providers if proper credentials are configured
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_ID !== "your-google-client-id") {
+if (process.env.GOOGLE_CLIENT_ID && 
+    process.env.GOOGLE_CLIENT_ID !== "your-google-client-id" &&
+    process.env.GOOGLE_CLIENT_SECRET && 
+    process.env.GOOGLE_CLIENT_SECRET !== "your-google-client-secret" &&
+    !process.env.GOOGLE_CLIENT_ID.includes("your-") &&
+    !process.env.GOOGLE_CLIENT_ID.includes("client-id") &&
+    process.env.GOOGLE_CLIENT_ID.length > 30) {
   providers.push(GoogleProvider({
     clientId: process.env.GOOGLE_CLIENT_ID!,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
   }))
+  console.log('✅ Google OAuth provider configured')
+} else {
+  console.log('⚠️ Google OAuth provider skipped - invalid credentials')
 }
 
-if (process.env.TWITTER_CLIENT_ID && process.env.TWITTER_CLIENT_ID !== "your-twitter-client-id") {
+if (process.env.TWITTER_CLIENT_ID && 
+    process.env.TWITTER_CLIENT_ID !== "your-twitter-client-id" &&
+    process.env.TWITTER_CLIENT_SECRET && 
+    process.env.TWITTER_CLIENT_SECRET !== "your-twitter-client-secret" &&
+    !process.env.TWITTER_CLIENT_ID.includes("your-") &&
+    !process.env.TWITTER_CLIENT_ID.includes("client-id") &&
+    process.env.TWITTER_CLIENT_ID.length > 30) {
   providers.push(TwitterProvider({
     clientId: process.env.TWITTER_CLIENT_ID!,
     clientSecret: process.env.TWITTER_CLIENT_SECRET!,
     version: "2.0",
   }))
+  console.log('Twitter OAuth provider added successfully')
+} else {
+  console.log('Twitter OAuth provider skipped - placeholder or invalid credentials detected')
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: PrismaAdapter(prisma),
   providers,
   session: {
     strategy: 'jwt'
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.role = user.role
         token.walletAddress = user.walletAddress
@@ -176,7 +194,7 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
-    async signOut({ token, session }) {
+    async signOut() {
       // Ensure session is completely cleared
       console.log('NextAuth signOut callback triggered')
       return true

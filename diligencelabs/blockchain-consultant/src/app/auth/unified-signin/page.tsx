@@ -21,6 +21,7 @@ import { FormGridLines } from "@/components/ui/grid-lines"
 import { ProminentBorder } from "@/components/ui/border-effects"
 import { PageStructureLines } from "@/components/ui/page-structure"
 import { DynamicPageBackground } from "@/components/ui/dynamic-page-background"
+import { Logo } from "@/components/ui/logo"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -109,7 +110,7 @@ function UnifiedSignInContent() {
     // Check available OAuth providers
     getProviders().then(providers => {
       console.log('Available OAuth providers:', providers)
-      setAvailableProviders(providers)
+      setAvailableProviders(providers || {})
     }).catch(err => {
       console.log('Failed to fetch OAuth providers:', err)
       setAvailableProviders({})
@@ -118,14 +119,24 @@ function UnifiedSignInContent() {
 
   // Unified authentication check to prevent redirect loops
   useEffect(() => {
+    const justLoggedOut = sessionStorage.getItem('justLoggedOut')
+    
     console.log('Login page auth check:', { 
       status, 
       ready, 
       hasSession: !!session, 
       sessionUserId: session?.user?.id,
       authenticated, 
-      privyUserId: user?.id 
+      privyUserId: user?.id,
+      justLoggedOut: !!justLoggedOut
     })
+    
+    // If user just logged out, stay on login page regardless of session status
+    if (justLoggedOut) {
+      console.log('User just logged out, staying on login page and clearing flag')
+      sessionStorage.removeItem('justLoggedOut')
+      return
+    }
     
     if (status === "loading" || !ready) {
       console.log('Still loading, waiting...')
@@ -135,24 +146,14 @@ function UnifiedSignInContent() {
     // Only redirect if we have a valid session and we're not currently in a loading state
     if (status === "authenticated" && session?.user?.id) {
       console.log('Valid NextAuth session found, redirecting...', session.user.id)
-      // Clear any logout flags since we have a valid session
-      sessionStorage.removeItem('justLoggedOut')
       // Add a small delay to show the success state before redirecting
       setTimeout(() => handlePostAuthRedirect(), 1000)
     } else if (authenticated && user?.id && status !== "authenticated") {
       // Only Privy authenticated, no NextAuth session - redirect
       console.log('Privy authenticated, no NextAuth session, redirecting...', user.id)
-      sessionStorage.removeItem('justLoggedOut')
       // Add a small delay to show the success state before redirecting
       setTimeout(() => handlePostAuthRedirect(), 1000)
     } else {
-      // Check if user just logged out (prevent immediate redirect only when no valid session)
-      const justLoggedOut = sessionStorage.getItem('justLoggedOut')
-      if (justLoggedOut && status === "unauthenticated") {
-        console.log('User just logged out and has no valid session, clearing flag and staying on login page')
-        sessionStorage.removeItem('justLoggedOut')
-        return
-      }
       console.log('No valid authentication found, staying on login page')
     }
   }, [session, status, ready, authenticated, user, router, searchParams])
@@ -192,6 +193,14 @@ function UnifiedSignInContent() {
 
     try {
       console.log(`Starting ${provider} OAuth sign in...`)
+      console.log('Available providers:', availableProviders)
+      
+      // Check if provider is actually available
+      if (!availableProviders || !availableProviders[provider]) {
+        setError(`${provider} authentication is not configured. Please contact support.`)
+        setOAuthLoading(false)
+        return
+      }
       
       const redirect = searchParams?.get('redirect')
       const planId = searchParams?.get('plan')
@@ -206,10 +215,14 @@ function UnifiedSignInContent() {
         callbackUrl = '/#subscription'
       }
 
+      console.log(`Attempting to sign in with ${provider}, callback: ${callbackUrl}`)
+
       const result = await signIn(provider, { 
         callbackUrl,
         redirect: false 
       })
+      
+      console.log(`OAuth result for ${provider}:`, result)
       
       if (result?.error) {
         setError(`OAuth sign in failed: ${result.error}`)
@@ -218,10 +231,12 @@ function UnifiedSignInContent() {
         setTimeout(() => {
           window.location.href = callbackUrl
         }, 100)
+      } else {
+        setError(`${provider} authentication failed. Please try again or use email/password login.`)
       }
     } catch (error) {
       console.error("OAuth error:", error)
-      setError("OAuth sign in failed")
+      setError(`${provider} authentication failed. Please try again or use email/password login.`)
     } finally {
       setOAuthLoading(false)
     }
@@ -271,9 +286,9 @@ function UnifiedSignInContent() {
 
       {/* Navigation */}
       <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-6 sm:p-8">
-        <Link href="/" className={`font-bold text-2xl text-white transition-all duration-1000 ${isPageLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
-          Diligence Labs
-        </Link>
+        <div className={`transition-all duration-1000 ${isPageLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+          <Logo size="large" />
+        </div>
       </nav>
 
       <ProminentBorder 
@@ -283,11 +298,9 @@ function UnifiedSignInContent() {
         <Card className="bg-gradient-to-br from-gray-900/90 to-gray-800/50 backdrop-blur-xl border-0 shadow-2xl">
         <CardHeader className="space-y-1 text-center pb-6">
           <div className="flex justify-center mb-4">
-            <div className="text-3xl font-bold text-white">
-              Diligence Labs
-            </div>
+            <Logo size="xl" href={null} />
           </div>
-          <CardTitle className="text-3xl font-light mb-2">
+          <CardTitle className="text-3xl font-light mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
             Welcome Back
           </CardTitle>
           <CardDescription className="text-gray-400 text-lg">
@@ -311,13 +324,13 @@ function UnifiedSignInContent() {
             <TabsList className="grid w-full grid-cols-2 bg-gray-800/50 border border-gray-700 rounded-lg p-1 mb-6">
               <TabsTrigger 
                 value="social" 
-                className="data-[state=active]:bg-gray-700 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
               >
                 Social Login
               </TabsTrigger>
               <TabsTrigger 
                 value="traditional" 
-                className="data-[state=active]:bg-gray-700 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
               >
                 Email & Password
               </TabsTrigger>
@@ -327,14 +340,14 @@ function UnifiedSignInContent() {
               {/* Social Login Dropdown */}
               {availableProviders && Object.values(availableProviders)
                 .filter((provider: any) => provider.id !== 'credentials')
-                .length > 0 && (
+                .length > 0 ? (
                 <div className="space-y-4">
                   <div className="text-center text-sm text-gray-400 mb-4">
                     Choose your preferred social login method
                   </div>
                   
                   <Select value={selectedProvider} onValueChange={setSelectedProvider}>
-                    <SelectTrigger className="w-full h-12 bg-gray-800/50 border-gray-600 text-white hover:border-gray-500 focus:border-gray-400">
+                    <SelectTrigger className="w-full h-12 bg-gray-800/50 border-gray-600 text-white hover:border-gray-500 focus:border-blue-500 focus:ring-blue-500">
                       <SelectValue placeholder="Select a sign-in method" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-600">
@@ -360,7 +373,7 @@ function UnifiedSignInContent() {
                     <Button
                       onClick={() => handleOAuthSignIn(selectedProvider)}
                       disabled={!!oAuthLoading}
-                      className="w-full h-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 hover:border-gray-500 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+                      className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
                     >
                       {oAuthLoading === selectedProvider ? (
                         <div className="flex items-center space-x-2">
@@ -375,6 +388,17 @@ function UnifiedSignInContent() {
                       )}
                     </Button>
                   )}
+                </div>
+              ) : (
+                <div className="text-center py-8 border-2 border-dashed border-gray-600/30 bg-gray-800/20 rounded-lg">
+                  <div className="text-4xl mb-4">🔐</div>
+                  <h3 className="font-semibold mb-2 text-white">Social Login Temporarily Unavailable</h3>
+                  <p className="text-sm text-gray-400 mb-4">
+                    Social login providers are being configured. Please use email/password or Web3 wallet login.
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    For developers: Configure OAuth credentials in your .env file
+                  </p>
                 </div>
               )}
 
@@ -411,7 +435,7 @@ function UnifiedSignInContent() {
                   </div>
                   <Button 
                     onClick={handlePrivyLogin}
-                    className="w-full h-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 hover:border-gray-500 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
                   >
                     <div className="flex items-center space-x-3">
                       <span className="text-xl">🔗</span>
@@ -424,7 +448,7 @@ function UnifiedSignInContent() {
               {ready && authenticated && (
                 <div className="text-center py-6">
                   <div className="flex flex-col items-center space-y-3">
-                    <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center animate-pulse">
+                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center animate-pulse">
                       <span className="text-2xl">✅</span>
                     </div>
                     <div className="text-green-400 font-medium">Wallet Connected</div>
@@ -453,7 +477,7 @@ function UnifiedSignInContent() {
                           <Input
                             placeholder="Enter your email"
                             type="email"
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-gray-400 focus:ring-gray-400 h-12 transition-all duration-200 hover:border-gray-500"
+                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
                             {...field}
                           />
                         </FormControl>
@@ -471,7 +495,7 @@ function UnifiedSignInContent() {
                           <Input
                             type="password"
                             placeholder="Enter your password"
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-gray-400 focus:ring-gray-400 h-12 transition-all duration-200 hover:border-gray-500"
+                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
                             {...field}
                           />
                         </FormControl>
@@ -482,7 +506,7 @@ function UnifiedSignInContent() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full h-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 hover:border-gray-500 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
                   >
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
@@ -499,13 +523,13 @@ function UnifiedSignInContent() {
               <div className="flex items-center justify-between text-sm mt-6">
                 <Link
                   href="/auth/forgot-password"
-                  className="text-gray-400 hover:text-gray-300 transition-colors"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
                 >
                   Forgot password?
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="text-gray-400 hover:text-gray-300 transition-colors"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
                 >
                   Create account
                 </Link>

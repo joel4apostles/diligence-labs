@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
@@ -12,6 +11,7 @@ import { SectionGridLines } from "@/components/ui/grid-lines"
 import { SubtleBorder, ProminentBorder } from "@/components/ui/border-effects"
 import { PageStructureLines } from "@/components/ui/page-structure"
 import { HorizontalDivider } from "@/components/ui/section-divider"
+import { Logo } from "@/components/ui/logo"
 
 
 
@@ -39,7 +39,6 @@ const clientTypes = [
 ]
 
 export default function AboutPage() {
-  const { data: session } = useSession()
   const [isPageLoaded, setIsPageLoaded] = useState(false)
 
   useEffect(() => {
@@ -68,108 +67,36 @@ export default function AboutPage() {
             </Link>
           </nav>
 
-          <h1 className="text-5xl font-light mb-6">
-            About <span className="font-normal text-white">Diligence Labs</span>
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <Logo size="xl" href={null} />
+          </div>
+
+          <h1 className="text-5xl md:text-6xl font-light mb-6">
+            About <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Diligence Labs</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-4xl mx-auto leading-relaxed mb-8">
             Diligence Labs stands at the forefront of blockchain consulting, bridging the gap between complex Web3 technologies and practical business solutions. Founded with the vision of democratizing access to expert blockchain guidance, we specialize in transforming innovative ideas into sustainable, scalable blockchain ventures.
           </p>
-          <p className="text-lg text-gray-500 max-w-4xl mx-auto leading-relaxed">
-            Our comprehensive approach combines deep technical expertise with strategic business acumen, ensuring that every project we touch is positioned for long-term success in the rapidly evolving blockchain ecosystem. From early-stage startups to established enterprises, we provide the critical insights and guidance needed to navigate the complexities of Web3 development, token launch consultation, and market positioning.
-          </p>
-        </div>
-
-        <HorizontalDivider style="subtle" />
-
-        {/* Company Mission & Vision */}
-        <div className={`mb-20 transition-all duration-1000 delay-300 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-light mb-4">
-              <span className="font-normal bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Our Mission</span>
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            <SubtleBorder className="rounded-xl overflow-hidden" animated={true} movingBorder={true}>
-              <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-blue-500/20 h-full rounded-xl">
-                {/* Dynamic background gradient */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20" />
-                
-                {/* Enhanced Hover Effects */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 transform -rotate-12 scale-110" />
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                
-                <Card className="bg-transparent border-0 h-full relative z-10">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-white flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                        🎯
-                      </div>
-                      Vision & Purpose
-                    </CardTitle>
-                  </CardHeader>
-                <CardContent className="space-y-4 text-gray-300 leading-relaxed">
-                  <p>
-                    At Diligence Labs, we envision a world where blockchain technology is accessible, understandable, and strategically implemented to drive real business value. Our purpose is to demystify the complexities of Web3 and provide actionable insights that transform innovative concepts into market-ready solutions.
-                  </p>
-                  <p>
-                    We believe that the future of business lies at the intersection of traditional expertise and emerging blockchain technologies. Our role is to be that bridge, ensuring that every project we support is built on solid foundations and positioned for sustainable growth.
-                  </p>
-                </CardContent>
-                </Card>
-              </div>
-            </SubtleBorder>
-
-            <SubtleBorder className="rounded-xl overflow-hidden" animated={true} movingBorder={true}>
-              <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-purple-500/20 h-full rounded-xl">
-                {/* Dynamic background gradient */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20" />
-                
-                {/* Enhanced Hover Effects */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 transform -rotate-12 scale-110" />
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                
-                <Card className="bg-transparent border-0 h-full relative z-10">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-white flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                        🌟
-                      </div>
-                      Core Values
-                    </CardTitle>
-                  </CardHeader>
-                <CardContent className="space-y-4 text-gray-300 leading-relaxed">
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <div>
-                        <span className="text-blue-400 font-medium">Integrity:</span> Providing honest, unbiased analysis and recommendations
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <div>
-                        <span className="text-purple-400 font-medium">Excellence:</span> Maintaining the highest standards in research and advisory services
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <div>
-                        <span className="text-cyan-400 font-medium">Innovation:</span> Staying at the forefront of blockchain technology and market trends
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                </Card>
-              </div>
-            </SubtleBorder>
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="text-center p-4 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-xl border border-blue-500/10">
+              <div className="text-2xl font-bold text-blue-400 mb-2">5+</div>
+              <div className="text-sm text-gray-400">Years Experience</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-xl border border-purple-500/10">
+              <div className="text-2xl font-bold text-purple-400 mb-2">3+</div>
+              <div className="text-sm text-gray-400">Active Projects</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-r from-green-500/5 to-emerald-500/5 rounded-xl border border-green-500/10">
+              <div className="text-2xl font-bold text-green-400 mb-2">100%</div>
+              <div className="text-sm text-gray-400">Success Rate</div>
+            </div>
           </div>
         </div>
 
         <HorizontalDivider style="subtle" />
 
         {/* Client Types */}
-        <div className={`mb-20 transition-all duration-1000 delay-400 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className={`mb-20 transition-all duration-1000 delay-300 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="text-center mb-12">
             <h2 className="text-3xl font-light mb-4">
               <span className="font-normal bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent">Who We Serve</span>
@@ -227,7 +154,7 @@ export default function AboutPage() {
         <HorizontalDivider style="subtle" />
 
         {/* Professional Background Section */}
-        <div className={`mb-20 transition-all duration-1000 delay-500 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className={`mb-20 transition-all duration-1000 delay-400 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <ProminentBorder className="rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10" animated={true} movingBorder={true}>
             <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-blue-500/20 rounded-3xl">
               {/* Dynamic background gradient */}
@@ -308,7 +235,7 @@ export default function AboutPage() {
         <HorizontalDivider style="subtle" />
 
         {/* CTA Section */}
-        <div className={`text-center transition-all duration-1000 delay-600 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className={`text-center transition-all duration-1000 delay-500 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="text-center">
             <p className="text-gray-400 mb-8 text-lg">Ready to elevate your blockchain project?</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
