@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  
+  // Skip static generation for API routes that require database
+  ...(process.env.DATABASE_URL ? {} : {
+    experimental: {
+      skipTrailingSlashRedirect: true,
+    }
+  }),
   // Enable compression for better performance
   compress: true,
   
