@@ -1,0 +1,252 @@
+name: 🚀 Release Management
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      skip_tests:
+        description: 'Skip tests (emergency release)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+  DATABASE_URL: 'postgresql://dummy:dummy@dummy:5432/dummy'
+
+jobs:
+  # Version Management Job
+  version-bump:
+    name: 📦 Version Bump
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    outputs:
+      new_version: ${{ steps.version.outputs.version }}
+    
+    steps:
+      - name: 🔧 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🏷️ Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 📈 Bump Version
+        id: version
+        run: |
+          NEW_VERSION=$(npm run version ${{ inputs.version_type }} 2>&1 | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+' | head -1 | sed 's/v//')
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "🎉 Version bumped to $NEW_VERSION"
+
+      - name: 💾 Commit Version Changes
+        run: |
+          git add .
+          git commit -m "🔖 Bump version to v${{ steps.version.outputs.version }}"
+          git push origin main
+          git push --tags
+
+  # Build and Test Job
+  build-and-test:
+    name: 🏗️ Build & Test
+    runs-on: ubuntu-latest
+    needs: [version-bump]
+    if: always() && !failure() && !inputs.skip_tests
+    
+    steps:
+      - name: 🔧 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🧪 Run Linting
+        run: npm run lint
+
+      - name: 🏗️ Test Build
+        run: npm run build
+
+      - name: 🧪 Run Tests (if available)
+        run: |
+          if [ -d "__tests__" ] || [ -d "test" ] || [ -f "jest.config.js" ]; then
+            npm test
+          else
+            echo "⚠️ No tests found, skipping test step"
+          fi
+        continue-on-error: false
+
+  # Release Job
+  release:
+    name: 🎊 Create Release
+    runs-on: ubuntu-latest
+    needs: [version-bump, build-and-test]
+    if: always() && !failure()
+    
+    steps:
+      - name: 🔧 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 📝 Generate Changelog
+        run: npm run changelog
+
+      - name: 🎉 Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ needs.version-bump.outputs.new_version }}"
+          if [ -z "$VERSION" ]; then
+            # Get current version if not from version bump
+            VERSION=$(node -p "require('./package.json').version")
+          fi
+          
+          # Generate release notes
+          node scripts/release-manager.js --skip-deploy --skip-checks
+        
+      - name: 📊 Create Deployment Record
+        run: |
+          VERSION="${{ needs.version-bump.outputs.new_version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION=$(node -p "require('./package.json').version")
+          fi
+          echo "🚀 Created release for version v$VERSION"
+
+  # Auto-release on tag push
+  auto-release:
+    name: 🏷️ Auto Release from Tag
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: 🔧 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🏗️ Build Application
+        run: npm run build
+
+      - name: 📝 Generate Release Notes
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG_NAME#v}
+          echo "Creating release for version: $VERSION"
+          
+          # Generate changelog for this version
+          npm run changelog
+
+      - name: 🎊 Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG_NAME#v}
+          
+          # Use release manager to create GitHub release
+          node scripts/release-manager.js --skip-deploy --skip-checks
+
+  # Health check job
+  health-check:
+    name: 🏥 Post-Release Health Check
+    runs-on: ubuntu-latest
+    needs: [release, auto-release]
+    if: always() && !failure()
+    
+    steps:
+      - name: 🔧 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🏥 Run Health Checks
+        run: |
+          echo "🏥 Running post-release health checks..."
+          
+          # Check if build still works
+          npm run build
+          
+          # Verify package.json version
+          VERSION=$(node -p "require('./package.json').version")
+          echo "✅ Current version: $VERSION"
+          
+          # Check if scripts are executable
+          if [ -x "scripts/version-manager.js" ] && [ -x "scripts/release-manager.js" ]; then
+            echo "✅ Scripts are executable"
+          else
+            echo "⚠️ Making scripts executable"
+            chmod +x scripts/*.js
+          fi
+          
+          echo "🎉 Health checks completed successfully!"
+
+      - name: 📊 Display Release Summary
+        run: |
+          echo "## 🎊 Release Summary"
+          echo "- Version: $(node -p "require('./package.json').version")"
+          echo "- Commit: $(git rev-parse --short HEAD)"
+          echo "- Branch: $(git rev-parse --abbrev-ref HEAD)"
+          echo "- Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          
+          if [ -f "deployments.log" ]; then
+            echo "- Last deployment recorded in deployments.log"
+          fi

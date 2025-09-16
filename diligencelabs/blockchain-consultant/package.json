@@ -1,6 +1,6 @@
 {
   "name": "diligence-labs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -8,7 +8,14 @@
     "build:vercel": "DATABASE_URL='postgresql://dummy:dummy@dummy:5432/dummy' prisma generate --no-engine && next build --no-lint",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "version": "node scripts/version-manager.js",
+    "version:patch": "npm run version patch",
+    "version:minor": "npm run version minor",
+    "version:major": "npm run version major",
+    "release": "node scripts/release-manager.js",
+    "changelog": "node scripts/generate-changelog.js",
+    "prerelease": "npm run build && npm run lint"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
