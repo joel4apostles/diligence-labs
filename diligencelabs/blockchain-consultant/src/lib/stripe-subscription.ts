@@ -5,11 +5,14 @@ import { getStripePriceId, getPlanPrice } from './subscription-plans'
 type SubscriptionPlan = 'BASIC_MONTHLY' | 'PROFESSIONAL_MONTHLY' | 'ENTERPRISE_MONTHLY'
 type BillingCycle = 'MONTHLY' | 'YEARLY'
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not defined')
+// Use dummy Stripe key for builds when actual STRIPE_SECRET_KEY is not available
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || 'sk_test_dummy_key_for_build_purposes_only'
+
+if (!process.env.STRIPE_SECRET_KEY && process.env.NODE_ENV !== 'development') {
+  console.warn('STRIPE_SECRET_KEY is not defined - using dummy key for build. Stripe functionality will not work until proper key is configured.')
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2024-06-20',
 })
 
