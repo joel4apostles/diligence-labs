@@ -1,3 +1,20 @@
+# 🔗 Diligence Labs - Blockchain Consultant & Advisory Platform
+
+A modern, secure blockchain consulting platform built with Next.js, featuring wallet integration, payment processing, and comprehensive admin capabilities.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjoel4apostles%2Fdiligence-labs&project-name=diligence-labs-blockchain-consultant&repository-name=diligence-labs-blockchain-consultant&root-directory=diligencelabs%2Fblockchain-consultant&env=NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,DATABASE_URL&envDescription=Required%20environment%20variables&envLink=https%3A%2F%2Fgithub.com%2Fjoel4apostles%2Fdiligence-labs%2Fblob%2Fmain%2Fdiligencelabs%2Fblockchain-consultant%2F.env.example)
+
+## ✨ Features
+
+- 🔐 **Multi-Auth System**: Email, OAuth (Google, Twitter, GitHub), and Web3 wallet authentication
+- 💳 **Stripe Integration**: Subscription management and payment processing  
+- 🎨 **Modern UI**: Built with Tailwind CSS and shadcn/ui components
+- 🔒 **End-to-End Encryption**: Client-side field encryption for sensitive data
+- 👨‍💼 **Admin Dashboard**: Comprehensive user management and analytics
+- 🔍 **Fraud Prevention**: Built-in monitoring and alert systems
+- 📱 **Mobile Responsive**: Optimized for all device sizes
+- 🚀 **Version Control**: Automated semantic versioning and release management
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

@@ -1,0 +1,24 @@
+{
+  "name": "diligence-labs-blockchain-consultant",
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "postgresql://dummy:dummy@dummy:5432/dummy"
+  },
+  "build": {
+    "env": {
+      "DATABASE_URL": "postgresql://dummy:dummy@dummy:5432/dummy"
+    }
+  }
+}
