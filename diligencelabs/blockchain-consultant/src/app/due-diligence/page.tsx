@@ -342,17 +342,17 @@ export default function DueDiligencePage() {
                         <Shield className="w-8 h-8 text-white" />
                       </div>
                       <CardTitle className="text-2xl text-white mb-2">Join as Expert</CardTitle>
-                      <p className="text-gray-400">Become a verified expert and earn rewards for quality evaluations</p>
+                      <p className="text-gray-400">Apply to become an expert evaluator - selection based on proven blockchain experience</p>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
                         <div className="flex items-center space-x-3 text-gray-300">
                           <CheckCircle className="w-5 h-5 text-green-400" />
-                          <span>Stake tokens to participate</span>
+                          <span>Selection based on verified experience</span>
                         </div>
                         <div className="flex items-center space-x-3 text-gray-300">
                           <CheckCircle className="w-5 h-5 text-green-400" />
-                          <span>Earn rewards for accurate evaluations</span>
+                          <span>Earn rewards for honest evaluations</span>
                         </div>
                         <div className="flex items-center space-x-3 text-gray-300">
                           <CheckCircle className="w-5 h-5 text-green-400" />
@@ -360,7 +360,7 @@ export default function DueDiligencePage() {
                         </div>
                         <div className="flex items-center space-x-3 text-gray-300">
                           <CheckCircle className="w-5 h-5 text-green-400" />
-                          <span>Participate in DAO governance</span>
+                          <span>Future DAO governance participation</span>
                         </div>
                       </div>
                       <div className="space-y-2 pt-4">
@@ -369,7 +369,7 @@ export default function DueDiligencePage() {
                           onClick={() => handleAuth('signup', 'expert')}
                         >
                           <UserPlus className="mr-2 w-4 h-4" />
-                          Sign Up as Expert
+                          Apply as Expert
                         </Button>
                         <Button 
                           variant="outline"
