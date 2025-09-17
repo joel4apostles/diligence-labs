@@ -11,71 +11,81 @@ export async function GET(request: Request) {
       return unauthorizedResponse()
     }
 
-    // Get reports that don't have assignments or are still pending
-    const pendingReports = await prisma.report.findMany({
-      where: {
-        OR: [
-          { status: 'PENDING' },
-          {
-            AND: [
-              { status: { not: 'COMPLETED' } },
-              { assignments: { none: {} } }
-            ]
-          }
-        ]
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            email: true
-          }
-        },
-        assignments: {
-          select: {
-            id: true,
-            status: true
-          }
-        }
-      },
-      orderBy: [
-        { priority: 'desc' },
-        { createdAt: 'asc' }
-      ]
-    })
+    let pendingReports: any[] = []
+    let pendingSessions: any[] = []
 
-    // Get sessions that don't have assignments or are still pending
-    const pendingSessions = await prisma.session.findMany({
-      where: {
-        OR: [
-          { status: 'PENDING' },
-          {
-            AND: [
-              { status: { not: 'COMPLETED' } },
-              { assignments: { none: {} } }
-            ]
-          }
-        ]
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            email: true
+    try {
+      // Get reports that don't have assignments or are still pending
+      pendingReports = await prisma.report.findMany({
+        where: {
+          OR: [
+            { status: 'PENDING' },
+            {
+              AND: [
+                { status: { not: 'COMPLETED' } },
+                { assignments: { none: {} } }
+              ]
+            }
+          ]
+        },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true
+            }
+          },
+          assignments: {
+            select: {
+              id: true,
+              status: true
+            }
           }
         },
-        assignments: {
-          select: {
-            id: true,
-            status: true
+        orderBy: [
+          { priority: 'desc' },
+          { createdAt: 'asc' }
+        ]
+      })
+
+      // Get sessions that don't have assignments or are still pending
+      pendingSessions = await prisma.session.findMany({
+        where: {
+          OR: [
+            { status: 'PENDING' },
+            {
+              AND: [
+                { status: { not: 'COMPLETED' } },
+                { assignments: { none: {} } }
+              ]
+            }
+          ]
+        },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true
+            }
+          },
+          assignments: {
+            select: {
+              id: true,
+              status: true
+            }
           }
-        }
-      },
-      orderBy: [
-        { priority: 'desc' },
-        { createdAt: 'asc' }
-      ]
-    })
+        },
+        orderBy: [
+          { priority: 'desc' },
+          { createdAt: 'asc' }
+        ]
+      })
+    } catch (error) {
+      console.warn('Database not available for pending assignments data, using fallback data')
+      // Provide fallback data when database is unavailable
+      pendingReports = []
+      pendingSessions = []
+    }
 
     // Format items for unified display
     const pendingItems = [

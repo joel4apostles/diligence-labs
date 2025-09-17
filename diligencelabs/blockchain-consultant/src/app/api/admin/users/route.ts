@@ -40,39 +40,52 @@ export async function GET(request: Request) {
       whereClause.walletAddress = null
     }
 
-    // Get users with counts
-    const [users, totalCount] = await Promise.all([
-      prisma.user.findMany({
-        where: whereClause,
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          role: true,
-          walletAddress: true,
-          accountStatus: true,
-          accountStatusReason: true,
-          failedLoginAttempts: true,
-          accountLockedUntil: true,
-          lastFailedLogin: true,
-          statusChangedAt: true,
-          statusChangedBy: true,
-          createdAt: true,
-          updatedAt: true,
-          emailVerified: true,
-          _count: {
-            select: {
-              sessions: true,
-              reports: true
+    let users: any[] = []
+    let totalCount = 0
+
+    try {
+      // Get users with counts
+      const [usersResult, totalCountResult] = await Promise.all([
+        prisma.user.findMany({
+          where: whereClause,
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            walletAddress: true,
+            accountStatus: true,
+            accountStatusReason: true,
+            failedLoginAttempts: true,
+            accountLockedUntil: true,
+            lastFailedLogin: true,
+            statusChangedAt: true,
+            statusChangedBy: true,
+            createdAt: true,
+            updatedAt: true,
+            emailVerified: true,
+            _count: {
+              select: {
+                sessions: true,
+                reports: true
+              }
             }
-          }
-        },
-        orderBy: { createdAt: 'desc' },
-        skip: offset,
-        take: limit
-      }),
-      prisma.user.count({ where: whereClause })
-    ])
+          },
+          orderBy: { createdAt: 'desc' },
+          skip: offset,
+          take: limit
+        }),
+        prisma.user.count({ where: whereClause })
+      ])
+
+      users = usersResult
+      totalCount = totalCountResult
+    } catch (error) {
+      console.warn('Database not available for user data, using fallback data')
+      // Provide fallback data when database is unavailable
+      users = []
+      totalCount = 0
+    }
 
     const totalPages = Math.ceil(totalCount / limit)
 

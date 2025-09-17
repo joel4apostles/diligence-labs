@@ -6,9 +6,9 @@
 5 silly config load:file:/usr/local/etc/npmrc
 6 verbose title npm config get prefix
 7 verbose argv "--global" "config" "get" "prefix"
-8 verbose logfile logs-max:10 dir:/Users/joel/vibe-code/diligencelabs/blockchain-consultant/.npm-cache/_logs/2025-09-17T00_00_42_080Z-
-9 verbose logfile /Users/joel/vibe-code/diligencelabs/blockchain-consultant/.npm-cache/_logs/2025-09-17T00_00_42_080Z-debug-0.log
-10 verbose cwd /Users/joel/vibe-code
+8 verbose logfile logs-max:10 dir:/Users/joel/vibe-code/diligencelabs/blockchain-consultant/.npm-cache/_logs/2025-09-17T00_15_57_762Z-
+9 verbose logfile /Users/joel/vibe-code/diligencelabs/blockchain-consultant/.npm-cache/_logs/2025-09-17T00_15_57_762Z-debug-0.log
+10 verbose cwd /Users/joel/vibe-code/diligencelabs/blockchain-consultant
 11 verbose os Darwin 24.6.0
 12 verbose node v22.18.0
 13 verbose npm  v10.9.3

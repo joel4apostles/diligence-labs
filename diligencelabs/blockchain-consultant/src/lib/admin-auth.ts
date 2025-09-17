@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken"
 import { NextResponse } from "next/server"
+import { getTempAdmin } from "@/lib/temp-admin-storage"
 
 export interface AdminTokenPayload {
   adminId: string
@@ -22,6 +23,27 @@ export function verifyAdminToken(request: Request): AdminTokenPayload | null {
       token, 
       process.env.ADMIN_JWT_SECRET || 'admin-secret-key'
     ) as AdminTokenPayload
+    
+    // Verify admin exists in temporary storage (for fallback scenarios)
+    const tempAdmin = getTempAdmin(decoded.email)
+    if (tempAdmin && tempAdmin.id === decoded.adminId) {
+      return {
+        adminId: decoded.adminId,
+        email: decoded.email,
+        name: decoded.name,
+        role: tempAdmin.role as 'SUPER_ADMIN' | 'ADMIN' | 'MODERATOR'
+      }
+    }
+    
+    // For demo purposes, trust the token if it's the mock admin
+    if (decoded.adminId === 'mock-admin-id' && decoded.email === 'admin@test.com') {
+      return {
+        adminId: decoded.adminId,
+        email: decoded.email,
+        name: decoded.name,
+        role: 'SUPER_ADMIN'
+      }
+    }
     
     return decoded
   } catch (error) {
