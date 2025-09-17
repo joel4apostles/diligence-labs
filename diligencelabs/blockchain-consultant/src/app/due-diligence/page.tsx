@@ -223,7 +223,6 @@ export default function DueDiligencePage() {
             <TabButton id="overview" label="How It Works" active={activeTab === 'overview'} onClick={setActiveTab} />
             <TabButton id="evaluation" label="Evaluation Criteria" active={activeTab === 'evaluation'} onClick={setActiveTab} />
             <TabButton id="experts" label="Expert Tiers" active={activeTab === 'experts'} onClick={setActiveTab} />
-            <TabButton id="submit" label="Submit Project" active={activeTab === 'submit'} onClick={setActiveTab} />
             <TabButton id="auth" label="Join Platform" active={activeTab === 'auth'} onClick={setActiveTab} />
           </div>
 
@@ -330,71 +329,6 @@ export default function DueDiligencePage() {
             </div>
           )}
 
-          {/* Submit Project Tab */}
-          {activeTab === 'submit' && (
-            <div className="max-w-2xl mx-auto">
-              <Card className="bg-gray-900/50 border-gray-800">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-white text-center">Submit Your Project</CardTitle>
-                  <p className="text-gray-400 text-center">Get comprehensive due diligence from verified experts</p>
-                </CardHeader>
-                <CardContent className="p-8">
-                  <form className="space-y-6">
-                    <div>
-                      <label className="block text-white font-medium mb-2">Project Name</label>
-                      <Input 
-                        placeholder="Enter your project name" 
-                        className="bg-gray-800/50 border-gray-700 text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-white font-medium mb-2">Project Description</label>
-                      <Textarea 
-                        placeholder="Describe your project, its mission, and key objectives"
-                        className="bg-gray-800/50 border-gray-700 text-white min-h-[120px]"
-                      />
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-white font-medium mb-2">Website URL</label>
-                        <Input 
-                          placeholder="https://yourproject.com" 
-                          className="bg-gray-800/50 border-gray-700 text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-white font-medium mb-2">Twitter Handle</label>
-                        <Input 
-                          placeholder="@yourproject" 
-                          className="bg-gray-800/50 border-gray-700 text-white"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-white font-medium mb-2">Founding Team</label>
-                      <Textarea 
-                        placeholder="List key team members and their roles"
-                        className="bg-gray-800/50 border-gray-700 text-white min-h-[100px]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-white font-medium mb-2">Current Status & Traction</label>
-                      <Textarea 
-                        placeholder="Describe current development status, user metrics, partnerships"
-                        className="bg-gray-800/50 border-gray-700 text-white min-h-[100px]"
-                      />
-                    </div>
-                    <Button 
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3"
-                    >
-                      Submit for Evaluation
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
-          )}
 
           {/* Authentication Tab */}
           {activeTab === 'auth' && (
@@ -475,6 +409,10 @@ export default function DueDiligencePage() {
                         <div className="flex items-center space-x-3 text-gray-300">
                           <CheckCircle className="w-5 h-5 text-green-400" />
                           <span>Transparent and unbiased evaluation</span>
+                        </div>
+                        <div className="flex items-center space-x-3 text-gray-300">
+                          <CheckCircle className="w-5 h-5 text-green-400" />
+                          <span>Access to project submission dashboard</span>
                         </div>
                       </div>
                       <div className="space-y-2 pt-4">
