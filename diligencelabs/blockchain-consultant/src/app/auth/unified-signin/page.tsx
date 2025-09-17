@@ -256,6 +256,8 @@ function UnifiedSignInContent() {
         return '🐦'
       case 'github':
         return '👨‍💻'
+      case 'web3-wallet':
+        return '🔗'
       default:
         return '🔑'
     }
@@ -366,12 +368,24 @@ function UnifiedSignInContent() {
                           </SelectItem>
                         ))
                       }
+                      {ready && (
+                        <SelectItem 
+                          key="web3-wallet" 
+                          value="web3-wallet"
+                          className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <span className="text-lg">🔗</span>
+                            <span>Connect Web3 Wallet</span>
+                          </div>
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                   
                   {selectedProvider && (
                     <Button
-                      onClick={() => handleOAuthSignIn(selectedProvider)}
+                      onClick={() => selectedProvider === 'web3-wallet' ? handlePrivyLogin() : handleOAuthSignIn(selectedProvider)}
                       disabled={!!oAuthLoading}
                       className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
                     >
@@ -383,7 +397,9 @@ function UnifiedSignInContent() {
                       ) : (
                         <div className="flex items-center space-x-3">
                           <span className="text-xl">{getProviderIcon(selectedProvider)}</span>
-                          <span className="font-medium">Sign in with {getProviderName(selectedProvider)}</span>
+                          <span className="font-medium">
+                            {selectedProvider === 'web3-wallet' ? 'Connect Web3 Wallet' : `Sign in with ${getProviderName(selectedProvider)}`}
+                          </span>
                         </div>
                       )}
                     </Button>
@@ -402,50 +418,7 @@ function UnifiedSignInContent() {
                 </div>
               )}
 
-              {/* Web3 Wallet Sign-In */}
-              {!ready && (
-                <div className="flex items-center justify-center py-6">
-                  <div className="flex flex-col items-center space-y-3">
-                    <div className="flex space-x-1">
-                      <div className="h-2 w-2 bg-blue-400 rounded-full animate-bounce"></div>
-                      <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="h-2 w-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                    </div>
-                    <span className="text-sm text-gray-400">Initializing Web3...</span>
-                  </div>
-                </div>
-              )}
-
-              {ready && !authenticated && (
-                <div className="space-y-4">
-                  {/* Divider if OAuth providers exist */}
-                  {availableProviders && Object.values(availableProviders).filter((provider: any) => provider.id !== 'credentials').length > 0 && (
-                    <div className="relative my-6">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-gray-700" />
-                      </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-gray-900 px-3 text-gray-500">or</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="text-center text-sm text-gray-400 mb-4">
-                    Connect your Web3 wallet
-                  </div>
-                  <Button 
-                    onClick={handlePrivyLogin}
-                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <span className="text-xl">🔗</span>
-                      <span className="font-medium">Connect Web3 Wallet</span>
-                    </div>
-                  </Button>
-                </div>
-              )}
-
-              {ready && authenticated && (
+              {ready && authenticated && selectedProvider === 'web3-wallet' && (
                 <div className="text-center py-6">
                   <div className="flex flex-col items-center space-y-3">
                     <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center animate-pulse">

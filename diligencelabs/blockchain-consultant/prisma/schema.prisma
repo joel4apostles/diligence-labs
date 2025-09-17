@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -90,12 +90,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -195,7 +195,6 @@ model TeamMember {
   userId         String           @unique
   position       String
   department     Department
-  specializations Specialization[]
   hourlyRate     Float?
   isActive       Boolean          @default(true)
   maxHoursPerWeek Int             @default(40)
@@ -207,6 +206,7 @@ model TeamMember {
   
   // Relations
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specializations TeamMemberSpecialization[]
   
   // Performance indexes
   @@index([userId])
@@ -215,6 +215,24 @@ model TeamMember {
   @@index([isActive, department])
   
   @@map("team_members")
+}
+
+model TeamMemberSpecialization {
+  id             String         @id @default(cuid())
+  teamMemberId   String
+  specialization Specialization
+  
+  // Timestamps
+  createdAt      DateTime       @default(now())
+  
+  // Relations
+  teamMember     TeamMember     @relation(fields: [teamMemberId], references: [id], onDelete: Cascade)
+  
+  @@unique([teamMemberId, specialization])
+  @@index([teamMemberId])
+  @@index([specialization])
+  
+  @@map("team_member_specializations")
 }
 
 model ReportAssignment {
@@ -475,7 +493,7 @@ model AdminNotificationLog {
   adminId          String
   notificationType String    // 'subscription_status', 'malicious_activity', 'subscription_expiration'
   emailSent        Boolean   @default(false)
-  details          String?   @db.Text // JSON string with notification details
+  details          String? // JSON string with notification details
   
   // Timestamps
   createdAt        DateTime  @default(now())

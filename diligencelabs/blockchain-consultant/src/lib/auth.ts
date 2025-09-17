@@ -6,7 +6,7 @@ import TwitterProvider from 'next-auth/providers/twitter'
 import { prisma } from './prisma'
 import bcrypt from 'bcryptjs'
 import { sendEmail, getPasswordResetTemplate } from './email'
-import { logger } from './logger'
+import { logger, log } from './logger'
 import crypto from 'crypto'
 
 const providers = [
@@ -27,14 +27,14 @@ const providers = [
         }
       })
 
-      logger.auth('login_attempt', user?.id, !!user, {
+      log.auth('login_attempt', user?.id, !!user, {
         email: credentials.email.toLowerCase(),
         hasPassword: !!user?.password,
         accountStatus: user?.accountStatus
       })
 
       if (!user || !user.password) {
-        logger.auth('login_failed', undefined, false, { reason: 'user_not_found_or_no_password' })
+        log.auth('login_failed', undefined, false, { reason: 'user_not_found_or_no_password' })
         return null
       }
 
