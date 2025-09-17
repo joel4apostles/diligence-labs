@@ -270,6 +270,9 @@ export default function Home() {
           <Link href="#subscription" className="hidden md:block text-gray-300 hover:text-white transition-colors text-sm lg:text-base">
             Pricing
           </Link>
+          <Link href="/due-diligence" className="hidden md:block text-gray-300 hover:text-white transition-colors text-sm lg:text-base">
+            Due Diligence
+          </Link>
           <Link href="/about" className="hidden md:block text-gray-300 hover:text-white transition-colors text-sm lg:text-base">
             About
           </Link>
@@ -309,6 +312,13 @@ export default function Home() {
                 onClick={() => setShowMobileMenu(false)}
               >
                 Pricing
+              </Link>
+              <Link 
+                href="/due-diligence" 
+                className="text-gray-300 hover:text-white transition-colors py-2"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Due Diligence
               </Link>
               <Link 
                 href="/about" 
