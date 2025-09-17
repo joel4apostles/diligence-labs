@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import dynamic from "next/dynamic"
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,6 +28,27 @@ import {
   UserPlus,
   LogIn
 } from 'lucide-react'
+
+// Dynamically import background components for consistency with main site
+const FloatingElements = dynamic(() => import("@/components/ui/animated-background").then(mod => ({ default: mod.FloatingElements })), {
+  ssr: false,
+  loading: () => null
+})
+
+const ParallaxBackground = dynamic(() => import("@/components/ui/parallax-background").then(mod => ({ default: mod.ParallaxBackground })), {
+  ssr: false,
+  loading: () => null
+})
+
+const HeroGridLines = dynamic(() => import("@/components/ui/grid-lines").then(mod => ({ default: mod.HeroGridLines })), {
+  ssr: false,
+  loading: () => null
+})
+
+const DynamicPageBackground = dynamic(() => import("@/components/ui/dynamic-page-background").then(mod => ({ default: mod.DynamicPageBackground })), {
+  ssr: false,
+  loading: () => null
+})
 
 export default function DueDiligencePage() {
   const [activeTab, setActiveTab] = useState('overview')
@@ -133,10 +155,20 @@ export default function DueDiligencePage() {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Dynamic Page Background with Enhanced Effects */}
+      <DynamicPageBackground variant="default" opacity={0.25} />
+      
+      {/* Sophisticated Grid Lines System */}
+      <HeroGridLines />
+      
+      {/* Parallax Background */}
+      <ParallaxBackground />
+      {/* Floating Elements */}
+      <FloatingElements />
+
       {/* Hero Section */}
-      <div className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10" />
+      <div className="relative py-20 overflow-hidden z-10">
         <div className="container mx-auto px-6 relative">
           {/* Back to Homepage Link */}
           <div className="mb-8">
@@ -184,35 +216,8 @@ export default function DueDiligencePage() {
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="py-20 bg-gradient-to-r from-blue-900/20 to-purple-900/20">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join our marketplace as a project submitter or verified expert and be part of the future of decentralized due diligence.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-4"
-              onClick={() => handleAuth('signup', 'submitter')}
-            >
-              Submit Your Project
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 px-8 py-4"
-              onClick={() => handleAuth('signup', 'expert')}
-            >
-              Apply as Expert
-            </Button>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content Tabs */}
-      <div className="py-20">
+      <div className="py-20 relative z-10">
         <div className="container mx-auto px-6">
           <div className="flex flex-wrap justify-center gap-4 mb-12">
             <TabButton id="overview" label="How It Works" active={activeTab === 'overview'} onClick={setActiveTab} />
@@ -707,7 +712,7 @@ export default function DueDiligencePage() {
       </div>
 
       {/* Platform Features */}
-      <div className="py-20 bg-black/20">
+      <div className="py-20 bg-black/40 relative z-10">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">Platform Features</h2>
