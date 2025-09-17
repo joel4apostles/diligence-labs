@@ -11,38 +11,56 @@ export async function GET(request: Request) {
       return unauthorizedResponse()
     }
 
-    // Get wallet statistics
-    const [totalUsers, usersWithWallets, usersWithoutWallets] = await Promise.all([
-      prisma.user.count(),
-      prisma.user.count({
+    let totalUsers = 0
+    let usersWithWallets = 0
+    let usersWithoutWallets = 0
+    let recentWalletConnections: any[] = []
+
+    try {
+      // Get wallet statistics
+      const results = await Promise.all([
+        prisma.user.count(),
+        prisma.user.count({
+          where: {
+            walletAddress: { not: null }
+          }
+        }),
+        prisma.user.count({
+          where: {
+            walletAddress: null
+          }
+        })
+      ])
+
+      totalUsers = results[0]
+      usersWithWallets = results[1]
+      usersWithoutWallets = results[2]
+
+      // Get recent wallet connections (users who have wallets, ordered by updatedAt)
+      recentWalletConnections = await prisma.user.findMany({
         where: {
           walletAddress: { not: null }
-        }
-      }),
-      prisma.user.count({
-        where: {
-          walletAddress: null
-        }
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          walletAddress: true,
+          updatedAt: true
+        },
+        orderBy: {
+          updatedAt: 'desc'
+        },
+        take: 10
       })
-    ])
-
-    // Get recent wallet connections (users who have wallets, ordered by updatedAt)
-    const recentWalletConnections = await prisma.user.findMany({
-      where: {
-        walletAddress: { not: null }
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        walletAddress: true,
-        updatedAt: true
-      },
-      orderBy: {
-        updatedAt: 'desc'
-      },
-      take: 10
-    })
+    } catch (error) {
+      console.warn('Database not available for wallet stats, using fallback data')
+      // Provide fallback data when database is unavailable
+      totalUsers = 0
+      usersWithWallets = 0
+      usersWithoutWallets = 0
+      recentWalletConnections = []
+    }
 
     const walletConnectionRate = totalUsers > 0 ? (usersWithWallets / totalUsers) * 100 : 0
 
@@ -51,13 +69,13 @@ export async function GET(request: Request) {
       usersWithWallets,
       usersWithoutWallets,
       walletConnectionRate,
-      recentWalletConnections: recentWalletConnections.map(user => ({
+      recentWalletConnections: recentWalletConnections.length > 0 ? recentWalletConnections.map(user => ({
         userId: user.id,
         email: user.email,
         name: user.name,
-        walletAddress: user.walletAddress!,
-        connectedAt: user.updatedAt.toISOString()
-      }))
+        walletAddress: user.walletAddress || '',
+        connectedAt: user.updatedAt ? user.updatedAt.toISOString() : new Date().toISOString()
+      })) : []
     })
 
   } catch (error) {

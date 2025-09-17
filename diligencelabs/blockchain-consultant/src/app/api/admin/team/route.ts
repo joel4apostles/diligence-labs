@@ -31,58 +31,78 @@ export async function GET(request: Request) {
       whereClause.department = department
     }
 
-    // Get team members with user details
-    const teamMembers = await prisma.teamMember.findMany({
-      where: whereClause,
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            role: true
+    let teamMembers: any[] = []
+    let stats = {
+      totalMembers: 0,
+      activeMembers: 0,
+      averageWorkload: 0,
+      departments: {}
+    }
+
+    try {
+      // Get team members with user details
+      teamMembers = await prisma.teamMember.findMany({
+        where: whereClause,
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              role: true
+            }
           }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    })
-
-    // Get team statistics
-    const [
-      totalMembers,
-      activeMembers,
-      departmentStats
-    ] = await Promise.all([
-      prisma.teamMember.count(),
-      prisma.teamMember.count({ where: { isActive: true } }),
-      prisma.teamMember.groupBy({
-        by: ['department'],
-        _count: { department: true }
+        },
+        orderBy: { createdAt: 'desc' }
       })
-    ])
 
-    // Calculate average workload
-    const workloadData = await prisma.teamMember.findMany({
-      select: { currentWorkload: true, maxHoursPerWeek: true },
-      where: { isActive: true }
-    })
+      // Get team statistics
+      const [
+        totalMembers,
+        activeMembers,
+        departmentStats
+      ] = await Promise.all([
+        prisma.teamMember.count(),
+        prisma.teamMember.count({ where: { isActive: true } }),
+        prisma.teamMember.groupBy({
+          by: ['department'],
+          _count: { department: true }
+        })
+      ])
 
-    const averageWorkload = workloadData.length > 0 
-      ? Math.round(workloadData.reduce((acc, member) => 
-          acc + (member.currentWorkload / member.maxHoursPerWeek) * 100, 0) / workloadData.length)
-      : 0
+      // Calculate average workload
+      const workloadData = await prisma.teamMember.findMany({
+        select: { currentWorkload: true, maxHoursPerWeek: true },
+        where: { isActive: true }
+      })
 
-    // Format department statistics
-    const departments = departmentStats.reduce((acc, stat) => {
-      acc[stat.department] = stat._count.department
-      return acc
-    }, {} as Record<string, number>)
+      const averageWorkload = workloadData.length > 0 
+        ? Math.round(workloadData.reduce((acc, member) => 
+            acc + (member.currentWorkload / member.maxHoursPerWeek) * 100, 0) / workloadData.length)
+        : 0
 
-    const stats = {
-      totalMembers,
-      activeMembers,
-      averageWorkload,
-      departments
+      // Format department statistics
+      const departments = departmentStats.reduce((acc, stat) => {
+        acc[stat.department] = stat._count.department
+        return acc
+      }, {} as Record<string, number>)
+
+      stats = {
+        totalMembers,
+        activeMembers,
+        averageWorkload,
+        departments
+      }
+    } catch (error) {
+      console.warn('Database not available for team data, using fallback data')
+      // Provide fallback data when database is unavailable
+      teamMembers = []
+      stats = {
+        totalMembers: 0,
+        activeMembers: 0,
+        averageWorkload: 0,
+        departments: {}
+      }
     }
 
     return NextResponse.json({

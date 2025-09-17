@@ -83,8 +83,6 @@ export class AdminKeyManager {
       
       // Store in temporary memory
       tempKeys.set(key, tempKey)
-      console.log('Stored temp key:', key)
-      console.log('Current temp keys:', Array.from(tempKeys.keys()))
       
       return {
         id: crypto.randomUUID(),
@@ -97,12 +95,8 @@ export class AdminKeyManager {
    * Validate an admin key
    */
   static async validateAdminKey(key: string): Promise<{ valid: boolean; key?: AdminKey; reason?: string }> {
-    console.log('Validating admin key:', key)
-    console.log('Temporary keys stored:', Array.from(tempKeys.keys()))
-    
     // First check temporary in-memory storage
     const tempKey = tempKeys.get(key)
-    console.log('Found temp key:', tempKey ? 'YES' : 'NO')
     if (tempKey) {
       // Check if temp key is active
       if (!tempKey.isActive) {
@@ -138,11 +132,7 @@ export class AdminKeyManager {
 
     // Fallback to environment variable if no database
     const envKey = process.env.ADMIN_ACCESS_CODE
-    console.log('Environment key exists:', envKey ? 'YES' : 'NO')
-    console.log('Input key length:', key.length, 'Environment key length:', envKey?.length || 0)
-    console.log('Keys match:', key === envKey)
     if (envKey && key === envKey) {
-      console.log('Key matched environment variable')
       return { valid: true }
     }
 
