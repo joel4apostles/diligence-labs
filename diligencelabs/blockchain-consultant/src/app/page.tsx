@@ -73,33 +73,58 @@ export default function Home() {
   const [showSubscriptionForm, setShowSubscriptionForm] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
+  const [expandedService, setExpandedService] = useState<number | null>(null)
 
   const services = [
     {
-      title: "Business Strategy Help",
+      title: "Strategic Advisory",
       description: "We'll help you figure out if blockchain makes sense for your business, and if it does, we'll show you the best way to use it.",
       details: "Think of us as your blockchain guide. We help you understand what blockchain can actually do for your business (beyond the hype), help you choose the right technology, and create a realistic plan to get there. No confusing tech speak - just practical advice.",
+      expandedContent: {
+        process: ["Initial consultation to understand your business goals", "Market research and blockchain feasibility analysis", "Technology recommendation and roadmap creation", "Implementation timeline and resource planning"],
+        benefits: ["Avoid costly mistakes from jumping into blockchain too early", "Get a clear understanding of real vs. hype", "Save time with expert guidance instead of trial and error", "Connect with the right technical partners"],
+        timeline: "2-4 weeks",
+        deliverables: "Strategy document, technology recommendations, implementation roadmap"
+      },
       image: "/api/placeholder/80/80",
       color: "from-blue-500 to-cyan-500"
     },
     {
-      title: "Project Reviews",
+      title: "Due Diligence",
       description: "Thinking of investing in or partnering with a blockchain project? We'll take a close look and tell you what you need to know.",
       details: "We thoroughly examine blockchain projects - checking the code, evaluating the team, looking at the business model, and assessing real-world potential. Perfect if you're an investor, partner, or just want an honest second opinion before making big decisions.",
+      expandedContent: {
+        process: ["Project review and product market fit evaluation", "Team background and credential verification", "Business model and tokenomics analysis", "Market opportunity and competitive assessment"],
+        benefits: ["Make informed investment decisions with confidence", "Identify potential red flags before committing", "Understand the real risks and opportunities", "Get an unbiased third-party perspective"],
+        timeline: "1-3 weeks",
+        deliverables: "Comprehensive due diligence report with risk assessment and recommendations"
+      },
       image: "/api/placeholder/80/80",
       color: "from-purple-500 to-pink-500"
     },
     {
-      title: "Token Launch Help",
+      title: "Token Launch Consultation",
       description: "Planning to launch your own token? We'll walk you through everything - from legal requirements to getting people excited about your project.",
       details: "Launching a token involves way more than just the technical stuff. We help with the legal paperwork, building your community, creating buzz around your project, and making sure everything goes smoothly from day one.",
+      expandedContent: {
+        process: ["Legal compliance and regulatory guidance", "Tokenomics design and economic modeling", "Community building and marketing strategy", "Launch preparation and execution support"],
+        benefits: ["Navigate complex legal requirements safely", "Build a sustainable token economy", "Create genuine community interest", "Launch with confidence and proper preparation"],
+        timeline: "4-8 weeks",
+        deliverables: "Token design document, legal compliance guide, marketing strategy, launch checklist"
+      },
       image: "/api/placeholder/80/80",
       color: "from-green-500 to-emerald-500"
     },
     {
-      title: "Technology Guidance",
+      title: "Blockchain Integration Advisory",
       description: "Not sure which blockchain to build on or which tools to use? We'll help you pick the right technology for your specific needs.",
       details: "There are tons of blockchain platforms and tools out there. We help you cut through the noise and choose what actually works best for your project. We'll also connect you with reliable development teams and service providers.",
+      expandedContent: {
+        process: ["Requirements analysis and technical assessment", "Blockchain platform comparison and selection", "Architecture design and scalability planning", "Development partner recommendations"],
+        benefits: ["Choose the right technology from the start", "Avoid expensive platform migrations later", "Get connected with proven development teams", "Build on a solid technical foundation"],
+        timeline: "1-2 weeks",
+        deliverables: "Technology recommendation report, architecture blueprint, partner referrals"
+      },
       image: "/api/placeholder/80/80",
       color: "from-orange-500 to-red-500"
     }
@@ -212,6 +237,10 @@ export default function Home() {
     setExpandedFaq(expandedFaq === index ? null : index)
   }
 
+  const toggleService = (index: number) => {
+    setExpandedService(expandedService === index ? null : index)
+  }
+
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Dynamic Page Background with Enhanced Effects */}
@@ -304,15 +333,14 @@ export default function Home() {
         
         <div className={`space-y-6 sm:space-y-8 max-w-6xl px-4 transition-all duration-1000 delay-500 relative z-20 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <h1 className="text-3xl sm:text-5xl lg:text-7xl xl:text-8xl font-light leading-tight relative">
-            <span className="block">Expert</span>
-            <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent font-normal relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 via-purple-400/10 to-cyan-400/10 blur-xl rounded-lg transform scale-110" />
+            <span className="block text-white">Expert</span>
+            <span className="block text-white font-normal relative">
               Blockchain
             </span>
-            <span className="block">Consulting</span>
+            <span className="block text-white">Consulting</span>
           </h1>
           
-          <p className="text-lg sm:text-xl lg:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed px-2">
+          <p className="text-lg sm:text-xl lg:text-2xl text-white/80 max-w-3xl mx-auto leading-relaxed px-2">
             We help you understand blockchain without the confusing jargon and make smart decisions for your business.
           </p>
 
@@ -367,9 +395,9 @@ export default function Home() {
         <div className="max-w-[1400px] mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl sm:text-5xl font-light mb-4">
-              What We <span className="font-normal">Deliver</span>
+              What We <span className="font-normal text-white">Deliver</span>
             </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">
               Here's how we can help your business succeed with blockchain technology
             </p>
           </div>
@@ -438,14 +466,71 @@ export default function Home() {
                   <p className="text-gray-300 leading-relaxed mb-4 text-base sm:text-lg">{service.description}</p>
                   <p className="text-gray-500 leading-relaxed text-sm">{service.details}</p>
                   
-                  {/* Learn More Link */}
+                  {/* Expandable Content */}
+                  <div className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                    expandedService === index ? 'max-h-[800px] opacity-100 mt-6' : 'max-h-0 opacity-0'
+                  }`}>
+                    <div className="border-t border-gray-700/50 pt-6">
+                      {/* Process Section */}
+                      <div className="mb-6">
+                        <h4 className="text-white font-semibold mb-3 text-lg">Our Process</h4>
+                        <div className="space-y-2">
+                          {service.expandedContent.process.map((step, stepIndex) => (
+                            <div key={stepIndex} className="flex items-start gap-3">
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs text-white font-medium mt-0.5">
+                                {stepIndex + 1}
+                              </div>
+                              <p className="text-white/80 text-sm leading-relaxed">{step}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Benefits Section */}
+                      <div className="mb-6">
+                        <h4 className="text-white font-semibold mb-3 text-lg">Key Benefits</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {service.expandedContent.benefits.map((benefit, benefitIndex) => (
+                            <div key={benefitIndex} className="flex items-start gap-2">
+                              <div className="flex-shrink-0 w-2 h-2 bg-white/40 rounded-full mt-2"></div>
+                              <p className="text-white/80 text-sm leading-relaxed">{benefit}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Timeline and Deliverables */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="bg-gray-800/30 rounded-lg p-4">
+                          <h5 className="text-white font-medium mb-2 text-sm">Timeline</h5>
+                          <p className="text-white/80 text-sm">{service.expandedContent.timeline}</p>
+                        </div>
+                        <div className="bg-gray-800/30 rounded-lg p-4">
+                          <h5 className="text-white font-medium mb-2 text-sm">Deliverables</h5>
+                          <p className="text-white/80 text-sm">{service.expandedContent.deliverables}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Learn More Button */}
                   <div className="mt-6">
-                    <a href="#" className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors text-sm font-medium">
-                      Learn More
-                      <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button 
+                      onClick={() => toggleService(index)}
+                      className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors text-sm font-medium group"
+                    >
+                      {expandedService === index ? 'Show Less' : 'Learn More'}
+                      <svg 
+                        className={`ml-2 w-4 h-4 transition-all duration-300 ${
+                          expandedService === index ? 'rotate-90' : 'group-hover:translate-x-1'
+                        }`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                    </a>
+                    </button>
                   </div>
                 </div>
 
@@ -477,9 +562,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-light mb-4">
-              Our Proven <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Process</span>
+              Our Proven <span className="font-normal text-white">Process</span>
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            <p className="text-xl text-white/80 max-w-3xl mx-auto">
               How we work with you step-by-step to get things done right
             </p>
           </div>
@@ -525,13 +610,13 @@ export default function Home() {
                 >
                   <div className="p-8 bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl hover:bg-gradient-to-br hover:from-gray-900/80 hover:to-gray-800/50 transition-all duration-500 flex flex-col h-full min-h-[280px]">
                     <div className="flex flex-col items-start mb-6 flex-shrink-0">
-                      <div className={`text-5xl font-light mb-3 bg-gradient-${process.color} bg-clip-text text-transparent opacity-70`}>
+                      <div className="text-5xl font-light mb-3 text-white/70">
                         {process.step}
                       </div>
-                      <div className={`w-16 h-0.5 bg-gradient-${process.color} rounded-full`} />
+                      <div className="w-16 h-0.5 bg-white/30 rounded-full" />
                     </div>
-                    <h3 className="text-xl font-semibold mb-4 leading-tight flex-shrink-0">{process.title}</h3>
-                    <p className="text-gray-400 leading-relaxed text-sm flex-grow">{process.description}</p>
+                    <h3 className="text-xl font-semibold mb-4 leading-tight flex-shrink-0 text-white">{process.title}</h3>
+                    <p className="text-white/70 leading-relaxed text-sm flex-grow">{process.description}</p>
                   </div>
                 </ProminentBorder>
                 
@@ -629,9 +714,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-light mb-4">
-              Monthly <span className="font-normal bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">Subscription Plans</span>
+              Monthly <span className="font-normal text-white">Subscription Plans</span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
               Get unlimited access to expert blockchain consulting with our monthly subscription plans. 
               Save up to 40% compared to individual consultations.
             </p>
@@ -900,9 +985,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-light mb-4">
-              Let's Discuss Your <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Project</span>
+              Let's Discuss Your <span className="font-normal text-white">Project</span>
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
               Got questions about your blockchain project? Not sure where to start? Drop us a message and we'll get back to you with straight answers.
             </p>
           </div>
@@ -910,34 +995,42 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             {/* FAQ Section */}
             <div className="space-y-6">
-              <h3 className="text-2xl font-semibold mb-6 text-center lg:text-left">
+              <h3 className="text-2xl font-semibold mb-6 text-center lg:text-left text-white">
                 Common Questions
               </h3>
               <div className="space-y-3">
                 {[
                   {
-                    question: "Do I actually need blockchain for my project?",
-                    answer: "Honestly, probably not. Most problems can be solved with regular databases and servers. We'll tell you straight up if blockchain isn't the right fit - we'd rather save you time and money than sell you something you don't need."
+                    question: "What services does Diligence Labs offer?",
+                    answer: "We provide four core services: Strategic Advisory (helping you understand if blockchain fits your business), Due Diligence (thorough project reviews for investors), Token Launch Consultation (end-to-end token launch guidance), and Blockchain Integration Advisory (technology selection and architecture guidance)."
                   },
                   {
-                    question: "How much does blockchain development typically cost?",
-                    answer: "It depends on what you're building, but expect anywhere from $50k for a simple token to $500k+ for a complex financial app. We'll give you realistic estimates based on your specific needs."
+                    question: "How do you help blockchain project founders?",
+                    answer: "We help founders in several ways: evaluate if blockchain is right for their project, design sustainable token economics, navigate legal compliance, build their community, choose the right technology stack, and connect with reliable development partners. We're like a co-founder who's been through this before."
                   },
                   {
-                    question: "How long does it take to build a blockchain project?",
-                    answer: "Simple projects might take 3-6 months, while complex ones can take 12-18 months or more. We'll help you understand what's realistic for your timeline and budget."
+                    question: "What do you offer to VCs and investors?",
+                    answer: "We provide comprehensive due diligence reports that include project review and market fit evaluation, team credential verification, business model analysis, and market opportunity assessment. This helps investors make informed decisions and avoid costly mistakes in the blockchain space."
                   },
                   {
-                    question: "What's the difference between different blockchains?",
-                    answer: "Each blockchain has trade-offs - some are faster but more centralized, others are more secure but expensive to use. We'll help you pick the one that makes sense for your specific use case."
+                    question: "How is Diligence Labs different from other blockchain consultants?",
+                    answer: "We focus on practical, no-nonsense advice without the industry jargon. We'll honestly tell you if blockchain isn't right for your project rather than trying to sell you something you don't need. Our approach is research-backed and based on real experience with over 5 years in the space."
                   },
                   {
-                    question: "Can you help with regulatory compliance?",
-                    answer: "We can point you in the right direction and help you understand the landscape, but you'll need a specialized crypto lawyer for the actual legal work. We can recommend good ones."
+                    question: "What's your process for working with new clients?",
+                    answer: "We start with a free consultation to understand your needs and goals. Then we provide a clear roadmap of our recommendations, timeline, and deliverables. Throughout the engagement, we maintain regular communication and provide actionable insights you can actually implement."
                   },
                   {
-                    question: "Do you build the actual software?",
-                    answer: "We focus on strategy and guidance, not development. But we know great development teams and can help you find the right one for your project."
+                    question: "Do you only work with crypto projects?",
+                    answer: "Not at all! We work with traditional companies exploring blockchain, new blockchain projects, existing crypto projects looking to improve, and investors evaluating opportunities. Our goal is to help anyone make smart decisions about blockchain technology, regardless of their current involvement in the space."
+                  },
+                  {
+                    question: "What makes your due diligence process unique?",
+                    answer: "Our due diligence goes beyond technical analysis. We evaluate product-market fit, assess the team's real-world execution capability, analyze sustainable tokenomics, and provide honest risk assessments. We look for red flags that others might miss and focus on long-term viability rather than short-term hype."
+                  },
+                  {
+                    question: "How do you help with token launches?",
+                    answer: "We guide you through the entire token launch process: legal compliance and regulatory requirements, designing sustainable token economics, building genuine community engagement, creating effective marketing strategies, and preparing for a successful launch. We focus on building lasting value, not just generating initial buzz."
                   }
                 ].map((faq, index) => {
                   const isExpanded = expandedFaq === index

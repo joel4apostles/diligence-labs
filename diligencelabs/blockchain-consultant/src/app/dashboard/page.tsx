@@ -194,7 +194,9 @@ function DashboardContent() {
               <div className="text-lg text-gray-400">Dashboard</div>
             </div>
             <h1 className="text-4xl font-light mb-2">
-              Welcome back, <span className="font-normal text-white">{unifiedUser?.name || unifiedUser?.email}</span>
+              Welcome back, <span className="font-normal text-white">
+                {unifiedUser?.name || 'User'}
+              </span>
             </h1>
             <p className="text-gray-400 text-lg">Manage your consulting services and subscriptions</p>
           </div>
@@ -458,7 +460,7 @@ function DashboardContent() {
           <div className={`mb-12 transition-all duration-1000 delay-400 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <div className="text-center mb-8">
               <h2 className="text-2xl font-light mb-2">
-                <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Upgrade Your Plan</span>
+                <span className="font-normal text-white">Upgrade Your Plan</span>
               </h2>
               <p className="text-gray-400">Subscribe to unlock premium consultation services</p>
             </div>
@@ -535,7 +537,7 @@ function DashboardContent() {
         <div className={`transition-all duration-1000 delay-500 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-light mb-2">
-              <span className="font-normal bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Profile & Settings</span>
+              <span className="font-normal text-white">Profile & Settings</span>
             </h2>
             <p className="text-gray-400">Manage your account information and preferences</p>
           </div>
