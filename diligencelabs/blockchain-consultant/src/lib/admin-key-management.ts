@@ -1,6 +1,17 @@
 import { prisma } from '@/lib/prisma'
 import crypto from 'crypto'
 
+// Temporary in-memory storage for generated keys when database is unavailable
+const tempKeys = new Map<string, {
+  key: string
+  createdAt: Date
+  expiresAt: Date | null
+  createdBy: string
+  isActive: boolean
+  usageCount: number
+  maxUsages: number | null
+}>()
+
 export interface AdminKey {
   id: string
   key: string
@@ -58,10 +69,9 @@ export class AdminKeyManager {
 
       return adminKey
     } catch (error) {
-      // Fallback to environment variable if database is not available
-      console.warn('Database not available, using environment fallback for admin key')
-      return {
-        id: crypto.randomUUID(),
+      // Fallback to temporary storage if database is not available
+      console.warn('Database not available, using temporary storage for admin key')
+      const tempKey = {
         key,
         createdAt: new Date(),
         expiresAt,
@@ -70,6 +80,16 @@ export class AdminKeyManager {
         usageCount: 0,
         maxUsages: options.maxUsages || null
       }
+      
+      // Store in temporary memory
+      tempKeys.set(key, tempKey)
+      console.log('Stored temp key:', key)
+      console.log('Current temp keys:', Array.from(tempKeys.keys()))
+      
+      return {
+        id: crypto.randomUUID(),
+        ...tempKey
+      }
     }
   }
 
@@ -77,9 +97,52 @@ export class AdminKeyManager {
    * Validate an admin key
    */
   static async validateAdminKey(key: string): Promise<{ valid: boolean; key?: AdminKey; reason?: string }> {
+    console.log('Validating admin key:', key)
+    console.log('Temporary keys stored:', Array.from(tempKeys.keys()))
+    
+    // First check temporary in-memory storage
+    const tempKey = tempKeys.get(key)
+    console.log('Found temp key:', tempKey ? 'YES' : 'NO')
+    if (tempKey) {
+      // Check if temp key is active
+      if (!tempKey.isActive) {
+        return { valid: false, reason: 'Invalid or expired key' }
+      }
+
+      // Check expiration
+      if (tempKey.expiresAt && tempKey.expiresAt < new Date()) {
+        tempKey.isActive = false
+        tempKeys.set(key, tempKey)
+        return { valid: false, reason: 'Key has expired' }
+      }
+
+      // Check usage limit
+      if (tempKey.maxUsages && tempKey.usageCount >= tempKey.maxUsages) {
+        tempKey.isActive = false
+        tempKeys.set(key, tempKey)
+        return { valid: false, reason: 'Key usage limit exceeded' }
+      }
+
+      // Increment usage count
+      tempKey.usageCount += 1
+      tempKeys.set(key, tempKey)
+
+      return { 
+        valid: true, 
+        key: {
+          id: crypto.randomUUID(),
+          ...tempKey
+        }
+      }
+    }
+
     // Fallback to environment variable if no database
     const envKey = process.env.ADMIN_ACCESS_CODE
+    console.log('Environment key exists:', envKey ? 'YES' : 'NO')
+    console.log('Input key length:', key.length, 'Environment key length:', envKey?.length || 0)
+    console.log('Keys match:', key === envKey)
     if (envKey && key === envKey) {
+      console.log('Key matched environment variable')
       return { valid: true }
     }
 

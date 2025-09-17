@@ -58,12 +58,26 @@ interface NotificationSummary {
   expiredSubscriptions: number
 }
 
+interface TeamMember {
+  id: string
+  user: {
+    id: string
+    name: string | null
+    email: string
+    role: string
+  }
+  position: string
+  department: string
+  isActive: boolean
+}
+
 interface DashboardData {
   stats: DashboardStats
   notifications: {
     summary: NotificationSummary
     permissions: AdminPermissions
   }
+  teamMembers?: TeamMember[]
 }
 
 export default function AdminDashboardPage() {
@@ -90,6 +104,7 @@ export default function AdminDashboardPage() {
     suspiciousUsers: 0,
     expiredSubscriptions: 0
   })
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
 
   useEffect(() => {
     // Set page as loaded immediately for better perceived performance
@@ -129,6 +144,9 @@ export default function AdminDashboardPage() {
         setPermissions(data.notifications.permissions)
         setNotificationSummary(data.notifications.summary)
         
+        // Fetch team members separately to avoid slowing down main dashboard
+        fetchTeamMembers()
+        
         const endTime = Date.now()
         const cacheStatus = response.headers.get('X-Cache') || 'UNKNOWN'
         console.log(`Dashboard data loaded successfully in ${endTime - startTime}ms (Cache: ${cacheStatus})`)
@@ -139,6 +157,26 @@ export default function AdminDashboardPage() {
       console.error("Error fetching dashboard data:", error)
     } finally {
       setLoading(false)
+    }
+  }, [])
+
+  const fetchTeamMembers = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('adminToken')
+      if (!token) return
+
+      const response = await fetch('/api/admin/team?limit=5', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setTeamMembers(data.members || [])
+      }
+    } catch (error) {
+      console.error("Error fetching team members:", error)
     }
   }, [])
 
@@ -271,8 +309,55 @@ export default function AdminDashboardPage() {
               <CardDescription className="text-gray-400">Manage team members, roles, and specializations</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Team Members Preview */}
+              {teamMembers.length > 0 ? (
+                <div className="space-y-3 mb-4">
+                  <h4 className="text-sm font-medium text-gray-300">Active Team Members</h4>
+                  <div className="space-y-2">
+                    {teamMembers.slice(0, 3).map((member) => (
+                      <div key={member.id} className="flex items-center justify-between p-2 bg-gray-800/30 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs font-medium">
+                              {member.user.name?.charAt(0) || member.user.email.charAt(0)}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-white text-sm font-medium">
+                              {member.user.name || 'No Name'}
+                            </p>
+                            <p className="text-gray-400 text-xs">{member.position}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            member.department === 'BLOCKCHAIN_INTEGRATION' ? 'bg-blue-500/20 text-blue-400' :
+                            member.department === 'STRATEGY_CONSULTING' ? 'bg-purple-500/20 text-purple-400' :
+                            member.department === 'DUE_DILIGENCE' ? 'bg-green-500/20 text-green-400' :
+                            'bg-gray-500/20 text-gray-400'
+                          }`}>
+                            {member.department.replace(/_/g, ' ')}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    {teamMembers.length > 3 && (
+                      <p className="text-xs text-gray-400 text-center">
+                        +{teamMembers.length - 3} more team members
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-4 text-gray-400 text-sm">
+                  No team members found
+                </div>
+              )}
+              
               <Link href="/admin/team">
-                <Button className="w-full justify-start bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white transition-all duration-300 hover:scale-105">Team Overview</Button>
+                <Button className="w-full justify-start bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white transition-all duration-300 hover:scale-105">
+                  {teamMembers.length > 0 ? 'View All Team Members' : 'Manage Team'}
+                </Button>
               </Link>
             </CardContent>
           </Card>
@@ -323,6 +408,22 @@ export default function AdminDashboardPage() {
             </Card>
           </ProminentBorder>
         )}
+
+        <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
+            <CardHeader>
+              <CardTitle className="text-white text-xl">Admin Key Management</CardTitle>
+              <CardDescription className="text-gray-400">Generate and manage dynamic admin registration keys</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Link href="/admin/keys">
+                <Button className="w-full justify-start bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white transition-all duration-300 hover:scale-105">
+                  🔐 Manage Admin Keys
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </ProminentBorder>
 
         <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
           <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">

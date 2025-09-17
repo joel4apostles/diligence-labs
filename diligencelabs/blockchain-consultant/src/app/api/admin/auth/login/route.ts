@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { prisma } from "@/lib/prisma"
+import { getTempAdmin } from "@/lib/temp-admin-storage"
 
 export async function POST(request: Request) {
   try {
@@ -22,19 +23,27 @@ export async function POST(request: Request) {
       })
     } catch (error) {
       console.warn('Database not available for admin login, using fallback authentication')
-      // For demo purposes, allow login if credentials match expected values
-      if (email.toLowerCase() === 'admin@test.com') {
-        // Create a mock admin for testing the key management interface
-        const expectedPassword = 'SecureAdmin123!'
-        const isValidDemo = await bcrypt.compare(password, await bcrypt.hash(expectedPassword, 12))
-        if (password === expectedPassword) {
-          admin = {
-            id: 'mock-admin-id',
-            email: email.toLowerCase(),
-            name: 'Test Admin',
-            hashedPassword: await bcrypt.hash(expectedPassword, 12),
-            role: 'ADMIN',
-            isActive: true
+      
+      // First check temporary admin storage
+      const tempAdmin = getTempAdmin(email.toLowerCase())
+      if (tempAdmin) {
+        console.log('Found admin in temporary storage')
+        admin = tempAdmin
+      } else {
+        // For demo purposes, allow login if credentials match expected values
+        if (email.toLowerCase() === 'admin@test.com') {
+          // Create a mock admin for testing the key management interface
+          const expectedPassword = 'SecureAdmin123!'
+          const isValidDemo = await bcrypt.compare(password, await bcrypt.hash(expectedPassword, 12))
+          if (password === expectedPassword) {
+            admin = {
+              id: 'mock-admin-id',
+              email: email.toLowerCase(),
+              name: 'Test Admin',
+              hashedPassword: await bcrypt.hash(expectedPassword, 12),
+              role: 'SUPER_ADMIN',
+              isActive: true
+            }
           }
         }
       }

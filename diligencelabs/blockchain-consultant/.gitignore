@@ -42,3 +42,6 @@ next-env.d.ts
 
 /src/generated/prisma
 .env
+
+# temporary admin storage (development only)
+.temp-admins.json

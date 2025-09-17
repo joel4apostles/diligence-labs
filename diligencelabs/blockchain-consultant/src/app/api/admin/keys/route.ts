@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AdminKeyManager } from '@/lib/admin-key-management'
-import { verifyAdminAuth } from '@/lib/admin-auth'
+import { verifyAdminAuth, hasPermission } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,6 +8,13 @@ export async function GET(request: NextRequest) {
     const adminAuth = await verifyAdminAuth(request)
     if (!adminAuth.success) {
       return NextResponse.json({ error: adminAuth.error }, { status: 401 })
+    }
+
+    // Check if admin has SUPER_ADMIN privileges
+    if (!hasPermission(adminAuth.admin.role, 'SUPER_ADMIN')) {
+      return NextResponse.json({ 
+        error: 'Access denied. Super Admin privileges required for key management.' 
+      }, { status: 403 })
     }
 
     const url = new URL(request.url)
@@ -37,6 +44,13 @@ export async function POST(request: NextRequest) {
     const adminAuth = await verifyAdminAuth(request)
     if (!adminAuth.success) {
       return NextResponse.json({ error: adminAuth.error }, { status: 401 })
+    }
+
+    // Check if admin has SUPER_ADMIN privileges
+    if (!hasPermission(adminAuth.admin.role, 'SUPER_ADMIN')) {
+      return NextResponse.json({ 
+        error: 'Access denied. Super Admin privileges required for key management.' 
+      }, { status: 403 })
     }
 
     const body = await request.json()
@@ -87,6 +101,13 @@ export async function DELETE(request: NextRequest) {
     const adminAuth = await verifyAdminAuth(request)
     if (!adminAuth.success) {
       return NextResponse.json({ error: adminAuth.error }, { status: 401 })
+    }
+
+    // Check if admin has SUPER_ADMIN privileges
+    if (!hasPermission(adminAuth.admin.role, 'SUPER_ADMIN')) {
+      return NextResponse.json({ 
+        error: 'Access denied. Super Admin privileges required for key management.' 
+      }, { status: 403 })
     }
 
     const body = await request.json()

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import jwt from "jsonwebtoken"
 import { prisma } from "@/lib/prisma"
+import { getTempAdmin } from "@/lib/temp-admin-storage"
 
 export async function GET(request: Request) {
   try {
@@ -29,14 +30,22 @@ export async function GET(request: Request) {
       })
     } catch (error) {
       console.warn('Database not available for token verification, using token data')
-      // For demo purposes, trust the token if it's the mock admin
-      if (decoded.adminId === 'mock-admin-id' && decoded.email === 'admin@test.com') {
-        admin = {
-          id: decoded.adminId,
-          email: decoded.email,
-          name: decoded.name,
-          role: 'ADMIN',
-          isActive: true
+      
+      // First check temporary admin storage
+      const tempAdmin = getTempAdmin(decoded.email)
+      if (tempAdmin && tempAdmin.id === decoded.adminId) {
+        console.log('Found admin in temporary storage for verification')
+        admin = tempAdmin
+      } else {
+        // For demo purposes, trust the token if it's the mock admin
+        if (decoded.adminId === 'mock-admin-id' && decoded.email === 'admin@test.com') {
+          admin = {
+            id: decoded.adminId,
+            email: decoded.email,
+            name: decoded.name,
+            role: 'SUPER_ADMIN',
+            isActive: true
+          }
         }
       }
     }

@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { validatePasswordStrength } from "@/lib/password-security"
 import { AdminKeyManager } from "@/lib/admin-key-management"
+import { addTempAdmin } from "@/lib/temp-admin-storage"
+import crypto from 'crypto'
 
 export async function POST(request: Request) {
   try {
@@ -69,18 +71,25 @@ export async function POST(request: Request) {
           name,
           email: email.toLowerCase(),
           hashedPassword,
-          role: 'ADMIN',
+          role: 'SUPER_ADMIN',
           isActive: true
         }
       })
     } catch (error) {
       console.warn('Database not available, creating mock admin response')
+      const adminId = crypto.randomUUID()
       admin = {
-        id: 'mock-admin-id',
+        id: adminId,
         name,
         email: email.toLowerCase(),
-        role: 'ADMIN'
+        hashedPassword,
+        role: 'SUPER_ADMIN',
+        isActive: true,
+        createdAt: new Date()
       }
+      
+      // Store in temporary memory for login
+      addTempAdmin(email.toLowerCase(), admin)
     }
 
     return NextResponse.json({
