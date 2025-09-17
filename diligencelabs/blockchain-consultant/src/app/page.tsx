@@ -72,6 +72,7 @@ export default function Home() {
   const [selectedPlan, setSelectedPlan] = useState<any>(null)
   const [showSubscriptionForm, setShowSubscriptionForm] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
 
   const services = [
     {
@@ -205,6 +206,10 @@ export default function Home() {
   const handleSubscriptionClose = () => {
     setShowSubscriptionForm(false)
     setSelectedPlan(null)
+  }
+
+  const toggleFaq = (index: number) => {
+    setExpandedFaq(expandedFaq === index ? null : index)
   }
 
   return (
@@ -908,7 +913,7 @@ export default function Home() {
               <h3 className="text-2xl font-semibold mb-6 text-center lg:text-left">
                 Common Questions
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {[
                   {
                     question: "Do I actually need blockchain for my project?",
@@ -934,18 +939,40 @@ export default function Home() {
                     question: "Do you build the actual software?",
                     answer: "We focus on strategy and guidance, not development. But we know great development teams and can help you find the right one for your project."
                   }
-                ].map((faq, index) => (
-                  <SubtleBorder key={index} className="rounded-xl overflow-hidden" animated={false}>
-                    <div className="p-6 bg-gradient-to-br from-gray-900/40 to-gray-800/20 backdrop-blur-sm">
-                      <h4 className="font-semibold text-white mb-3 text-lg leading-snug">
-                        {faq.question}
-                      </h4>
-                      <p className="text-gray-400 leading-relaxed">
-                        {faq.answer}
-                      </p>
-                    </div>
-                  </SubtleBorder>
-                ))}
+                ].map((faq, index) => {
+                  const isExpanded = expandedFaq === index
+                  return (
+                    <SubtleBorder key={index} className="rounded-xl overflow-hidden" animated={false}>
+                      <div className="bg-gradient-to-br from-gray-900/40 to-gray-800/20 backdrop-blur-sm">
+                        <button
+                          onClick={() => toggleFaq(index)}
+                          className="w-full p-4 text-left flex items-center justify-between hover:bg-white/5 transition-all duration-300 group"
+                        >
+                          <h4 className="font-semibold text-white text-base lg:text-lg leading-snug pr-4 group-hover:text-blue-400 transition-colors">
+                            {faq.question}
+                          </h4>
+                          <div className={`flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 border border-blue-400/30 flex items-center justify-center transition-all duration-300 group-hover:bg-blue-500/30 group-hover:border-blue-400/50 ${isExpanded ? 'rotate-45' : ''}`}>
+                            <svg
+                              className="w-3 h-3 text-blue-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                          </div>
+                        </button>
+                        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                          <div className="px-4 pb-4 border-t border-gray-700/30">
+                            <p className="text-gray-400 leading-relaxed pt-3">
+                              {faq.answer}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </SubtleBorder>
+                  )
+                })}
               </div>
             </div>
 
