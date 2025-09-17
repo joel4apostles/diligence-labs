@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -137,6 +138,18 @@ export default function DueDiligencePage() {
       <div className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10" />
         <div className="container mx-auto px-6 relative">
+          {/* Back to Homepage Link */}
+          <div className="mb-8">
+            <Link 
+              href="/"
+              className="inline-flex items-center text-gray-400 hover:text-white transition-colors group"
+            >
+              <svg className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Homepage
+            </Link>
+          </div>
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex items-center justify-center mb-6">
               <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full">
@@ -171,30 +184,29 @@ export default function DueDiligencePage() {
         </div>
       </div>
 
-      {/* Features Grid */}
-      <div className="py-20 bg-black/20">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Platform Features</h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Comprehensive due diligence through verified expertise and transparent evaluation
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => {
-              const IconComponent = feature.icon
-              return (
-                <Card key={index} className="bg-gray-900/50 border-gray-800 hover:bg-gray-800/50 transition-all duration-300 group">
-                  <CardContent className="p-8">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                      <IconComponent className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-                    <p className="text-gray-400 leading-relaxed">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              )
-            })}
+      {/* CTA Section */}
+      <div className="py-20 bg-gradient-to-r from-blue-900/20 to-purple-900/20">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">Ready to Get Started?</h2>
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Join our marketplace as a project submitter or verified expert and be part of the future of decentralized due diligence.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-4"
+              onClick={() => handleAuth('signup', 'submitter')}
+            >
+              Submit Your Project
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 px-8 py-4"
+              onClick={() => handleAuth('signup', 'expert')}
+            >
+              Apply as Expert
+            </Button>
           </div>
         </div>
       </div>
@@ -209,6 +221,7 @@ export default function DueDiligencePage() {
             <TabButton id="submit" label="Submit Project" active={activeTab === 'submit'} onClick={setActiveTab} />
             <TabButton id="auth" label="Join Platform" active={activeTab === 'auth'} onClick={setActiveTab} />
           </div>
+
 
           {/* Overview Tab */}
           {activeTab === 'overview' && (
@@ -693,29 +706,30 @@ export default function DueDiligencePage() {
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="py-20 bg-gradient-to-r from-blue-900/20 to-purple-900/20">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join our marketplace as a project submitter or verified expert and be part of the future of decentralized due diligence.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-4"
-              onClick={() => handleAuth('signup', 'submitter')}
-            >
-              Submit Your Project
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 px-8 py-4"
-              onClick={() => handleAuth('signup', 'expert')}
-            >
-              Apply as Expert
-            </Button>
+      {/* Platform Features */}
+      <div className="py-20 bg-black/20">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">Platform Features</h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              Comprehensive due diligence through verified expertise and transparent evaluation
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => {
+              const IconComponent = feature.icon
+              return (
+                <Card key={index} className="bg-gray-900/50 border-gray-800 hover:bg-gray-800/50 transition-all duration-300 group">
+                  <CardContent className="p-8">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                      <IconComponent className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                    <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </div>
       </div>
