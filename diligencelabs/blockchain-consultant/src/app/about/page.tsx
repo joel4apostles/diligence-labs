@@ -17,24 +17,24 @@ import { Logo } from "@/components/ui/logo"
 
 const clientTypes = [
   {
-    title: "Early-Stage Blockchain Projects",
-    description: "Startups and emerging protocols seeking strategic guidance and technical validation",
-    features: ["Technical architecture review", "Token launch consultation", "Go-to-market strategy", "Compliance guidance"]
+    title: "New Blockchain Projects",
+    description: "Startups building something new and want to make sure they're on the right track",
+    features: ["Check if your tech approach makes sense", "Help with token planning", "Figure out your launch strategy", "Navigate legal requirements"]
   },
   {
-    title: "Existing Blockchain Ventures",
-    description: "Established projects looking to optimize, scale, or pivot their blockchain strategies",
-    features: ["Performance optimization", "Strategic pivots", "Market expansion", "Partnership strategies"]
+    title: "Existing Crypto Projects",
+    description: "Projects that are already running but want to improve or try new things",
+    features: ["Make your project run better", "Help you change direction if needed", "Find new opportunities", "Connect with the right partners"]
   },
   {
-    title: "Traditional Companies",
-    description: "Enterprises exploring blockchain integration and digital transformation opportunities",
-    features: ["Blockchain integration planning", "Token launch strategies", "Technology assessment", "Implementation roadmaps"]
+    title: "Regular Companies",
+    description: "Traditional businesses wondering if blockchain could help them somehow",
+    features: ["Honest assessment of blockchain fit", "Help plan a token if it makes sense", "Evaluate blockchain tools and platforms", "Create a realistic implementation plan"]
   },
   {
-    title: "Investors & Institutions",
-    description: "Investment funds and institutions requiring comprehensive due diligence analysis",
-    features: ["Investment due diligence", "Risk assessment", "Technology evaluation", "Market analysis"]
+    title: "Investors & Funds",
+    description: "People with money who want to know if a blockchain project is worth investing in",
+    features: ["Thorough project analysis", "Identify potential risks", "Evaluate the technology", "Assess market potential"]
   }
 ]
 
@@ -75,7 +75,7 @@ export default function AboutPage() {
             About <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Diligence Labs</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-4xl mx-auto leading-relaxed mb-8">
-            Diligence Labs stands at the forefront of blockchain consulting, bridging the gap between complex Web3 technologies and practical business solutions. Founded with the vision of democratizing access to expert blockchain guidance, we specialize in transforming innovative ideas into sustainable, scalable blockchain ventures.
+            We're a small team that helps people make sense of blockchain technology and decide if it's right for their business. Instead of throwing around confusing tech jargon, we give you straight answers about what blockchain can and can't do for you.
           </p>
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="text-center p-4 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-xl border border-blue-500/10">
@@ -102,8 +102,8 @@ export default function AboutPage() {
               <span className="font-normal bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent">Who We Serve</span>
             </h2>
             <p className="text-gray-400 text-lg max-w-3xl mx-auto">
-              From early-stage blockchain projects to established enterprises, we provide tailored consulting solutions 
-              for every stage of the Web3 journey
+              Whether you're just getting started with crypto or you're a company looking to explore blockchain, 
+              we work with all kinds of people at different stages
             </p>
           </div>
           
@@ -202,26 +202,26 @@ export default function AboutPage() {
                     </h3>
                     <div className="space-y-6 text-gray-300 leading-relaxed">
                       <p className="text-lg">
-                        With over <strong className="text-white">5 years of professional experience</strong> as a blockchain researcher and due diligence expert, 
-                        Joel has established himself as a trusted advisor in the Web3 ecosystem. His expertise spans across technical analysis, 
-                        business strategy, and risk assessment for blockchain ventures.
+                        Joel has been working with blockchain projects for over <strong className="text-white">5 years</strong>. 
+                        He's good at figuring out if projects are worth investing in and helping them avoid common mistakes. 
+                        His background in research and technology helps him see both the technical and business sides of projects.
                       </p>
                       
                       <p>
-                        Joel has worked extensively with <strong className="text-blue-400">top-tier launchpads</strong>, conducting comprehensive 
-                        due diligence assessments that have helped identify promising projects and mitigate investment risks. His analytical 
-                        approach combines technical expertise with deep market understanding.
+                        He's worked with several <strong className="text-blue-400">crypto launchpads</strong> (platforms that help new projects raise money), 
+                        where his job was to thoroughly examine projects and spot potential problems before investors put money in. 
+                        This gave him a really good eye for what works and what doesn't.
                       </p>
                       
                       <p>
-                        Currently, Joel is actively advising <strong className="text-purple-400">3+ blockchain projects</strong>, providing ongoing 
-                        strategic guidance on tokenomics, technical architecture, and market positioning. His hands-on experience with both 
-                        early-stage startups and established protocols gives him unique insights into the challenges and opportunities in the space.
+                        Right now, Joel is helping <strong className="text-purple-400">3+ blockchain projects</strong> with their strategy, 
+                        token design, and general direction. Working with projects at different stages - from brand new ideas to 
+                        established companies - has taught him a lot about what challenges come up and how to solve them.
                       </p>
                       
                       <p>
-                        Beyond pure blockchain ventures, Joel specializes in helping <strong className="text-cyan-400">traditional companies</strong> 
-                        explore blockchain integration opportunities, design token launch strategies, and navigate the regulatory landscape of Web3 adoption.
+                        Joel also helps <strong className="text-cyan-400">regular companies</strong> figure out if blockchain makes sense for their business, 
+                        how to launch a token if they need one, and how to deal with all the legal stuff that comes with crypto.
                       </p>
                     </div>
                   </div>
@@ -234,10 +234,134 @@ export default function AboutPage() {
 
         <HorizontalDivider style="subtle" />
 
+        {/* Team Section */}
+        <div className={`mb-20 transition-all duration-1000 delay-500 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-light mb-4">
+              <span className="font-normal bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Our Team</span>
+            </h2>
+            <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+              A small but experienced team focused on giving you practical blockchain advice
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Team Member 1 - Sarah Chen */}
+            <SubtleBorder className="rounded-xl overflow-hidden" animated={true} movingBorder={true}>
+              <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-purple-500/20 rounded-xl">
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20" />
+                
+                <Card className="bg-transparent border-0 relative z-10">
+                  <CardContent className="p-8 text-center">
+                    <div className="w-24 h-24 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-purple-500/20">
+                      <div className="text-3xl font-light text-gray-300 opacity-80">SC</div>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Sarah Chen</h3>
+                    <p className="text-purple-400 text-sm font-medium mb-4">Technical Research Lead</p>
+                    <div className="space-y-3 text-sm">
+                      <div className="bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-lg p-3 border border-purple-500/10">
+                        <p className="text-purple-300 font-medium mb-1">🎓 Background</p>
+                        <div className="text-gray-400 text-xs">
+                          <p>• Computer Science PhD</p>
+                          <p>• Former DeFi Protocol Developer</p>
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-r from-green-500/5 to-teal-500/5 rounded-lg p-3 border border-green-500/10">
+                        <p className="text-green-300 font-medium mb-1">🔍 Focus Areas</p>
+                        <div className="text-gray-400 text-xs">
+                          <p>• Smart Contract Analysis</p>
+                          <p>• Protocol Security Review</p>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-gray-400 text-sm mt-4 leading-relaxed">
+                      Sarah digs deep into the technical stuff so you don't have to. She's great at explaining complex blockchain concepts in ways that actually make sense.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </SubtleBorder>
+
+            {/* Team Member 2 - Marcus Rodriguez */}
+            <SubtleBorder className="rounded-xl overflow-hidden" animated={true} movingBorder={true}>
+              <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-blue-500/20 rounded-xl">
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20" />
+                
+                <Card className="bg-transparent border-0 relative z-10">
+                  <CardContent className="p-8 text-center">
+                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
+                      <div className="text-3xl font-light text-gray-300 opacity-80">MR</div>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Marcus Rodriguez</h3>
+                    <p className="text-blue-400 text-sm font-medium mb-4">Business Strategy Advisor</p>
+                    <div className="space-y-3 text-sm">
+                      <div className="bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-lg p-3 border border-blue-500/10">
+                        <p className="text-blue-300 font-medium mb-1">🎓 Background</p>
+                        <div className="text-gray-400 text-xs">
+                          <p>• MBA in Finance</p>
+                          <p>• 8 Years Traditional Finance</p>
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-r from-green-500/5 to-teal-500/5 rounded-lg p-3 border border-green-500/10">
+                        <p className="text-green-300 font-medium mb-1">🔍 Focus Areas</p>
+                        <div className="text-gray-400 text-xs">
+                          <p>• Token Economics</p>
+                          <p>• Market Analysis</p>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-gray-400 text-sm mt-4 leading-relaxed">
+                      Marcus helps figure out if your blockchain project makes business sense. He's especially good at designing token systems that actually work long-term.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </SubtleBorder>
+
+            {/* Team Member 3 - Lisa Park */}
+            <SubtleBorder className="rounded-xl overflow-hidden" animated={true} movingBorder={true}>
+              <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-emerald-500/20 rounded-xl">
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20" />
+                
+                <Card className="bg-transparent border-0 relative z-10">
+                  <CardContent className="p-8 text-center">
+                    <div className="w-24 h-24 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
+                      <div className="text-3xl font-light text-gray-300 opacity-80">LP</div>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Lisa Park</h3>
+                    <p className="text-emerald-400 text-sm font-medium mb-4">Regulatory & Compliance Advisor</p>
+                    <div className="space-y-3 text-sm">
+                      <div className="bg-gradient-to-r from-emerald-500/5 to-teal-500/5 rounded-lg p-3 border border-emerald-500/10">
+                        <p className="text-emerald-300 font-medium mb-1">🎓 Background</p>
+                        <div className="text-gray-400 text-xs">
+                          <p>• Law Degree (JD)</p>
+                          <p>• Former SEC Compliance Officer</p>
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-r from-green-500/5 to-teal-500/5 rounded-lg p-3 border border-green-500/10">
+                        <p className="text-green-300 font-medium mb-1">🔍 Focus Areas</p>
+                        <div className="text-gray-400 text-xs">
+                          <p>• Crypto Regulations</p>
+                          <p>• Legal Risk Assessment</p>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-gray-400 text-sm mt-4 leading-relaxed">
+                      Lisa helps navigate the confusing world of crypto regulations. She keeps track of what's legal, what's not, and what's changing so you don't get in trouble.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </SubtleBorder>
+          </div>
+        </div>
+
+        <HorizontalDivider style="subtle" />
+
         {/* CTA Section */}
         <div className={`text-center transition-all duration-1000 delay-500 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="text-center">
-            <p className="text-gray-400 mb-8 text-lg">Ready to elevate your blockchain project?</p>
+            <p className="text-gray-400 mb-8 text-lg">Have questions about your blockchain project?</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="group relative bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 px-8 py-3 rounded-lg transition-all duration-300 hover:scale-105 overflow-hidden">
                 <Link href="/book-consultation" className="relative z-10 flex items-center justify-center">

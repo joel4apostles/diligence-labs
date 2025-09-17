@@ -75,30 +75,30 @@ export default function Home() {
 
   const services = [
     {
-      title: "Strategic Advisory",
-      description: "Navigate complex blockchain landscapes with expert guidance on technology decisions, regulatory compliance, and market positioning strategies.",
-      details: "Our strategic advisory services help you make informed decisions about blockchain adoption, technology stack selection, and go-to-market strategies. We provide comprehensive market analysis, competitive positioning, and roadmap development.",
+      title: "Business Strategy Help",
+      description: "We'll help you figure out if blockchain makes sense for your business, and if it does, we'll show you the best way to use it.",
+      details: "Think of us as your blockchain guide. We help you understand what blockchain can actually do for your business (beyond the hype), help you choose the right technology, and create a realistic plan to get there. No confusing tech speak - just practical advice.",
       image: "/api/placeholder/80/80",
       color: "from-blue-500 to-cyan-500"
     },
     {
-      title: "Due Diligence",
-      description: "Comprehensive analysis of technical architecture, team capabilities, tokenomics, and market potential for investment decisions.",
-      details: "Deep-dive technical and business analysis covering code audits, team assessment, market opportunity evaluation, competitive analysis, and risk assessment. Perfect for investors, partners, and stakeholders.",
+      title: "Project Reviews",
+      description: "Thinking of investing in or partnering with a blockchain project? We'll take a close look and tell you what you need to know.",
+      details: "We thoroughly examine blockchain projects - checking the code, evaluating the team, looking at the business model, and assessing real-world potential. Perfect if you're an investor, partner, or just want an honest second opinion before making big decisions.",
       image: "/api/placeholder/80/80",
       color: "from-purple-500 to-pink-500"
     },
     {
-      title: "Token Launch Consultation",
-      description: "End-to-end guidance for successful token launches including regulatory compliance, marketing strategy, and technical implementation.",
-      details: "Complete token launch support from concept to execution. Includes legal compliance, technical implementation, marketing strategy, community building, and post-launch optimization.",
+      title: "Token Launch Help",
+      description: "Planning to launch your own token? We'll walk you through everything - from legal requirements to getting people excited about your project.",
+      details: "Launching a token involves way more than just the technical stuff. We help with the legal paperwork, building your community, creating buzz around your project, and making sure everything goes smoothly from day one.",
       image: "/api/placeholder/80/80",
       color: "from-green-500 to-emerald-500"
     },
     {
-      title: "Blockchain Integration Advisory",
-      description: "Strategic guidance on blockchain deployment choices, technical solution providers, and white label services for optimal project implementation.",
-      details: "Expert advisory on blockchain selection, infrastructure partners, development frameworks, and third-party integrations. We help identify the best technical solution providers and white label services to accelerate your blockchain project deployment.",
+      title: "Technology Guidance",
+      description: "Not sure which blockchain to build on or which tools to use? We'll help you pick the right technology for your specific needs.",
+      details: "There are tons of blockchain platforms and tools out there. We help you cut through the noise and choose what actually works best for your project. We'll also connect you with reliable development teams and service providers.",
       image: "/api/placeholder/80/80",
       color: "from-orange-500 to-red-500"
     }
@@ -308,7 +308,7 @@ export default function Home() {
           </h1>
           
           <p className="text-lg sm:text-xl lg:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed px-2">
-            Strategic guidance, due diligence, and technical expertise for your blockchain ventures.
+            We help you understand blockchain without the confusing jargon and make smart decisions for your business.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mt-8 sm:mt-12 px-4">
@@ -365,7 +365,7 @@ export default function Home() {
               What We <span className="font-normal">Deliver</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Comprehensive blockchain expertise across strategy, technology, and market dynamics
+              Here's how we can help your business succeed with blockchain technology
             </p>
           </div>
 
@@ -475,7 +475,7 @@ export default function Home() {
               Our Proven <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Process</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              A systematic approach to blockchain consulting that delivers measurable results
+              How we work with you step-by-step to get things done right
             </p>
           </div>
 
@@ -483,26 +483,26 @@ export default function Home() {
             {[
               {
                 step: "01",
-                title: "Discovery & Analysis",
-                description: "Deep dive into your project requirements, technical architecture, and business objectives with comprehensive market research",
+                title: "Understanding Your Needs",
+                description: "We'll sit down with you to understand exactly what you're trying to achieve and what challenges you're facing",
                 color: "from-blue-500 to-cyan-500"
               },
               {
                 step: "02", 
-                title: "Strategic Planning",
-                description: "Develop comprehensive roadmap with detailed risk assessment, realistic timeline, and optimal resource allocation strategy",
+                title: "Creating a Plan",
+                description: "We'll put together a clear, realistic plan with timelines and budgets that actually make sense for your situation",
                 color: "from-purple-500 to-pink-500"
               },
               {
                 step: "03",
-                title: "Implementation",
-                description: "Execute recommendations with hands-on support, continuous monitoring, and rigorous quality assurance protocols",
+                title: "Getting It Done",
+                description: "We'll work with you to put the plan into action, providing hands-on support and keeping you updated every step of the way",
                 color: "from-emerald-500 to-teal-500"
               },
               {
                 step: "04",
-                title: "Optimization",
-                description: "Continuous improvement through performance monitoring, data analysis, and post-launch optimization strategies",
+                title: "Making It Better",
+                description: "Once everything's running, we'll help you track how it's performing and make improvements as needed",
                 color: "from-orange-500 to-red-500"
               }
             ].map((process, index) => (
@@ -557,8 +557,8 @@ export default function Home() {
                 <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-500/25">
                   <div className="w-10 h-10 bg-white/20 rounded-lg" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-4">DeFi & Web3</h3>
-                <p className="text-gray-400 leading-relaxed">Deep expertise in decentralized finance protocols, yield farming strategies, automated market makers, and cutting-edge Web3 infrastructure development</p>
+                <h3 className="text-2xl font-semibold mb-4">Financial Apps</h3>
+                <p className="text-gray-400 leading-relaxed">We understand how crypto financial apps work - from lending and borrowing platforms to trading tools and everything in between</p>
               </div>
             </SubtleBorder>
             
@@ -567,8 +567,8 @@ export default function Home() {
                 <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-purple-500/25">
                   <div className="w-10 h-10 bg-white/20 rounded-lg" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-4">Enterprise Blockchain</h3>
-                <p className="text-gray-400 leading-relaxed">Strategic guidance for enterprise blockchain adoption, supply chain optimization, digital transformation initiatives, and regulatory compliance</p>
+                <h3 className="text-2xl font-semibold mb-4">Business Applications</h3>
+                <p className="text-gray-400 leading-relaxed">We help companies figure out if and how blockchain can improve their operations - whether it's tracking products, managing data, or working with regulations</p>
               </div>
             </SubtleBorder>
             
@@ -577,8 +577,8 @@ export default function Home() {
                 <div className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-emerald-500/25">
                   <div className="w-10 h-10 bg-white/20 rounded-lg" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-4">Token Economics</h3>
-                <p className="text-gray-400 leading-relaxed">Advanced token launch consultation, governance model optimization, sustainable economic mechanisms, and innovative incentive structures</p>
+                <h3 className="text-2xl font-semibold mb-4">Token Design</h3>
+                <p className="text-gray-400 leading-relaxed">We help you design tokens that actually work - figuring out the right supply, pricing, and incentives to keep your project sustainable</p>
               </div>
             </SubtleBorder>
           </div>
@@ -890,7 +890,7 @@ export default function Home() {
       {/* Section Divider */}
       <HorizontalDivider style="prominent" />
 
-      {/* Contact Section */}
+      {/* Contact & FAQ Section */}
       <section id="contact" className="relative z-10 py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
@@ -898,11 +898,65 @@ export default function Home() {
               Let's Discuss Your <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Project</span>
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              Have a specific project in mind? Need custom consultation? Get in touch with our blockchain experts to explore how we can accelerate your initiatives.
+              Got questions about your blockchain project? Not sure where to start? Drop us a message and we'll get back to you with straight answers.
             </p>
           </div>
 
-          <ContactForm />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* FAQ Section */}
+            <div className="space-y-6">
+              <h3 className="text-2xl font-semibold mb-6 text-center lg:text-left">
+                Common Questions
+              </h3>
+              <div className="space-y-4">
+                {[
+                  {
+                    question: "Do I actually need blockchain for my project?",
+                    answer: "Honestly, probably not. Most problems can be solved with regular databases and servers. We'll tell you straight up if blockchain isn't the right fit - we'd rather save you time and money than sell you something you don't need."
+                  },
+                  {
+                    question: "How much does blockchain development typically cost?",
+                    answer: "It depends on what you're building, but expect anywhere from $50k for a simple token to $500k+ for a complex financial app. We'll give you realistic estimates based on your specific needs."
+                  },
+                  {
+                    question: "How long does it take to build a blockchain project?",
+                    answer: "Simple projects might take 3-6 months, while complex ones can take 12-18 months or more. We'll help you understand what's realistic for your timeline and budget."
+                  },
+                  {
+                    question: "What's the difference between different blockchains?",
+                    answer: "Each blockchain has trade-offs - some are faster but more centralized, others are more secure but expensive to use. We'll help you pick the one that makes sense for your specific use case."
+                  },
+                  {
+                    question: "Can you help with regulatory compliance?",
+                    answer: "We can point you in the right direction and help you understand the landscape, but you'll need a specialized crypto lawyer for the actual legal work. We can recommend good ones."
+                  },
+                  {
+                    question: "Do you build the actual software?",
+                    answer: "We focus on strategy and guidance, not development. But we know great development teams and can help you find the right one for your project."
+                  }
+                ].map((faq, index) => (
+                  <SubtleBorder key={index} className="rounded-xl overflow-hidden" animated={false}>
+                    <div className="p-6 bg-gradient-to-br from-gray-900/40 to-gray-800/20 backdrop-blur-sm">
+                      <h4 className="font-semibold text-white mb-3 text-lg leading-snug">
+                        {faq.question}
+                      </h4>
+                      <p className="text-gray-400 leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </SubtleBorder>
+                ))}
+              </div>
+            </div>
+
+            {/* Contact Form */}
+            <div>
+              <h3 className="text-2xl font-semibold mb-6 text-center lg:text-left">
+                Get In Touch
+              </h3>
+              <ContactForm />
+            </div>
+          </div>
         </div>
       </section>
 
