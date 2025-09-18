@@ -3,11 +3,11 @@ import Link from 'next/link'
 
 interface LogoProps {
   className?: string
-  href?: string
+  href?: string | null
   height?: number
   width?: number
   showText?: boolean
-  size?: 'small' | 'medium' | 'large' | 'xl'
+  size?: 'small' | 'medium' | 'large' | 'xl' | 'lg' | 'sm'
 }
 
 export function Logo({ 
@@ -21,14 +21,19 @@ export function Logo({
   // Define size presets for better consistency
   const sizePresets = {
     small: { width: 140, height: 35 },
+    sm: { width: 140, height: 35 },
     medium: { width: 180, height: 45 },
     large: { width: 220, height: 55 },
+    lg: { width: 220, height: 55 }, // Map lg to large
     xl: { width: 260, height: 65 }
   }
   
+  // Ensure we have a valid size, fallback to medium if not found
+  const validSize = sizePresets[size as keyof typeof sizePresets] ? size as keyof typeof sizePresets : 'medium'
+  
   const logoSize = {
-    width: width ?? sizePresets[size].width,
-    height: height ?? sizePresets[size].height
+    width: width ?? sizePresets[validSize].width,
+    height: height ?? sizePresets[validSize].height
   }
   const logoElement = (
     <div className={`flex items-center ${className}`}>
@@ -48,7 +53,7 @@ export function Logo({
     </div>
   )
 
-  if (href) {
+  if (href && href !== null) {
     return (
       <Link href={href} className="transition-opacity hover:opacity-80">
         {logoElement}

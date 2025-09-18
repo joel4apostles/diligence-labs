@@ -19,6 +19,7 @@ import { DynamicPageBackground } from "@/components/ui/dynamic-page-background"
 import { HorizontalDivider } from "@/components/ui/section-divider"
 import { PAID_SUBSCRIPTION_PLANS } from "@/lib/subscription-plans"
 import { Logo } from "@/components/ui/logo"
+import SubscriptionDashboard from "@/components/SubscriptionDashboard"
 import dynamic from "next/dynamic"
 
 // Dynamically import heavy components with React.memo optimization
@@ -454,6 +455,21 @@ function DashboardContent() {
             </div>
           </SubtleBorder>
         </div>
+
+        {/* User Reputation & Subscription Management */}
+        <div className={`mb-12 transition-all duration-1000 delay-400 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-light mb-2">
+              <span className="font-normal text-white">Reputation & Subscriptions</span>
+            </h2>
+            <p className="text-gray-400">Track your progress and manage your subscription tier</p>
+          </div>
+          
+          <SubscriptionDashboard />
+        </div>
+
+        {/* Section Divider */}
+        <HorizontalDivider style="subtle" />
 
         {/* Subscription Plans Section - Only show if user doesn't have active subscription */}
         {!subscriptionData && (

@@ -34,6 +34,7 @@ const DashboardSkeleton = dynamic(() => import("@/components/admin/DashboardSkel
   loading: () => <div className="min-h-screen bg-black" />
 })
 
+
 interface DashboardStats {
   totalUsers: number
   totalSessions: number
@@ -435,6 +436,22 @@ export default function AdminDashboardPage() {
               <Link href="/admin/fraud-prevention">
                 <Button className="w-full justify-start bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white transition-all duration-300 hover:scale-105">
                   Fraud Prevention Report
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </ProminentBorder>
+
+        <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
+            <CardHeader>
+              <CardTitle className="text-white text-xl">Expert Applications</CardTitle>
+              <CardDescription className="text-gray-400">Review and approve expert verification requests</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Link href="/admin/expert-applications">
+                <Button className="w-full justify-start bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white transition-all duration-300 hover:scale-105">
+                  👨‍💼 Review Applications
                 </Button>
               </Link>
             </CardContent>

@@ -28,6 +28,8 @@ import {
   UserPlus,
   LogIn
 } from 'lucide-react'
+import ProjectSubmissionForm from '@/components/ProjectSubmissionForm'
+import ExpertLeaderboard from '@/components/ExpertLeaderboard'
 
 // Dynamically import background components for consistency with main site
 const FloatingElements = dynamic(() => import("@/components/ui/animated-background").then(mod => ({ default: mod.FloatingElements })), {
@@ -55,6 +57,7 @@ export default function DueDiligencePage() {
   const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null)
   const [userType, setUserType] = useState<'expert' | 'submitter' | null>(null)
   const [showPassword, setShowPassword] = useState(false)
+  const [showSubmissionForm, setShowSubmissionForm] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -135,6 +138,11 @@ export default function DueDiligencePage() {
     setActiveTab('auth')
   }
 
+  const handleProjectSubmission = () => {
+    setShowSubmissionForm(true)
+    setActiveTab('submit')
+  }
+
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Handle authentication logic here
@@ -199,7 +207,7 @@ export default function DueDiligencePage() {
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-4 text-lg"
-                onClick={() => handleAuth('signup', 'submitter')}
+                onClick={handleProjectSubmission}
               >
                 Submit Project <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
@@ -223,6 +231,8 @@ export default function DueDiligencePage() {
             <TabButton id="overview" label="How It Works" active={activeTab === 'overview'} onClick={setActiveTab} />
             <TabButton id="evaluation" label="Evaluation Criteria" active={activeTab === 'evaluation'} onClick={setActiveTab} />
             <TabButton id="experts" label="Expert Tiers" active={activeTab === 'experts'} onClick={setActiveTab} />
+            <TabButton id="leaderboard" label="Expert Leaderboard" active={activeTab === 'leaderboard'} onClick={setActiveTab} />
+            <TabButton id="submit" label="Submit Project" active={activeTab === 'submit'} onClick={setActiveTab} />
             <TabButton id="auth" label="Join Platform" active={activeTab === 'auth'} onClick={setActiveTab} />
           </div>
 
@@ -326,6 +336,82 @@ export default function DueDiligencePage() {
                   </Card>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Expert Leaderboard Tab */}
+          {activeTab === 'leaderboard' && (
+            <div className="max-w-6xl mx-auto">
+              <ExpertLeaderboard />
+            </div>
+          )}
+
+          {/* Submit Project Tab */}
+          {activeTab === 'submit' && (
+            <div className="max-w-6xl mx-auto">
+              {showSubmissionForm ? (
+                <ProjectSubmissionForm
+                  onClose={() => {
+                    setShowSubmissionForm(false)
+                    setActiveTab('overview')
+                  }}
+                  onSuccess={() => {
+                    setShowSubmissionForm(false)
+                    setActiveTab('overview')
+                  }}
+                />
+              ) : (
+                <Card className="bg-gray-900/50 border-gray-800 text-center max-w-2xl mx-auto">
+                  <CardContent className="p-12">
+                    <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <FileCheck className="w-10 h-10 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-4">Submit Your Project</h3>
+                    <p className="text-gray-400 mb-8 leading-relaxed">
+                      Get your blockchain project evaluated by verified experts through our comprehensive 
+                      due diligence process. Our community-driven approach ensures transparent, 
+                      unbiased assessment across all key dimensions.
+                    </p>
+                    <div className="grid md:grid-cols-2 gap-4 mb-8 text-left">
+                      <div className="flex items-start space-x-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="text-white font-medium">Multi-dimensional Evaluation</h4>
+                          <p className="text-sm text-gray-400">Team, PMF, infrastructure, and risk assessment</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="text-white font-medium">Verified Experts</h4>
+                          <p className="text-sm text-gray-400">KYC-verified professionals with proven track records</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="text-white font-medium">Transparent Scoring</h4>
+                          <p className="text-sm text-gray-400">Detailed reports with scoring and recommendations</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <h4 className="text-white font-medium">Community Driven</h4>
+                          <p className="text-sm text-gray-400">Collaborative assessment process</p>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      size="lg"
+                      onClick={() => setShowSubmissionForm(true)}
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-8 py-4"
+                    >
+                      Start Project Submission
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           )}
 
