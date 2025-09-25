@@ -1,24 +1,17 @@
 {
   "name": "diligence-labs-blockchain-consultant",
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build:vercel",
+  "functions": {
+    "app/api/**/route.ts": {
+      "maxDuration": 30
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
-  "env": {
-    "DATABASE_URL": "file:./prisma/dev.db"
   },
-  "build": {
-    "env": {
-      "DATABASE_URL": "file:./prisma/dev.db"
-    }
-  }
+  "crons": [],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "regions": ["iad1"]
 }
