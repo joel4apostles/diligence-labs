@@ -2,681 +2,482 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect, useState, useCallback, useMemo } from "react"
+import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { useUnifiedAuth } from "@/components/providers/unified-auth-provider"
-import { useAccount, useConnect, useDisconnect } from "wagmi"
-import { ConnectButton } from "@rainbow-me/rainbowkit"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FloatingElements } from "@/components/ui/animated-background"
-import { ParallaxBackground } from "@/components/ui/parallax-background"
-import { SectionGridLines } from "@/components/ui/grid-lines"
-import { SubtleBorder } from "@/components/ui/border-effects"
-import { PageStructureLines } from "@/components/ui/page-structure"
-import { DynamicPageBackground } from "@/components/ui/dynamic-page-background"
-import { HorizontalDivider } from "@/components/ui/section-divider"
-import { PAID_SUBSCRIPTION_PLANS } from "@/lib/subscription-plans"
-import { Logo } from "@/components/ui/logo"
-import SubscriptionDashboard from "@/components/SubscriptionDashboard"
-import dynamic from "next/dynamic"
+import { Badge } from "@/components/ui/badge"
+import { 
+  Calendar, 
+  Users, 
+  BarChart3, 
+  Settings, 
+  CreditCard, 
+  Wallet,
+  FileText,
+  TrendingUp,
+  Bell,
+  Shield,
+  Zap,
+  Crown
+} from "lucide-react"
 
-// Dynamically import heavy components with React.memo optimization
-const SubscriptionForm = dynamic(() => import("@/components/subscription").then(mod => ({ default: mod.SubscriptionForm })), {
-  loading: () => <div className="h-64 animate-pulse bg-gray-800/50 rounded-xl" />,
-  ssr: false
-})
-
-// Lazy load background components for better initial load
-const FloatingElementsLazy = dynamic(() => import("@/components/ui/animated-background").then(mod => ({ default: mod.FloatingElements })), {
-  ssr: false,
-  loading: () => null
-})
-
-const ParallaxBackgroundLazy = dynamic(() => import("@/components/ui/parallax-background").then(mod => ({ default: mod.ParallaxBackground })), {
-  ssr: false,
-  loading: () => null
-})
-
-function DashboardContent() {
+export default function Dashboard() {
   const { data: session, status } = useSession()
   const { user: unifiedUser, isLoading: unifiedLoading, isAuthenticated, logout } = useUnifiedAuth()
-  // Enable wallet functionality
-  const { address, isConnected } = useAccount()
-  const { disconnect } = useDisconnect()
-  const [isPageLoaded, setIsPageLoaded] = useState(false)
-  const [subscriptionData, setSubscriptionData] = useState<any>(null)
-  const [creditBalance, setCreditBalance] = useState<any>(null)
-  const [selectedPlan, setSelectedPlan] = useState<any>(null)
-  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false)
   const router = useRouter()
+  const [isPageLoaded, setIsPageLoaded] = useState(false)
+  const [dashboardStats, setDashboardStats] = useState({
+    totalSessions: 0,
+    upcomingSessions: 0,
+    completedReports: 0,
+    pendingReports: 0
+  })
+  const [subscriptionData, setSubscriptionData] = useState<any>(null)
+  const [isLoadingStats, setIsLoadingStats] = useState(true)
 
   useEffect(() => {
     // Wait for both auth systems to be ready
     if (status === "loading" || unifiedLoading) return
     
-    console.log('Dashboard auth check:', { 
-      nextAuthStatus: status, 
-      hasSession: !!session, 
-      userId: session?.user?.id,
-      isAuthenticated, 
-      unifiedLoading 
-    })
-    
     // Prioritize NextAuth session for traditional login
     if (status === "authenticated" && session?.user) {
-      console.log('NextAuth session valid, loading dashboard')
       setIsPageLoaded(true)
-      fetchSubscriptionData()
+      fetchDashboardData()
     } else if (isAuthenticated && status !== "authenticated") {
       // Only use unified auth if NextAuth is not authenticated
-      console.log('Unified auth valid, loading dashboard')
       setIsPageLoaded(true)
-      fetchSubscriptionData()
+      fetchDashboardData()
     } else if (status === "unauthenticated" && !isAuthenticated && !unifiedLoading) {
       // Only redirect if both auth systems confirm no authentication
-      console.log('No authentication found, redirecting to login')
       router.push("/auth/unified-signin")
     }
-    // If still loading or in transition state, wait
   }, [session, status, isAuthenticated, unifiedLoading, router])
 
-  const fetchSubscriptionData = useCallback(async () => {
+  const fetchDashboardData = useCallback(async () => {
     if (!session) return
     
     try {
-      const [subscriptionResponse, usageResponse] = await Promise.all([
-        fetch('/api/subscriptions/manage'),
-        fetch('/api/subscriptions/usage')
+      setIsLoadingStats(true)
+      const [statsResponse, subscriptionResponse] = await Promise.all([
+        fetch('/api/dashboard/stats'),
+        fetch('/api/subscriptions/manage')
       ])
+
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json()
+        setDashboardStats(statsData)
+      }
 
       if (subscriptionResponse.ok) {
         const subscriptionData = await subscriptionResponse.json()
         setSubscriptionData(subscriptionData.subscription)
       }
-
-      if (usageResponse.ok) {
-        const usageData = await usageResponse.json()
-        setCreditBalance(usageData.creditBalance)
-      }
     } catch (error) {
-      console.error("Failed to fetch subscription data:", error)
+      console.error("Failed to fetch dashboard data:", error)
+    } finally {
+      setIsLoadingStats(false)
     }
   }, [session])
 
-  // Handle wallet connection sync
-  useEffect(() => {
-    const syncWalletAddress = async () => {
-      if (isConnected && address && session?.user?.id) {
-        try {
-          const response = await fetch('/api/user/wallet', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ walletAddress: address }),
-          })
-          
-          if (response.ok) {
-            console.log('Wallet address synced successfully')
-          } else {
-            console.error('Failed to sync wallet address')
-          }
-        } catch (error) {
-          console.error('Error syncing wallet address:', error)
-        }
-      }
-    }
-
-    syncWalletAddress()
-  }, [isConnected, address, session?.user?.id])
-
-  const handleDisconnectWallet = useCallback(async () => {
-    try {
-      // Disconnect from wagmi
-      disconnect()
-      
-      // Remove from user profile
-      const response = await fetch('/api/user/wallet', {
-        method: 'DELETE',
-      })
-      
-      if (response.ok) {
-        console.log('Wallet disconnected successfully')
-      }
-    } catch (error) {
-      console.error('Failed to disconnect wallet:', error)
-    }
-  }, [disconnect])
-
-  const openSubscriptionModal = useCallback((plan: any) => {
-    setSelectedPlan(plan)
-    setIsSubscriptionModalOpen(true)
-  }, [])
-
-  const closeSubscriptionModal = useCallback(() => {
-    setSelectedPlan(null)
-    setIsSubscriptionModalOpen(false)
-  }, [])
-
-  const onSubscriptionSuccess = useCallback(() => {
-    closeSubscriptionModal()
-    // Refresh subscription data
-    fetchSubscriptionData()
-  }, [closeSubscriptionModal, fetchSubscriptionData])
-
+  // Enhanced loading states
   if (status === "loading" || unifiedLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">Loading...</div>
+      <div className="min-h-screen bg-black text-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="space-y-8">
+            {/* Header Skeleton */}
+            <div className="space-y-4">
+              <div className="h-12 bg-gray-800/50 rounded-lg w-96 animate-pulse"></div>
+              <div className="h-6 bg-gray-800/50 rounded-lg w-80 animate-pulse"></div>
+            </div>
+            
+            {/* Stats Cards Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-32 bg-gray-800/50 rounded-xl animate-pulse"></div>
+              ))}
+            </div>
+            
+            {/* Main Cards Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-48 bg-gray-800/50 rounded-xl animate-pulse"></div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 
-  if (!isAuthenticated) {
-    return null
+  // Enhanced error states
+  if (!isAuthenticated && !session?.user && status === "unauthenticated") {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center py-16">
+            <Shield className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-white mb-2">Authentication Required</h2>
+            <p className="text-gray-400 mb-6">Please sign in to access your dashboard</p>
+            <Link href="/auth/unified-signin">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Sign In
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* Dynamic Dashboard Background */}
-      <DynamicPageBackground variant="dashboard" opacity={0.2} />
-      
-      <PageStructureLines />
-      <SectionGridLines />
-      <ParallaxBackgroundLazy />
-      <FloatingElementsLazy />
-
-      <div className="relative z-10 container mx-auto px-4 py-8">
-        <div className={`flex justify-between items-center mb-12 transition-all duration-1000 ${isPageLoaded ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'}`}>
-          <div>
-            <div className="flex items-center gap-4 mb-4">
-              <Logo size="xl" href={null} />
-              <div className="w-px h-8 bg-gray-600"></div>
-              <div className="text-lg text-gray-400">Dashboard</div>
+    <div className="min-h-screen bg-black text-white">
+      <div className="container mx-auto px-4 py-8">
+        {/* Enhanced Header */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div>
+              <h1 className="text-4xl lg:text-5xl font-light mb-3">
+                Welcome back, <span className="font-normal bg-gradient-to-r from-orange-400 to-orange-300 bg-clip-text text-transparent">
+                  {unifiedUser?.name || session?.user?.name || 'User'}
+                </span>
+              </h1>
+              <p className="text-gray-400 text-lg max-w-2xl leading-relaxed">
+                Manage your blockchain consulting services, track sessions, and access expert advisory resources.
+              </p>
             </div>
-            <h1 className="text-4xl font-light mb-2">
-              Welcome back, <span className="font-normal text-white">
-                {unifiedUser?.name || 'User'}
-              </span>
-            </h1>
-            <p className="text-gray-400 text-lg">Manage your consulting services and subscriptions</p>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Wallet Connection */}
-            <div className="flex items-center gap-2">
-              {isConnected && address ? (
-                <div className="flex items-center gap-2">
-                  <div className="px-3 py-1 text-xs bg-green-500/20 text-green-400 rounded-lg border border-green-500/30 font-mono">
-                    {address.slice(0, 6)}...{address.slice(-4)}
-                  </div>
-                  <Button 
-                    onClick={handleDisconnectWallet}
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300"
-                  >
-                    Disconnect
-                  </Button>
-                </div>
-              ) : (
-                <ConnectButton.Custom>
-                  {({
-                    account,
-                    chain,
-                    openAccountModal,
-                    openChainModal,
-                    openConnectModal,
-                    authenticationStatus,
-                    mounted,
-                  }) => {
-                    const ready = mounted && authenticationStatus !== 'loading'
-                    const connected = ready && account && chain && (!authenticationStatus || authenticationStatus === 'authenticated')
-
-                    return (
-                      <div
-                        {...(!ready && {
-                          'aria-hidden': true,
-                          'style': {
-                            opacity: 0,
-                            pointerEvents: 'none',
-                            userSelect: 'none',
-                          },
-                        })}
-                      >
-                        {(() => {
-                          if (!connected) {
-                            return (
-                              <Button 
-                                onClick={openConnectModal} 
-                                variant="outline" 
-                                size="sm"
-                                className="border-blue-600 text-blue-400 hover:bg-blue-500/10 transition-all duration-300"
-                              >
-                                Connect Wallet
-                              </Button>
-                            )
-                          }
-
-                          return (
-                            <div className="flex items-center gap-2">
-                              <div className="px-3 py-1 text-xs bg-green-500/20 text-green-400 rounded-lg border border-green-500/30 font-mono">
-                                {account.address.slice(0, 6)}...{account.address.slice(-4)}
-                              </div>
-                              <Button 
-                                onClick={handleDisconnectWallet}
-                                variant="ghost" 
-                                size="sm" 
-                                className="text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300"
-                              >
-                                Disconnect
-                              </Button>
-                            </div>
-                          )
-                        })()}
-                      </div>
-                    )
-                  }}
-                </ConnectButton.Custom>
-              )}
-            </div>
-            
-            <Link href="/dashboard/profile">
-              <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-800 transition-all duration-300">
-                Profile
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard/profile">
+                <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-800 transition-all duration-300">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </Button>
+              </Link>
+              <Button 
+                onClick={() => logout()} 
+                variant="outline" 
+                className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300"
+              >
+                Sign Out
               </Button>
-            </Link>
-            <Button onClick={() => logout()} variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
-              Sign Out
-            </Button>
+            </div>
           </div>
         </div>
 
         {/* Subscription Status Banner */}
         {subscriptionData && (
-          <div className={`mb-8 transition-all duration-1000 delay-200 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <SubtleBorder className="rounded-xl overflow-hidden" animated={true} movingBorder={true}>
-              <div className="relative group bg-gradient-to-br from-blue-900/60 to-blue-800/30 backdrop-blur-xl rounded-xl">
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20" />
-                <Card className="bg-transparent border-0 relative z-10">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                          <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">
-                            {subscriptionData.planType.replace('_', ' ').toLowerCase().replace(/\b\w/g, (l: string) => l.toUpperCase())} Plan
-                          </h3>
-                          <p className="text-sm text-gray-400">
-                            Status: <span className="text-green-400 font-medium">{subscriptionData.status}</span> 
-                            {creditBalance && (
-                              <span className="ml-4">
-                                Credits: <span className="text-blue-400 font-medium">
-                                  {creditBalance.isUnlimited ? '∞' : creditBalance.remainingCredits}
-                                </span>
-                              </span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-4">
-                        <div className="text-right">
-                          <p className="text-sm text-gray-400">Next billing</p>
-                          <p className="text-white font-medium">
-                            {new Date(subscriptionData.currentPeriodEnd).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <Link href="/dashboard/profile">
-                          <Button variant="outline" size="sm" className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10 hover:border-blue-400 transition-all duration-300">
-                            Manage
-                          </Button>
-                        </Link>
-                      </div>
+          <div className="mb-8">
+            <Card className="bg-gradient-to-br from-blue-900/60 to-blue-800/30 backdrop-blur-xl border border-blue-500/30">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                      <Crown className="w-6 h-6 text-blue-400" />
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </SubtleBorder>
-          </div>
-        )}
-
-        {/* Section Divider */}
-        <HorizontalDivider style="subtle" />
-
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-12 transition-all duration-1000 delay-300 px-4 sm:px-0 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          {/* 1. Strategic Advisory - Book Consultation */}
-          <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
-            <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-blue-500/20 h-full rounded-xl">
-              {/* Dynamic background gradient */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20" />
-              
-              {/* Enhanced Hover Effects */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 transform -rotate-12 scale-110" />
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-              
-              <Card className="bg-transparent border-0 relative z-10">
-            <CardHeader>
-              <CardTitle className="text-xl text-white">Strategic Advisory</CardTitle>
-              <CardDescription className="text-gray-400">Book consultation session</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-                Navigate complex blockchain landscapes with expert guidance on technology decisions and strategies.
-              </p>
-              <Link href="/dashboard/book-consultation">
-                <Button className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300">Book Now</Button>
-              </Link>
-            </CardContent>
-              </Card>
-            </div>
-          </SubtleBorder>
-
-          {/* 2. Due Diligence - My Sessions */}
-          <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
-            <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-purple-500/20 h-full rounded-xl">
-              {/* Dynamic background gradient */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20" />
-              
-              {/* Enhanced Hover Effects */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 transform -rotate-12 scale-110" />
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-              
-              <Card className="bg-transparent border-0 relative z-10">
-                <CardHeader>
-                  <CardTitle className="text-xl text-white">Due Diligence</CardTitle>
-                  <CardDescription className="text-gray-400">View consultation history</CardDescription>
-                </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-                Comprehensive analysis of technical architecture, team capabilities, and market potential for decisions.
-              </p>
-              <Link href="/dashboard/sessions">
-                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">View Sessions</Button>
-              </Link>
-            </CardContent>
-              </Card>
-            </div>
-          </SubtleBorder>
-
-          {/* 3. Token Launch Consultation - Reports */}
-          <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
-            <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-green-500/20 h-full rounded-xl">
-              {/* Dynamic background gradient */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20" />
-              
-              {/* Enhanced Hover Effects */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 transform -rotate-12 scale-110" />
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-              
-              <Card className="bg-transparent border-0 relative z-10">
-                <CardHeader>
-                  <CardTitle className="text-xl text-white">Token Launch</CardTitle>
-                  <CardDescription className="text-gray-400">Access launch guidance</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-                    End-to-end guidance for successful token launches including regulatory compliance and strategy.
-                  </p>
-                  <Link href="/dashboard/reports">
-                    <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">View Reports</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </div>
-          </SubtleBorder>
-
-          {/* 4. Blockchain Integration Advisory - New Card */}
-          <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
-            <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-orange-500/20 h-full rounded-xl">
-              {/* Dynamic background gradient */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20" />
-              
-              {/* Enhanced Hover Effects */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 transform -rotate-12 scale-110" />
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-              
-              <Card className="bg-transparent border-0 relative z-10">
-                <CardHeader>
-                  <CardTitle className="text-xl text-white">Blockchain Integration Advisory</CardTitle>
-                  <CardDescription className="text-gray-400">Expert deployment guidance</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-                    Strategic guidance on blockchain deployment, solution providers, and white label services.
-                  </p>
-                  <Link href="/dashboard/request-report">
-                    <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">Request Analysis</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </div>
-          </SubtleBorder>
-        </div>
-
-        {/* User Reputation & Subscription Management */}
-        <div className={`mb-12 transition-all duration-1000 delay-400 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-light mb-2">
-              <span className="font-normal text-white">Reputation & Subscriptions</span>
-            </h2>
-            <p className="text-gray-400">Track your progress and manage your subscription tier</p>
-          </div>
-          
-          <SubscriptionDashboard />
-        </div>
-
-        {/* Section Divider */}
-        <HorizontalDivider style="subtle" />
-
-        {/* Subscription Plans Section - Only show if user doesn't have active subscription */}
-        {!subscriptionData && (
-          <div className={`mb-12 transition-all duration-1000 delay-400 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-light mb-2">
-                <span className="font-normal text-white">Upgrade Your Plan</span>
-              </h2>
-              <p className="text-gray-400">Subscribe to unlock premium consultation services</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-0">
-              {PAID_SUBSCRIPTION_PLANS.map((plan, index) => (
-                <SubtleBorder key={plan.id} className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
-                  <div className={`relative group bg-gradient-to-br ${
-                    index === 0 ? 'from-blue-900/60 to-blue-800/30 hover:shadow-blue-500/20' :
-                    index === 1 ? 'from-purple-900/60 to-purple-800/30 hover:shadow-purple-500/20' :
-                    'from-orange-900/60 to-orange-800/30 hover:shadow-orange-500/20'
-                  } backdrop-blur-xl transition-all duration-700 hover:shadow-2xl h-full rounded-xl`}>
-                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br ${
-                      index === 0 ? 'from-blue-500/20 to-cyan-500/20' :
-                      index === 1 ? 'from-purple-500/20 to-pink-500/20' :
-                      'from-orange-500/20 to-red-500/20'
-                    }`} />
-                    <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${
-                      index === 0 ? 'from-blue-500 to-cyan-500' :
-                      index === 1 ? 'from-purple-500 to-pink-500' :
-                      'from-orange-500 to-red-500'
-                    } transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`} />
-                    
-                    <Card className="bg-transparent border-0 relative z-10">
-                      <CardHeader className="text-center">
-                        {plan.popular && (
-                          <div className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-3 py-1 rounded-full text-sm font-medium mx-auto w-fit mb-4">
-                            Most Popular
-                          </div>
-                        )}
-                        <CardTitle className="text-xl text-white">{plan.name}</CardTitle>
-                        <div className="text-center mt-2">
-                          <span className="text-3xl font-bold text-white">${plan.price.monthly}</span>
-                          <span className="text-gray-400 ml-1">/month</span>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <ul className="space-y-3 mb-6 text-sm">
-                          {plan.features.slice(0, 4).map((feature, featureIndex) => (
-                            <li key={featureIndex} className="flex items-center text-gray-300">
-                              <svg className="w-4 h-4 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                              {feature.name}
-                              {feature.limit && <span className="text-gray-400"> ({feature.limit})</span>}
-                            </li>
-                          ))}
-                        </ul>
-                        <Button 
-                          onClick={() => openSubscriptionModal(plan)}
-                          className={`w-full bg-gradient-to-r ${
-                            index === 0 ? 'from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600' :
-                            index === 1 ? 'from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600' :
-                            'from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-                          } transition-all duration-300`}
-                        >
-                          Subscribe to {plan.name}
-                        </Button>
-                      </CardContent>
-                    </Card>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">
+                        {subscriptionData.planType?.replace('_', ' ').toLowerCase().replace(/\b\w/g, (l: string) => l.toUpperCase()) || 'Free'} Plan
+                      </h3>
+                      <p className="text-sm text-gray-400">
+                        Status: <span className="text-green-400 font-medium">{subscriptionData.status || 'Active'}</span>
+                      </p>
+                    </div>
                   </div>
-                </SubtleBorder>
-              ))}
-            </div>
+                  <Link href="/dashboard/profile">
+                    <Button variant="outline" size="sm" className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10 hover:border-blue-400">
+                      Manage Plan
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
-        {/* Section Divider */}
-        <div className="flex justify-center my-12">
-          <HorizontalDivider style="subtle" className="max-w-2xl" />
-        </div>
-
-        {/* Profile & Settings Section */}
-        <div className={`transition-all duration-1000 delay-500 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-light mb-2">
-              <span className="font-normal text-white">Profile & Settings</span>
-            </h2>
-            <p className="text-gray-400">Manage your account information and preferences</p>
+        {/* Upgrade Banner for Free Users */}
+        {(!subscriptionData || subscriptionData.planType === 'FREE') && (
+          <div className="mb-8">
+            <Card className="bg-gradient-to-br from-purple-900/60 to-pink-800/30 backdrop-blur-xl border border-purple-500/30">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                      <Zap className="w-6 h-6 text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">Unlock Premium Features</h3>
+                      <p className="text-sm text-gray-400">
+                        Upgrade to access unlimited consultations, priority support, and advanced analytics
+                      </p>
+                    </div>
+                  </div>
+                  <Link href="/dashboard/upgrade">
+                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white">
+                      Upgrade Now
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           </div>
+        )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 px-4 sm:px-0">
-            {/* Account Information - Strategic Advisory Theme (Blue-Cyan) */}
-            <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
-              <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-blue-500/20 h-full rounded-xl">
-                {/* Dynamic background gradient */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20" />
-                
-                {/* Enhanced Hover Effects */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 transform -rotate-12 scale-110" />
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                
-                <Card className="bg-transparent border-0 relative z-10">
-            <CardHeader>
-              <CardTitle className="text-xl text-white">Account Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Email</label>
-                <p className="text-sm text-gray-400">{unifiedUser?.email}</p>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Name</label>
-                <p className="text-sm text-gray-400">{unifiedUser?.name || "Not set"}</p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Role</label>
-                <p className="text-sm text-gray-400">{unifiedUser?.role || "USER"}</p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Auth Provider</label>
-                <p className="text-sm text-gray-400 capitalize">{unifiedUser?.authProvider || "Unknown"}</p>
-              </div>
-
-              {unifiedUser?.walletAddress && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">Connected Wallet</label>
-                  <p className="text-sm text-gray-400 font-mono bg-gray-800/50 px-3 py-2 rounded">
-                    {unifiedUser.walletAddress.slice(0, 6)}...{unifiedUser.walletAddress.slice(-4)}
+        {/* Dashboard Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-800 hover:bg-gray-900/70 transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-400">Total Sessions</p>
+                  <p className="text-2xl font-bold text-white">
+                    {isLoadingStats ? '--' : dashboardStats.totalSessions}
                   </p>
                 </div>
-              )}
-
-              <div className="pt-4 border-t border-gray-700">
-                <Link href="/dashboard/profile">
-                  <Button variant="outline" size="sm" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
-                    Manage Profile
-                  </Button>
-                </Link>
+                <Calendar className="w-8 h-8 text-blue-400" />
               </div>
             </CardContent>
-                </Card>
-              </div>
-            </SubtleBorder>
+          </Card>
 
-            {/* Quick Actions - Blockchain Integration Advisory Theme (Orange-Red) */}
-            <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
-              <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-orange-500/20 h-full rounded-xl">
-                {/* Dynamic background gradient */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20" />
-                
-                {/* Enhanced Hover Effects */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 transform -rotate-12 scale-110" />
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                
-                <Card className="bg-transparent border-0 relative z-10">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-white">Quick Actions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Link href="/dashboard/services/strategic-advisory">
-                      <Button variant="outline" className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
-                        Strategic Advisory
-                      </Button>
-                    </Link>
-                    <Link href="/dashboard/services/due-diligence">
-                      <Button variant="outline" className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
-                        Due Diligence
-                      </Button>
-                    </Link>
-                    <Link href="/dashboard/services/token-launch">
-                      <Button variant="outline" className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
-                        Token Launch Consultation
-                      </Button>
-                    </Link>
-                    <Link href="/dashboard/services/blockchain-integration-advisory">
-                      <Button variant="outline" className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
-                        Blockchain Integration Advisory
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+          <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-800 hover:bg-gray-900/70 transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-400">Upcoming</p>
+                  <p className="text-2xl font-bold text-white">
+                    {isLoadingStats ? '--' : dashboardStats.upcomingSessions}
+                  </p>
+                </div>
+                <Bell className="w-8 h-8 text-orange-400" />
               </div>
-            </SubtleBorder>
-          </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-800 hover:bg-gray-900/70 transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-400">Completed Reports</p>
+                  <p className="text-2xl font-bold text-white">
+                    {isLoadingStats ? '--' : dashboardStats.completedReports}
+                  </p>
+                </div>
+                <FileText className="w-8 h-8 text-green-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-800 hover:bg-gray-900/70 transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-400">Pending Reports</p>
+                  <p className="text-2xl font-bold text-white">
+                    {isLoadingStats ? '--' : dashboardStats.pendingReports}
+                  </p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-purple-400" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
+        {/* Main Action Cards - Enhanced */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {/* Book Consultation */}
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group">
+            <CardHeader className="pb-4">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-blue-500/40 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                  <Calendar className="w-8 h-8 text-blue-400" />
+                </div>
+                <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-xs">
+                  Priority
+                </Badge>
+              </div>
+              <CardTitle className="text-2xl text-white group-hover:text-blue-100 transition-colors duration-300 mb-2">
+                Book Consultation
+              </CardTitle>
+              <CardDescription className="text-gray-400 text-base">
+                Schedule personalized blockchain strategy sessions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-6">
+                <p className="text-gray-300 mb-4 leading-relaxed">
+                  Get expert guidance on blockchain strategy, token launches, smart contracts, and technology decisions.
+                </p>
+              </div>
+              <Link href="/dashboard/book-consultation" className="w-full">
+                <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transition-all duration-300 h-12">
+                  Schedule Session
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
 
+          {/* My Sessions */}
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 group">
+            <CardHeader className="pb-4">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500/30 to-pink-500/30 border border-purple-500/40 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                  <Users className="w-8 h-8 text-purple-400" />
+                </div>
+                <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-xs">
+                  Active
+                </Badge>
+              </div>
+              <CardTitle className="text-2xl text-white group-hover:text-purple-100 transition-colors duration-300 mb-2">
+                My Sessions
+              </CardTitle>
+              <CardDescription className="text-gray-400 text-base">
+                Track and manage your consultations
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-6">
+                <p className="text-gray-300 mb-4 leading-relaxed">
+                  Access session notes, recordings, action items, and follow-up recommendations.
+                </p>
+              </div>
+              <Link href="/dashboard/sessions" className="w-full">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-white/10 hover:text-white hover:border-gray-500 transition-all duration-300 h-12">
+                  View Sessions
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
 
-        {/* Subscription Modal */}
-        {selectedPlan && (
-          <SubscriptionForm
-            plan={selectedPlan}
-            isOpen={isSubscriptionModalOpen}
-            onClose={closeSubscriptionModal}
-            onSuccess={onSubscriptionSuccess}
-            context="dashboard"
-          />
-        )}
+          {/* Reports & Analytics */}
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-green-500/10 transition-all duration-300 group">
+            <CardHeader className="pb-4">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500/30 to-emerald-500/30 border border-green-500/40 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                  <BarChart3 className="w-8 h-8 text-green-400" />
+                </div>
+                <Badge className="bg-green-500/10 text-green-400 border-green-500/20 text-xs">
+                  Ready
+                </Badge>
+              </div>
+              <CardTitle className="text-2xl text-white group-hover:text-green-100 transition-colors duration-300 mb-2">
+                Reports & Analytics
+              </CardTitle>
+              <CardDescription className="text-gray-400 text-base">
+                Due diligence & market analysis
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-6">
+                <p className="text-gray-300 mb-4 leading-relaxed">
+                  Access comprehensive reports, market analysis, and technical assessments.
+                </p>
+              </div>
+              <Link href="/dashboard/reports" className="w-full">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-white/10 hover:text-white hover:border-gray-500 transition-all duration-300 h-12">
+                  View Reports
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Profile Settings */}
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 group">
+            <CardHeader className="pb-4">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500/30 to-red-500/30 border border-orange-500/40 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                  <Settings className="w-8 h-8 text-orange-400" />
+                </div>
+                <Badge className="bg-orange-500/10 text-orange-400 border-orange-500/20 text-xs">
+                  Settings
+                </Badge>
+              </div>
+              <CardTitle className="text-2xl text-white group-hover:text-orange-100 transition-colors duration-300 mb-2">
+                Profile Settings
+              </CardTitle>
+              <CardDescription className="text-gray-400 text-base">
+                Manage your account preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-6">
+                <p className="text-gray-300 mb-4 leading-relaxed">
+                  Update profile information, change password, manage wallet connections.
+                </p>
+              </div>
+              <Link href="/dashboard/profile" className="w-full">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-white/10 hover:text-white hover:border-gray-500 transition-all duration-300 h-12">
+                  Manage Profile
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Wallet Management */}
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-cyan-500/10 transition-all duration-300 group">
+            <CardHeader className="pb-4">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-cyan-500/30 to-teal-500/30 border border-cyan-500/40 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                  <Wallet className="w-8 h-8 text-cyan-400" />
+                </div>
+                <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-xs">
+                  Crypto
+                </Badge>
+              </div>
+              <CardTitle className="text-2xl text-white group-hover:text-cyan-100 transition-colors duration-300 mb-2">
+                Wallet Connection
+              </CardTitle>
+              <CardDescription className="text-gray-400 text-base">
+                Connect your crypto wallets
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-6">
+                <p className="text-gray-300 mb-4 leading-relaxed">
+                  Connect MetaMask, WalletConnect, and other wallets for seamless payments.
+                </p>
+              </div>
+              <Link href="/dashboard/wallet" className="w-full">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-white/10 hover:text-white hover:border-gray-500 transition-all duration-300 h-12">
+                  Manage Wallets
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Subscription Management */}
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-yellow-500/10 transition-all duration-300 group">
+            <CardHeader className="pb-4">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-yellow-500/30 to-orange-500/30 border border-yellow-500/40 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                  <CreditCard className="w-8 h-8 text-yellow-400" />
+                </div>
+                <Badge className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20 text-xs">
+                  Billing
+                </Badge>
+              </div>
+              <CardTitle className="text-2xl text-white group-hover:text-yellow-100 transition-colors duration-300 mb-2">
+                Subscription
+              </CardTitle>
+              <CardDescription className="text-gray-400 text-base">
+                Manage your billing and plans
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-6">
+                <p className="text-gray-300 mb-4 leading-relaxed">
+                  View billing history, upgrade plans, and manage payment methods.
+                </p>
+              </div>
+              <Link href="/dashboard/subscription" className="w-full">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-white/10 hover:text-white hover:border-gray-500 transition-all duration-300 h-12">
+                  Manage Subscription
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )
-}
-
-// Create a dynamic import to avoid SSR issues with wagmi
-const DashboardWrapper = dynamic(() => Promise.resolve(DashboardContent), { ssr: false })
-
-export default function Dashboard() {
-  return <DashboardWrapper />
 }

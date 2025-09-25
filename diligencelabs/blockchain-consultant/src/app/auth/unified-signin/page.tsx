@@ -15,13 +15,17 @@ import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FloatingElements } from "@/components/ui/animated-background"
-import { ParallaxBackground } from "@/components/ui/parallax-background"
-import { FormGridLines } from "@/components/ui/grid-lines"
-import { ProminentBorder } from "@/components/ui/border-effects"
-import { PageStructureLines } from "@/components/ui/page-structure"
-import { DynamicPageBackground } from "@/components/ui/dynamic-page-background"
 import { Logo } from "@/components/ui/logo"
+import { AuthErrorBoundary } from "@/components/ui/error-boundary"
+import { PageLoading, LoadingSpinner } from "@/components/ui/loading-states"
+import { 
+  PageWrapper, 
+  GlassMorphismCard, 
+  FloatingOrb,
+  theme,
+  animations
+} from "@/components/ui/consistent-theme"
+import { motion } from "framer-motion"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -107,9 +111,21 @@ function UnifiedSignInContent() {
   useEffect(() => {
     setIsPageLoaded(true)
     
+    // Handle URL messages
+    const message = searchParams?.get('message')
+    const verified = searchParams?.get('verified')
+    
+    if (message === 'check-email') {
+      setError('Registration successful! Please check your email and verify your account before logging in.')
+    } else if (verified === 'true') {
+      setError('Email verified successfully! You can now log in to your account.')
+    }
+    
     // Check available OAuth providers
     getProviders().then(providers => {
       console.log('Available OAuth providers:', providers)
+      console.log('Provider keys:', providers ? Object.keys(providers) : 'no providers')
+      console.log('Non-credential providers:', providers ? Object.keys(providers).filter(key => key !== 'credentials') : 'none')
       setAvailableProviders(providers || {})
     }).catch(err => {
       console.log('Failed to fetch OAuth providers:', err)
@@ -173,7 +189,29 @@ function UnifiedSignInContent() {
       console.log("Credentials sign in result:", result)
 
       if (result?.error) {
-        setError(result.error)
+        // Provide user-friendly error messages
+        const errorMessages: Record<string, string> = {
+          'CredentialsSignin': 'Invalid email or password. Please check your credentials and try again.',
+          'CallbackRouteError': 'Authentication failed. Please try again.',
+          'SessionRequired': 'Please log in to continue.',
+          'AccessDenied': 'Access denied. Please contact support if this continues.',
+          'Verification': 'Please verify your email address before logging in.',
+          'Account is temporarily locked': 'Account temporarily locked due to failed attempts. Check your email for a password reset link.',
+          'Account locked': 'Account temporarily locked. Check your email for a password reset link.',
+          'Please verify your email': 'Please verify your email address before logging in. Check your email for a verification link.'
+        }
+        
+        let userFriendlyError = result.error
+        
+        // Find matching error message
+        for (const [key, message] of Object.entries(errorMessages)) {
+          if (result.error.includes(key) || result.error.toLowerCase().includes(key.toLowerCase())) {
+            userFriendlyError = message
+            break
+          }
+        }
+        
+        setError(userFriendlyError)
       } else if (result?.ok) {
         console.log("Credentials sign in successful")
         // The useEffect will handle the redirect when the session updates
@@ -277,71 +315,95 @@ function UnifiedSignInContent() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center p-4">
-      {/* Dynamic Auth Background */}
-      <DynamicPageBackground variant="auth" opacity={0.25} />
-      
-      <PageStructureLines />
-      <FormGridLines />
-      <ParallaxBackground />
-      <FloatingElements />
-
-      {/* Navigation */}
-      <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-6 sm:p-8">
-        <div className={`transition-all duration-1000 ${isPageLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+    <AuthErrorBoundary>
+      <PageWrapper>
+        {/* Navigation */}
+        <motion.nav 
+          {...animations.slideDown}
+          className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-6 sm:p-8"
+        >
           <Logo size="large" />
-        </div>
-      </nav>
+          <Link href="/">
+            <motion.button
+              whileHover={{ scale: 1.05, y: -1 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-4 py-2 text-gray-300 hover:text-white border border-gray-600 hover:border-gray-400 rounded-lg transition-all duration-300 backdrop-blur-sm"
+            >
+              ← Back to Home
+            </motion.button>
+          </Link>
+        </motion.nav>
 
-      <ProminentBorder 
-        className={`w-full max-w-lg relative z-10 rounded-2xl overflow-hidden transition-all duration-1000 delay-300 ${isPageLoaded ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}
-        animated={true}
-      >
-        <Card className="bg-gradient-to-br from-gray-900/90 to-gray-800/50 backdrop-blur-xl border-0 shadow-2xl">
-        <CardHeader className="space-y-1 text-center pb-6">
-          <div className="flex justify-center mb-4">
-            <Logo size="xl" href={null} />
-          </div>
-          <CardTitle className="text-3xl font-light mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-            Welcome Back
-          </CardTitle>
-          <CardDescription className="text-gray-400 text-lg">
-            Sign in to continue to your dashboard
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent className="px-8 pb-8">
-          {error && (
-            <div className="bg-red-500/20 border border-red-500/30 text-red-300 text-sm p-4 rounded-xl backdrop-blur mb-6 animate-in slide-in-from-top-2">
-              <div className="flex items-center space-x-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{error}</span>
-              </div>
-            </div>
-          )}
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <motion.div
+            {...animations.fadeIn}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="w-full max-w-lg"
+          >
+            <GlassMorphismCard variant="primary" hover={true}>
+              <Card className="bg-transparent border-0 shadow-2xl">
+                <CardHeader className="space-y-1 text-center pb-6">
+                  <motion.div 
+                    {...animations.fadeIn}
+                    transition={{ duration: 0.6, delay: 0.5 }}
+                    className="flex justify-center mb-4"
+                  >
+                    <Logo size="xl" href={null} />
+                  </motion.div>
+                  <motion.div 
+                    {...animations.slideUp}
+                    transition={{ duration: 0.6, delay: 0.7 }}
+                  >
+                    <CardTitle className="text-3xl font-light mb-2">
+                      <span className="bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400 bg-clip-text text-transparent">
+                        Welcome Back
+                      </span>
+                    </CardTitle>
+                    <CardDescription className="text-gray-400 text-lg">
+                      Sign in to continue to your dashboard
+                    </CardDescription>
+                  </motion.div>
+                </CardHeader>
+                
+                <CardContent className="px-8 pb-8">
+                  {error && (
+                    <motion.div 
+                      {...animations.slideUp}
+                      className="bg-red-500/10 border border-red-500/20 text-red-300 text-sm p-4 rounded-xl backdrop-blur mb-6"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>{error}</span>
+                      </div>
+                    </motion.div>
+                  )}
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-800/50 border border-gray-700 rounded-lg p-1 mb-6">
-              <TabsTrigger 
-                value="social" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
-              >
-                Social Login
-              </TabsTrigger>
-              <TabsTrigger 
-                value="traditional" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
-              >
-                Email & Password
-              </TabsTrigger>
-            </TabsList>
+                  <motion.div
+                    {...animations.slideUp}
+                    transition={{ duration: 0.6, delay: 0.9 }}
+                  >
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                      <TabsList className="grid w-full grid-cols-2 bg-gray-800/30 border border-gray-700/50 rounded-lg p-1 mb-6 backdrop-blur-sm">
+                        <TabsTrigger 
+                          value="social" 
+                          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
+                        >
+                          Social Login
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="traditional" 
+                          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white text-gray-400 transition-all duration-300 hover:text-gray-200"
+                        >
+                          Email & Password
+                        </TabsTrigger>
+                      </TabsList>
 
             <TabsContent value="social" className="space-y-6">
               {/* Social Login Dropdown */}
-              {availableProviders && Object.values(availableProviders)
-                .filter((provider: any) => provider.id !== 'credentials')
+              {availableProviders && Object.keys(availableProviders)
+                .filter((key) => key !== 'credentials')
                 .length > 0 ? (
                 <div className="space-y-4">
                   <div className="text-center text-sm text-gray-400 mb-4">
@@ -353,9 +415,9 @@ function UnifiedSignInContent() {
                       <SelectValue placeholder="Select a sign-in method" />
                     </SelectTrigger>
                     <SelectContent className="bg-gray-800 border-gray-600">
-                      {Object.values(availableProviders)
-                        .filter((provider: any) => provider.id !== 'credentials')
-                        .map((provider: any) => (
+                      {Object.entries(availableProviders)
+                        .filter(([key, provider]: [string, any]) => key !== 'credentials')
+                        .map(([key, provider]: [string, any]) => (
                           <SelectItem 
                             key={provider.id} 
                             value={provider.id}
@@ -384,25 +446,30 @@ function UnifiedSignInContent() {
                   </Select>
                   
                   {selectedProvider && (
-                    <Button
-                      onClick={() => selectedProvider === 'web3-wallet' ? handlePrivyLogin() : handleOAuthSignIn(selectedProvider)}
-                      disabled={!!oAuthLoading}
-                      className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
+                    <motion.div
+                      {...animations.fadeIn}
+                      transition={{ duration: 0.4 }}
                     >
-                      {oAuthLoading === selectedProvider ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          <span>Connecting...</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center space-x-3">
-                          <span className="text-xl">{getProviderIcon(selectedProvider)}</span>
-                          <span className="font-medium">
-                            {selectedProvider === 'web3-wallet' ? 'Connect Web3 Wallet' : `Sign in with ${getProviderName(selectedProvider)}`}
-                          </span>
-                        </div>
-                      )}
-                    </Button>
+                      <Button
+                        onClick={() => selectedProvider === 'web3-wallet' ? handlePrivyLogin() : handleOAuthSignIn(selectedProvider)}
+                        disabled={!!oAuthLoading}
+                        className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110 disabled:opacity-70"
+                      >
+                        {oAuthLoading === selectedProvider ? (
+                          <div className="flex items-center space-x-2">
+                            <LoadingSpinner size="sm" color="white" />
+                            <span>Connecting...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-3">
+                            <span className="text-xl">{getProviderIcon(selectedProvider)}</span>
+                            <span className="font-medium">
+                              {selectedProvider === 'web3-wallet' ? 'Connect Web3 Wallet' : `Sign in with ${getProviderName(selectedProvider)}`}
+                            </span>
+                          </div>
+                        )}
+                      </Button>
+                    </motion.div>
                   )}
                 </div>
               ) : (
@@ -476,53 +543,62 @@ function UnifiedSignInContent() {
                       </FormItem>
                     )}
                   />
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110"
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    {isLoading ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Signing in...</span>
-                      </div>
-                    ) : (
-                      <span className="font-medium">Sign In</span>
-                    )}
-                  </Button>
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:brightness-110 disabled:opacity-70"
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center space-x-2">
+                          <LoadingSpinner size="sm" color="white" />
+                          <span>Signing in...</span>
+                        </div>
+                      ) : (
+                        <span className="font-medium">Sign In</span>
+                      )}
+                    </Button>
+                  </motion.div>
                 </form>
               </Form>
 
-              <div className="flex items-center justify-between text-sm mt-6">
+              <motion.div 
+                {...animations.fadeIn}
+                transition={{ duration: 0.6, delay: 1.1 }}
+                className="flex items-center justify-between text-sm mt-6"
+              >
                 <Link
                   href="/auth/forgot-password"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-orange-400 hover:text-orange-300 transition-colors duration-300"
                 >
                   Forgot password?
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-orange-400 hover:text-orange-300 transition-colors duration-300"
                 >
                   Create account
                 </Link>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-        </Card>
-      </ProminentBorder>
-    </div>
+              </motion.div>
+                    </TabsContent>
+                  </Tabs>
+                  </motion.div>
+                </CardContent>
+              </Card>
+            </GlassMorphismCard>
+          </motion.div>
+        </div>
+      </PageWrapper>
+    </AuthErrorBoundary>
   )
 }
 
 export default function UnifiedSignInPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
-      </div>
-    }>
+    <Suspense fallback={<PageLoading message="Loading sign in..." showLogo={true} />}>
       <UnifiedSignInContent />
     </Suspense>
   )

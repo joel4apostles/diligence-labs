@@ -4,10 +4,16 @@ import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ParallaxBackground } from "@/components/ui/parallax-background"
-import { FloatingElements } from "@/components/ui/animated-background"
-import { SectionGridLines } from "@/components/ui/grid-lines"
-import { PageStructureLines } from "@/components/ui/page-structure"
+import { ErrorBoundary } from "@/components/ui/error-boundary"
+import { PageLoading } from "@/components/ui/loading-states"
+import { 
+  PageWrapper, 
+  GlassMorphismCard, 
+  FloatingOrb,
+  theme,
+  animations
+} from "@/components/ui/consistent-theme"
+import { motion } from "framer-motion"
 
 interface AdminData {
   id: string
@@ -75,18 +81,15 @@ export default function AdminLayout({
   }
 
   if (isAuthPage) {
-    return <>{children}</>
+    return (
+      <ErrorBoundary>
+        {children}
+      </ErrorBoundary>
+    )
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p>Loading admin dashboard...</p>
-        </div>
-      </div>
-    )
+    return <PageLoading message="Loading admin dashboard..." showLogo={true} />
   }
 
   if (!adminData) {
@@ -94,18 +97,18 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      <PageStructureLines />
-      <SectionGridLines />
-      <ParallaxBackground />
-      <FloatingElements />
-      
-      {/* Admin-specific background elements */}
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-full filter blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-full filter blur-3xl animate-pulse" style={{ animationDelay: '3s' }} />
+    <ErrorBoundary>
+      <PageWrapper backgroundVariant="grid" showOrbs={false}>
+        {/* Admin-specific floating orbs */}
+        <FloatingOrb color="orange" position={{ top: '25%', right: '25%' }} delay={0} />
+        <FloatingOrb color="orange" position={{ bottom: '25%', left: '25%' }} delay={2} />
 
-      {/* Admin Navigation Header */}
-      <div className="relative z-10 border-b border-gray-800/50">
+        {/* Admin Navigation Header */}
+        <motion.div 
+          {...animations.slideDown}
+          transition={{ duration: 0.6 }}
+          className="border-b border-gray-800/50 backdrop-blur-xl bg-black/20"
+        >
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-8">
@@ -176,12 +179,13 @@ export default function AdminLayout({
             </div>
           </div>
         </div>
-      </div>
+        </motion.div>
 
-      {/* Admin Content */}
-      <div className="relative z-10">
-        {children}
-      </div>
-    </div>
+        {/* Admin Content */}
+        <div className="relative z-10">
+          {children}
+        </div>
+      </PageWrapper>
+    </ErrorBoundary>
   )
 }

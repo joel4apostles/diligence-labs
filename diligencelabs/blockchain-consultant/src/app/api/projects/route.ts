@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    const user = await verifyAuthAndGetUser(headers())
+    const authResult = await verifyAuthAndGetUser(request)
+    const user = authResult.error ? null : authResult.user
     
     if (userOnly && !user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
@@ -93,7 +94,8 @@ export async function GET(request: NextRequest) {
 // POST /api/projects - Submit a new project
 export async function POST(request: NextRequest) {
   try {
-    const user = await verifyAuthAndGetUser(headers())
+    const authResult = await verifyAuthAndGetUser(request)
+    const user = authResult.error ? null : authResult.user
     
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })

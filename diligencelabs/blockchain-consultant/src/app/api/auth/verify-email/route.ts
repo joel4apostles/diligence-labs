@@ -59,11 +59,48 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { email } = body
+    const { token, email } = body
 
+    // If token is provided, verify the email
+    if (token) {
+      // Find user with this verification token
+      const user = await prisma.user.findFirst({
+        where: {
+          emailVerificationToken: token,
+          emailVerificationExpiry: {
+            gt: new Date() // Token not expired
+          }
+        }
+      })
+
+      if (!user) {
+        return NextResponse.json(
+          { error: "Invalid or expired verification token" },
+          { status: 400 }
+        )
+      }
+
+      // Verify the user's email
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          emailVerified: new Date(),
+          emailVerificationToken: null,
+          emailVerificationExpiry: null,
+          accountStatus: 'ACTIVE' // Activate account upon email verification
+        }
+      })
+
+      return NextResponse.json({
+        message: "Email verified successfully",
+        verified: true
+      })
+    }
+
+    // If email is provided, resend verification email
     if (!email) {
       return NextResponse.json(
-        { error: "Email is required" },
+        { error: "Email or token is required" },
         { status: 400 }
       )
     }

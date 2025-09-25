@@ -29,6 +29,9 @@ model User {
   // Blockchain wallet
   walletAddress String?   @unique
   
+  // Wallet management
+  walletConnections WalletConnection[]
+  
   // Authentication
   password      String?
   
@@ -56,12 +59,8 @@ model User {
   // Subscription tracking
   stripeCustomerId String?
   
-  // User Reputation System
-  reputationPoints Int @default(0)
-  submitterTier    SubmitterTier @default(BASIC)
-  totalProjectsSubmitted Int @default(0)
-  successfulProjects Int @default(0)
-  averageProjectScore Float @default(0.0)
+  // Basic user tier for subscriptions
+  userTier    SubscriptionPlan @default(BASIC_MONTHLY)
   
   // Subscription limits
   monthlyProjectLimit Int @default(1)
@@ -83,11 +82,10 @@ model User {
   subscriptions Subscription[]
   notificationLogs AdminNotificationLog[]
   activityLogs UserActivityLog[]
+  creditBalance CreditBalance?
+  dashboardStats DashboardStats?
   
-  // Due Diligence Relations
-  submittedProjects Project[]
-  expertProfile     ExpertProfile?
-  userReputation    UserReputation?
+  // Simplified relations
   
   // Performance indexes
   @@index([email])
@@ -135,6 +133,17 @@ model Session {
   priority         Priority         @default(MEDIUM)
   estimatedHours   Int?
   
+  // Book consultation form fields
+  title            String?
+  projectName      String?
+  contactEmail     String?
+  urgency          Priority?
+  duration         Int?             // duration in minutes
+  totalPrice       Float?           // session price
+  preferredDate    DateTime?
+  paymentStatus    String?          // 'pending', 'completed', 'failed'
+  paymentMethod    String?          // 'subscription', 'payment'
+  
   // Guest session data (for non-authenticated users)
   guestEmail       String?
   guestName        String?
@@ -156,6 +165,7 @@ model Session {
   // Relations
   user             User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
   assignments      SessionAssignment[]
+  creditUsage      CreditUsage[]
   
   // Performance indexes
   @@index([userId])
@@ -324,7 +334,7 @@ enum Role {
 enum ConsultationType {
   STRATEGIC_ADVISORY
   DUE_DILIGENCE
-  TOKENOMICS_DESIGN
+  BLOCKCHAIN_INTEGRATION_ADVISORY
   TOKEN_LAUNCH
 }
 
@@ -433,6 +443,7 @@ model Subscription {
   
   // Relations
   user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creditBalances    CreditBalance[]
   
   // Performance indexes
   @@index([userId])
@@ -462,13 +473,6 @@ enum SubscriptionPlan {
   ECOSYSTEM_PARTNER_MONTHLY
 }
 
-enum SubmitterTier {
-  BASIC
-  VERIFIED
-  PREMIUM
-  VC
-  ECOSYSTEM_PARTNER
-}
 
 enum BillingCycle {
   MONTHLY
@@ -590,552 +594,124 @@ model AdminKey {
   @@map("admin_keys")
 }
 
-// Decentralized Due Diligence Models
+// Enhanced models for new features
 
-model Project {
-  id                String           @id @default(cuid())
-  name              String
-  description       String
-  website           String?
-  category          ProjectCategory
-  status            ProjectStatus    @default(SUBMITTED)
-  submitterId       String
-  
-  // Team information
-  foundingTeam      String?          // JSON string with founder details
-  teamSize          Int?
-  keyPersonnel      String?          // JSON string with key team members
-  
-  // Technical details
-  blockchain        String?          // Which blockchain(s)
-  technologyStack   String?          // JSON string with tech details
-  smartContract     String?          // Contract address if applicable
-  repository        String?          // GitHub repo URL
-  whitepaper        String?          // URL to whitepaper
-  
-  // Business metrics
-  fundingRaised     Float?           // Amount in USD
-  currentTraction   String?          // JSON string with traction metrics
-  userBase          Int?
-  monthlyRevenue    Float?
-  
-  // Due diligence requirements
-  evaluationDeadline DateTime?
-  priorityLevel     Priority         @default(MEDIUM)
-  evaluationBudget  Float?           // Budget in tokens/USD
-  
-  // Social verification
-  twitterHandle     String?
-  linkedinProfile   String?
-  discordServer     String?
-  telegramGroup     String?
-  
-  // Final scores (calculated from evaluations)
-  overallScore      Float?
-  teamScore         Float?
-  pmfScore          Float?
-  infrastructureScore Float?
-  statusScore       Float?
-  competitiveScore  Float?
-  riskScore         Float?
+model WalletConnection {
+  id            String   @id @default(cuid())
+  userId        String
+  address       String
+  type          String   // 'MetaMask', 'WalletConnect', etc.
+  network       String   // 'Ethereum', 'Polygon', etc.
+  isActive      Boolean  @default(true)
+  balance       String?  // Last known balance
+  lastSynced    DateTime?
   
   // Timestamps
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-  evaluationStartedAt DateTime?
-  evaluationCompletedAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   
   // Relations
-  submitter         User             @relation(fields: [submitterId], references: [id], onDelete: Cascade)
-  evaluations       ProjectEvaluation[]
-  assignments       ProjectAssignment[]
-  rewardDistributions RewardDistribution[]
-  
-  // Performance indexes
-  @@index([submitterId])
-  @@index([status])
-  @@index([category])
-  @@index([priorityLevel])
-  @@index([createdAt])
-  @@index([evaluationDeadline])
-  @@index([status, category])
-  @@index([status, createdAt])
-  
-  @@map("projects")
-}
-
-model ExpertProfile {
-  id                String              @id @default(cuid())
-  userId            String              @unique
-  
-  // Verification status
-  verificationStatus VerificationStatus @default(PENDING)
-  kycStatus         KYCStatus          @default(PENDING)
-  
-  // Professional information
-  linkedinUrl       String?
-  githubUrl         String?
-  twitterHandle     String?
-  company           String?
-  position          String?
-  yearsExperience   Int?
-  bio               String?
-  
-  // Expertise areas
-  primaryExpertise  String?            // JSON array of expertise areas
-  secondaryExpertise String?           // JSON array of secondary areas
-  
-  // Reputation & Performance
-  reputationPoints  Int                @default(0)
-  expertTier        ExpertTier         @default(BRONZE)
-  totalEvaluations  Int                @default(0)
-  accuracyRate      Float              @default(0.0)
-  averageRating     Float              @default(0.0)
-  
-  // Rewards & Staking
-  totalRewards      Float              @default(0.0)
-  currentStake      Float              @default(0.0)
-  stakedTokens      Float              @default(0.0)
-  
-  // Activity metrics
-  monthlyEvaluations Int               @default(0)
-  lastActiveAt      DateTime?
-  
-  // Penalties & Slashing
-  penaltyCount      Int                @default(0)
-  slashedAmount     Float              @default(0.0)
-  
-  // Timestamps
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  verifiedAt        DateTime?
-  
-  // Relations
-  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  evaluations       ProjectEvaluation[]
-  assignments       ProjectAssignment[]
-  achievements      ExpertAchievement[]
-  payouts           ExpertPayout[]
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   // Performance indexes
   @@index([userId])
-  @@index([verificationStatus])
-  @@index([expertTier])
-  @@index([reputationPoints])
-  @@index([totalEvaluations])
-  @@index([accuracyRate])
-  @@index([verificationStatus, expertTier])
-  @@index([reputationPoints, expertTier])
+  @@index([address])
+  @@index([type])
+  @@index([isActive])
+  @@index([userId, isActive])
   
-  @@map("expert_profiles")
+  @@map("wallet_connections")
 }
 
-model ProjectEvaluation {
-  id              String                 @id @default(cuid())
-  projectId       String
-  expertId        String
-  
-  // Evaluation scores (0-10)
-  teamScore       Float?
-  teamComments    String?
-  
-  pmfScore        Float?
-  pmfComments     String?
-  
-  infrastructureScore Float?
-  infrastructureComments String?
-  
-  statusScore     Float?
-  statusComments  String?
-  
-  competitiveScore Float?
-  competitiveComments String?
-  
-  riskScore       Float?
-  riskComments    String?
-  
-  // Overall assessment
-  overallScore    Float?
-  overallComments String?
-  recommendation  EvaluationRecommendation?
-  confidenceLevel Float?                 // 0-1 (how confident the expert is)
-  
-  // Evaluation metadata
-  status          EvaluationStatus       @default(ASSIGNED)
-  timeSpent       Int?                   // Minutes spent on evaluation
-  difficulty      EvaluationDifficulty   @default(MEDIUM)
-  
-  // Reward calculation
-  baseReward      Float?                 // Base reward for evaluation
-  qualityBonus    Float?                 // Bonus for high-quality evaluation
-  consensusBonus  Float?                 // Bonus for agreement with other experts
-  totalReward     Float?                 // Final reward amount
+model CreditBalance {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  subscriptionId    String?
+  isUnlimited       Boolean  @default(false)
+  totalCredits      Int      @default(0)
+  usedCredits       Int      @default(0)
+  remainingCredits  Int      @default(0)
+  resetDate         DateTime?
   
   // Timestamps
-  createdAt       DateTime               @default(now())
-  updatedAt       DateTime               @updatedAt
-  startedAt       DateTime?
-  submittedAt     DateTime?
-  approvedAt      DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
   
   // Relations
-  project         Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  expert          ExpertProfile          @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription      Subscription? @relation(fields: [subscriptionId], references: [id])
+  usageHistory      CreditUsage[]
   
   // Performance indexes
-  @@index([projectId])
-  @@index([expertId])
-  @@index([status])
-  @@index([submittedAt])
-  @@index([overallScore])
-  @@index([status, expertId])
-  @@index([status, projectId])
+  @@index([userId])
+  @@index([subscriptionId])
+  @@index([resetDate])
+  @@index([remainingCredits])
   
-  @@unique([projectId, expertId])
-  @@map("project_evaluations")
+  @@map("credit_balances")
 }
 
-model ProjectAssignment {
-  id              String              @id @default(cuid())
-  projectId       String
-  expertId        String
-  assignmentType  AssignmentType      @default(PRIMARY)
-  status          AssignmentStatus    @default(ASSIGNED)
-  
-  // Assignment details
-  estimatedHours  Int?
-  deadline        DateTime?
-  specialization  String?             // Required specialization for this assignment
-  
-  // Staking information
-  stakeRequired   Float?              // Required stake amount
-  stakeAmount     Float?              // Actual staked amount
-  stakeStatus     StakeStatus         @default(PENDING)
+model CreditUsage {
+  id              String        @id @default(cuid())
+  creditBalanceId String
+  sessionId       String?
+  creditsUsed     Int
+  reason          String        // 'consultation', 'report_generation', etc.
+  details         String?       // JSON with additional details
   
   // Timestamps
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
-  acceptedAt      DateTime?
-  completedAt     DateTime?
+  createdAt       DateTime      @default(now())
   
   // Relations
-  project         Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  expert          ExpertProfile       @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  creditBalance   CreditBalance @relation(fields: [creditBalanceId], references: [id], onDelete: Cascade)
+  session         Session?      @relation(fields: [sessionId], references: [id])
   
   // Performance indexes
-  @@index([projectId])
-  @@index([expertId])
-  @@index([status])
-  @@index([assignmentType])
-  @@index([deadline])
-  @@index([status, expertId])
+  @@index([creditBalanceId])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@index([reason])
   
-  @@unique([projectId, expertId])
-  @@map("project_assignments")
+  @@map("credit_usage_history")
 }
 
-model ExpertAchievement {
-  id              String              @id @default(cuid())
-  expertId        String
-  achievementType AchievementType
-  title           String
-  description     String
-  pointsAwarded   Int
+model DashboardStats {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  totalSessions     Int      @default(0)
+  upcomingSessions  Int      @default(0)
+  completedReports  Int      @default(0)
+  pendingReports    Int      @default(0)
+  totalSpent        Float    @default(0.0)
   
-  // Achievement metadata
-  criteria        String?             // JSON string with achievement criteria
-  progress        String?             // JSON string with progress tracking
-  badgeImage      String?             // URL to badge image
-  
-  // Timestamps
-  createdAt       DateTime            @default(now())
-  awardedAt       DateTime            @default(now())
+  // Cache timestamps
+  lastUpdated       DateTime @default(now())
   
   // Relations
-  expert          ExpertProfile       @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   // Performance indexes
-  @@index([expertId])
-  @@index([achievementType])
-  @@index([awardedAt])
-  @@index([expertId, achievementType])
+  @@index([userId])
+  @@index([lastUpdated])
   
-  @@map("expert_achievements")
+  @@map("dashboard_stats")
 }
 
-model RewardDistribution {
-  id                String    @id @default(cuid())
-  projectId         String
-  totalFee          Float     // Total fee paid by subscriber
-  platformFee       Float     // Platform's share
-  expertsPool       Float     // Pool for experts
-  
-  // Distribution details
-  distributionDate  DateTime  @default(now())
-  status           RewardStatus @default(PENDING)
-  
-  // Relations
-  project          Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  payouts          ExpertPayout[]
+model ConsultationPricing {
+  id                String            @id @default(cuid())
+  consultationType  ConsultationType  @unique
+  basePricePerHour  Float
+  description       String
+  isActive          Boolean           @default(true)
   
   // Timestamps
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
   
   // Performance indexes
-  @@index([projectId])
-  @@index([status])
-  @@index([distributionDate])
-  
-  @@map("reward_distributions")
-}
-
-model ExpertPayout {
-  id                   String              @id @default(cuid())
-  rewardDistributionId String
-  expertId             String
-  amount               Float
-  payoutType           PayoutType
-  
-  // Payout details
-  status               PayoutStatus        @default(PENDING)
-  transactionHash      String?             // Blockchain transaction hash
-  payoutDate           DateTime?
-  
-  // Relations
-  rewardDistribution   RewardDistribution  @relation(fields: [rewardDistributionId], references: [id], onDelete: Cascade)
-  expert               ExpertProfile       @relation(fields: [expertId], references: [id], onDelete: Cascade)
-  
-  // Timestamps
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
-  
-  // Performance indexes
-  @@index([rewardDistributionId])
-  @@index([expertId])
-  @@index([status])
-  @@index([payoutDate])
-  
-  @@map("expert_payouts")
-}
-
-model SubscriptionFeature {
-  id                String              @id @default(cuid())
-  planType          SubscriptionPlan
-  featureName       String
-  featureValue      String              // JSON string for complex values
-  isActive          Boolean             @default(true)
-  
-  // Timestamps
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  
-  // Performance indexes
-  @@index([planType])
+  @@index([consultationType])
   @@index([isActive])
   
-  @@unique([planType, featureName])
-  @@map("subscription_features")
+  @@map("consultation_pricing")
 }
 
-model UserReputation {
-  id              String            @id @default(cuid())
-  userId          String            @unique
-  
-  // Reputation tracking
-  totalPoints     Int               @default(0)
-  level           Int               @default(1)
-  badgesEarned    String?           // JSON array of badge IDs
-  
-  // Activity metrics
-  projectsSubmitted Int             @default(0)
-  averageRating   Float             @default(0.0)
-  completionRate  Float             @default(0.0)
-  
-  // Tier progression
-  tierProgress    Float             @default(0.0)
-  nextTierPoints  Int               @default(100)
-  
-  // Relations
-  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  achievements    UserAchievement[]
-  
-  // Timestamps
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  
-  // Performance indexes
-  @@index([userId])
-  @@index([totalPoints])
-  @@index([level])
-  
-  @@map("user_reputations")
-}
-
-model UserAchievement {
-  id                String           @id @default(cuid())
-  userReputationId  String
-  achievementType   UserAchievementType
-  title             String
-  description       String
-  pointsAwarded     Int
-  badgeImage        String?
-  
-  // Relations
-  userReputation    UserReputation   @relation(fields: [userReputationId], references: [id], onDelete: Cascade)
-  
-  // Timestamps
-  createdAt         DateTime         @default(now())
-  awardedAt         DateTime         @default(now())
-  
-  // Performance indexes
-  @@index([userReputationId])
-  @@index([achievementType])
-  @@index([awardedAt])
-  
-  @@map("user_achievements")
-}
-
-// Enums for Decentralized Due Diligence
-
-enum ProjectCategory {
-  DEFI
-  NFT
-  GAMEFI
-  INFRASTRUCTURE
-  LAYER2
-  DAO
-  METAVERSE
-  SOCIAL
-  PRIVACY
-  LENDING
-  DEX
-  STABLECOIN
-  BRIDGE
-  WALLET
-  TOOLING
-  OTHER
-}
-
-enum ProjectStatus {
-  SUBMITTED
-  UNDER_REVIEW
-  EXPERT_ASSIGNMENT
-  EVALUATION_IN_PROGRESS
-  EVALUATION_COMPLETED
-  REPORT_GENERATED
-  PUBLISHED
-  REJECTED
-  CANCELLED
-}
-
-enum VerificationStatus {
-  PENDING
-  UNDER_REVIEW
-  VERIFIED
-  REJECTED
-  SUSPENDED
-}
-
-enum KYCStatus {
-  PENDING
-  SUBMITTED
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-  EXPIRED
-}
-
-enum ExpertTier {
-  BRONZE
-  SILVER
-  GOLD
-  PLATINUM
-  DIAMOND
-}
-
-enum EvaluationRecommendation {
-  STRONG_BUY
-  BUY
-  HOLD
-  CAUTION
-  AVOID
-}
-
-enum EvaluationStatus {
-  ASSIGNED
-  ACCEPTED
-  IN_PROGRESS
-  SUBMITTED
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-  CANCELLED
-}
-
-enum EvaluationDifficulty {
-  SIMPLE
-  MEDIUM
-  COMPLEX
-  VERY_COMPLEX
-}
-
-enum AssignmentType {
-  PRIMARY
-  SECONDARY
-  REVIEWER
-  SPECIALIST
-}
-
-enum StakeStatus {
-  PENDING
-  STAKED
-  RELEASED
-  SLASHED
-  DISPUTED
-}
-
-enum AchievementType {
-  EVALUATION_MILESTONE
-  ACCURACY_ACHIEVEMENT
-  QUALITY_AWARD
-  CONSENSUS_EXPERT
-  TIER_PROMOTION
-  COMMUNITY_FAVORITE
-  SPECIALIST_RECOGNITION
-  LEADERSHIP_AWARD
-}
-
-enum RewardStatus {
-  PENDING
-  PROCESSING
-  DISTRIBUTED
-  FAILED
-  CANCELLED
-}
-
-enum PayoutType {
-  EVALUATION_REWARD
-  QUALITY_BONUS
-  CONSENSUS_BONUS
-  MONTHLY_BONUS
-  TIER_BONUS
-}
-
-enum PayoutStatus {
-  PENDING
-  PROCESSING
-  COMPLETED
-  FAILED
-  CANCELLED
-}
-
-enum UserAchievementType {
-  PROJECT_MILESTONE
-  RATING_ACHIEVEMENT
-  VERIFICATION_BADGE
-  TIER_UPGRADE
-  COMMUNITY_RECOGNITION
-  PLATFORM_LOYALTY
-  QUALITY_SUBMITTER
-}

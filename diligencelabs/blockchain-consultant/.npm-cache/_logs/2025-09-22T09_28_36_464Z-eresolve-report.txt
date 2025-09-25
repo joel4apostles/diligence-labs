@@ -1,0 +1,18 @@
+'Log files:
+/Users/joel/vibe-code/diligencelabs/blockchain-consultant/.npm-cache/_logs/2025-09-22T09_28_36_464Z-debug-0.log
+
+# npm resolution error report
+
+While resolving: diligence-labs@0.1.1
+Found: react@19.1.0
+node_modules/react
+  react@"19.1.0" from the root project
+
+Could not resolve dependency:
+peer react@"^16.8.0 || ^17.0.0 || ^18.0.0" from react-query@3.39.3
+node_modules/react-query
+  react-query@"*" from the root project
+
+Fix the upstream dependency conflict, or retry
+this command with --force or --legacy-peer-deps
+to accept an incorrect (and potentially broken) dependency resolution.

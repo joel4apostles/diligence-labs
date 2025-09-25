@@ -12,15 +12,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import { FloatingElements } from "@/components/ui/animated-background"
-import { ParallaxBackground } from "@/components/ui/parallax-background"
-import { SectionGridLines } from "@/components/ui/grid-lines"
-import { SubtleBorder } from "@/components/ui/border-effects"
-import { PageStructureLines } from "@/components/ui/page-structure"
-import { HorizontalDivider } from "@/components/ui/section-divider"
+import { Logo } from "@/components/ui/logo"
 import { ChangePasswordModal } from "@/components/profile/ChangePasswordModal"
 import { PrivacySettingsModal } from "@/components/profile/PrivacySettingsModal"
-import { Logo } from "@/components/ui/logo"
+import { DashboardErrorBoundary } from "@/components/ui/error-boundary"
+import { PageLoading, LoadingSpinner } from "@/components/ui/loading-states"
+import { 
+  PageWrapper, 
+  GlassMorphismCard, 
+  FloatingOrb,
+  theme,
+  animations
+} from "@/components/ui/consistent-theme"
+import { motion } from "framer-motion"
 
 export default function Profile() {
   const { data: session, update } = useSession()
@@ -168,26 +172,18 @@ export default function Profile() {
   }
 
   if (!session) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">Loading...</div>
-      </div>
-    )
+    return <PageLoading message="Loading your profile..." />
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      <PageStructureLines />
-      <SectionGridLines />
-      <ParallaxBackground />
-      <FloatingElements />
-      
-      {/* Animated Background Elements */}
-      <div className="absolute top-1/4 right-1/6 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full filter blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 left-1/6 w-96 h-96 bg-gradient-to-r from-cyan-500/10 to-pink-500/10 rounded-full filter blur-3xl animate-pulse" style={{ animationDelay: '3s' }} />
-
-      <div className="relative z-10 container mx-auto px-4 py-8">
-        <div className={`flex items-center gap-4 mb-12 transition-all duration-1000 ${isPageLoaded ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'}`}>
+    <DashboardErrorBoundary>
+      <PageWrapper>
+        <div className="container mx-auto px-4 py-8">
+        <motion.div 
+          {...animations.slideDown}
+          transition={{ duration: 0.8 }}
+          className="flex items-center gap-4 mb-12"
+        >
           <Link href="/dashboard">
             <Button variant="outline" size="sm" className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
               ← Back to Dashboard
@@ -204,14 +200,11 @@ export default function Profile() {
             </h1>
             <p className="text-gray-400 text-lg">Manage your account information and preferences</p>
           </div>
-        </div>
-
-        {/* Section Divider */}
-        <HorizontalDivider style="subtle" />
+        </motion.div>
 
         <div className={`grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8 max-w-8xl mx-auto transition-all duration-1000 delay-300 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           {/* 1. Profile Information - Strategic Advisory Theme (Blue-Cyan) */}
-          <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
+          <div className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105">
             <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-blue-500/20 h-full rounded-xl">
               {/* Dynamic background gradient */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20" />
@@ -278,10 +271,10 @@ export default function Profile() {
                 </CardContent>
               </Card>
             </div>
-          </SubtleBorder>
+          </div>
 
           {/* 2. Blockchain Wallet - Due Diligence Theme (Purple-Pink) */}
-          <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
+          <div className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105">
             <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-purple-500/20 h-full rounded-xl">
               {/* Dynamic background gradient */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20" />
@@ -381,10 +374,10 @@ export default function Profile() {
                 </CardContent>
               </Card>
             </div>
-          </SubtleBorder>
+          </div>
 
           {/* 3. Account Security - Token Launch Theme (Green-Emerald) */}
-          <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
+          <div className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105">
             <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-green-500/20 h-full rounded-xl">
               {/* Dynamic background gradient */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20" />
@@ -477,10 +470,10 @@ export default function Profile() {
                 </CardContent>
               </Card>
             </div>
-          </SubtleBorder>
+          </div>
 
           {/* 4. Subscription Management - Orange-Red Theme */}
-          <SubtleBorder className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105" animated={true} movingBorder={true}>
+          <div className="rounded-xl overflow-hidden transition-all duration-300 hover:scale-105">
             <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl transition-all duration-700 hover:shadow-2xl hover:shadow-orange-500/20 h-full rounded-xl">
               {/* Dynamic background gradient */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20" />
@@ -594,29 +587,25 @@ export default function Profile() {
                 </CardContent>
               </Card>
             </div>
-          </SubtleBorder>
+          </div>
         </div>
 
-        {/* Section Divider */}
-        <div className="flex justify-center my-16">
-          <HorizontalDivider style="subtle" className="max-w-2xl" />
-        </div>
+        {/* Modals */}
+        <ChangePasswordModal
+          isOpen={showChangePasswordModal}
+          onClose={() => setShowChangePasswordModal(false)}
+          onSuccess={() => {
+            // Optionally show a success message or update UI
+            console.log('Password changed successfully')
+          }}
+        />
+
+        <PrivacySettingsModal
+          isOpen={showPrivacySettingsModal}
+          onClose={() => setShowPrivacySettingsModal(false)}
+        />
       </div>
-
-      {/* Modals */}
-      <ChangePasswordModal
-        isOpen={showChangePasswordModal}
-        onClose={() => setShowChangePasswordModal(false)}
-        onSuccess={() => {
-          // Optionally show a success message or update UI
-          console.log('Password changed successfully')
-        }}
-      />
-
-      <PrivacySettingsModal
-        isOpen={showPrivacySettingsModal}
-        onClose={() => setShowPrivacySettingsModal(false)}
-      />
-    </div>
+      </PageWrapper>
+    </DashboardErrorBoundary>
   )
 }

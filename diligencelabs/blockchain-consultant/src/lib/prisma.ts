@@ -8,19 +8,11 @@ const globalForPrisma = globalThis as unknown as {
 
 // Create Prisma client with enhanced configuration
 const createPrismaClient = () => {
-  // Use dummy database URL for builds when actual DATABASE_URL is not available
-  const databaseUrl = process.env.DATABASE_URL || 'postgresql://dummy:dummy@dummy:5432/dummy'
-
   const client = new PrismaClient({
     log: process.env.NODE_ENV === 'development' 
       ? ['query', 'error', 'warn'] 
       : ['error'],
     errorFormat: 'minimal',
-    datasources: {
-      db: {
-        url: databaseUrl,
-      },
-    },
   })
 
   // For now, temporarily disable encryption middleware until we can properly configure it

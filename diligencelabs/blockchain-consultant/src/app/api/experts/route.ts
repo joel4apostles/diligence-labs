@@ -84,11 +84,13 @@ export async function GET(request: NextRequest) {
 // POST /api/experts - Create or update expert profile
 export async function POST(request: NextRequest) {
   try {
-    const user = await verifyAuthAndGetUser(headers())
+    const authResult = await verifyAuthAndGetUser(request)
     
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
     }
+    
+    const user = authResult.user
 
     const body = await request.json()
     const {

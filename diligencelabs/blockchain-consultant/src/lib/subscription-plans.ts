@@ -67,29 +67,26 @@ export const FREE_CONSULTATION_PLAN: SubscriptionPlanConfig = {
 export const PAID_SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
   {
     id: "BASIC_MONTHLY" as SubscriptionPlan,
-    name: "Premium",
-    description: "Monthly subscription with enhanced features",
+    name: "Professional",
+    description: "Perfect for growing businesses",
     price: {
       monthly: 299,
     },
     features: [
       { name: "3 Monthly Consultations", included: true },
       { name: "All Consultation Types", included: true },
-      { name: "Priority Scheduling", included: true },
-      { name: "Priority Email Support", included: true },
-      { name: "Advanced Reports & Analytics", included: true },
-      { name: "Credit Rollover", included: true },
-      { name: "Team Collaboration", included: true, limit: "2 members" },
-      { name: "Monthly Strategy Sessions", included: true },
+      { name: "Priority Support", included: true },
+      { name: "Detailed Reports", included: true },
+      { name: "Team Access (2 members)", included: true },
     ],
     stripePriceId: {
-      monthly: "price_premium_monthly",
+      monthly: "price_professional_monthly",
     },
     consultationCredits: {
       monthly: 3,
       rollover: true,
     },
-    consultationTypes: ["STRATEGIC_ADVISORY", "DUE_DILIGENCE", "TOKEN_LAUNCH", "BLOCKCHAIN_INTEGRATION_ADVISORY"],
+    consultationTypes: ["STRATEGIC_ADVISORY", "TOKEN_LAUNCH", "BLOCKCHAIN_INTEGRATION_ADVISORY"],
     prioritySupport: true,
     reportAccess: true,
     teamCollaboration: true,
@@ -97,51 +94,19 @@ export const PAID_SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
     popular: true,
   },
   {
-    id: "PROFESSIONAL_MONTHLY" as SubscriptionPlan,
-    name: "Professional",
-    description: "Advanced monthly subscription for professional users",
-    price: {
-      monthly: 499,
-    },
-    features: [
-      { name: "6 Monthly Consultations", included: true },
-      { name: "All Consultation Types", included: true },
-      { name: "Comprehensive Due Diligence", included: true },
-      { name: "Priority Support (24h response)", included: true },
-      { name: "Custom Reports & Analytics", included: true },
-      { name: "Team Collaboration", included: true, limit: "5 members" },
-      { name: "Monthly Strategic Reviews", included: true },
-      { name: "Direct Expert Access", included: true },
-    ],
-    stripePriceId: {
-      monthly: "price_professional_monthly",
-    },
-    consultationCredits: {
-      monthly: 6,
-      rollover: true,
-    },
-    consultationTypes: ["STRATEGIC_ADVISORY", "DUE_DILIGENCE", "TOKEN_LAUNCH", "BLOCKCHAIN_INTEGRATION_ADVISORY"],
-    prioritySupport: true,
-    reportAccess: true,
-    teamCollaboration: true,
-    maxTeamMembers: 5,
-  },
-  {
     id: "ENTERPRISE_MONTHLY" as SubscriptionPlan,
     name: "Enterprise",
-    description: "Top-tier monthly subscription for enterprise-level needs",
+    description: "For large organizations and VCs",
     price: {
-      monthly: 999,
+      monthly: 699,
     },
     features: [
-      { name: "Unlimited Monthly Consultations", included: true },
+      { name: "Unlimited Consultations", included: true },
       { name: "All Consultation Types", included: true },
-      { name: "White-glove Due Diligence", included: true },
       { name: "24/7 Priority Support", included: true },
       { name: "Custom Reports & Analytics", included: true },
-      { name: "Unlimited Team Collaboration", included: true },
+      { name: "Unlimited Team Access", included: true },
       { name: "Dedicated Account Manager", included: true },
-      { name: "Custom Integration Support", included: true },
     ],
     stripePriceId: {
       monthly: "price_enterprise_monthly",
@@ -150,7 +115,7 @@ export const PAID_SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
       monthly: -1, // Unlimited
       rollover: true,
     },
-    consultationTypes: ["STRATEGIC_ADVISORY", "DUE_DILIGENCE", "TOKEN_LAUNCH", "BLOCKCHAIN_INTEGRATION_ADVISORY"],
+    consultationTypes: ["STRATEGIC_ADVISORY", "TOKEN_LAUNCH", "BLOCKCHAIN_INTEGRATION_ADVISORY"],
     prioritySupport: true,
     reportAccess: true,
     teamCollaboration: true,
@@ -200,5 +165,7 @@ export function canAccessConsultationType(planId: SubscriptionPlan, consultation
   const plan = getPlanConfig(planId)
   if (!plan) return false
   
-  return plan.consultationTypes.includes(consultationType)
+  // Remove due diligence from allowed types
+  const allowedTypes = plan.consultationTypes.filter(type => type !== "DUE_DILIGENCE")
+  return allowedTypes.includes(consultationType)
 }

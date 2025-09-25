@@ -15,7 +15,7 @@ export async function GET() {
     const subscription = await prisma.subscription.findFirst({
       where: { 
         userId: session.user.id,
-        status: { in: ['ACTIVE', 'TRIALING', 'PAST_DUE', 'PAUSED'] }
+        status: { in: ['ACTIVE', 'TRIALING'] }
       },
       orderBy: { createdAt: 'desc' }
     })
@@ -80,21 +80,6 @@ export async function POST(request: NextRequest) {
         })
         break
 
-      case 'pause':
-        result = await pauseSubscription(subscription.stripeSubscriptionId)
-        await prisma.subscription.update({
-          where: { id: subscriptionId },
-          data: { status: 'PAUSED' }
-        })
-        break
-
-      case 'resume':
-        result = await resumeSubscription(subscription.stripeSubscriptionId)
-        await prisma.subscription.update({
-          where: { id: subscriptionId },
-          data: { status: 'ACTIVE' }
-        })
-        break
 
       default:
         return NextResponse.json({ error: "Invalid action" }, { status: 400 })

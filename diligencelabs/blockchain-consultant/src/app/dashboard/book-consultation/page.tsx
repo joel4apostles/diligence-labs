@@ -14,13 +14,8 @@ import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { ParallaxBackground } from "@/components/ui/parallax-background"
-import { FloatingElements } from "@/components/ui/animated-background"
 import { StripePayment } from "@/components/stripe-payment"
-import { FormGridLines } from "@/components/ui/grid-lines"
-import { ProminentBorder } from "@/components/ui/border-effects"
-import { PageStructureLines } from "@/components/ui/page-structure"
-import { HorizontalDivider } from "@/components/ui/section-divider"
+import { ArrowLeft, Calendar, Clock, DollarSign, CheckCircle } from "lucide-react"
 
 const bookingSchema = z.object({
   consultationType: z.enum(["STRATEGIC_ADVISORY", "DUE_DILIGENCE", "BLOCKCHAIN_INTEGRATION_ADVISORY", "TOKEN_LAUNCH"], {
@@ -248,16 +243,13 @@ export default function BookConsultation() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center p-4">
-        <ParallaxBackground />
-        <FloatingElements />
-        
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:6rem_6rem] opacity-10 animate-pulse" style={{ animationDuration: '8s' }} />
-        
-        <Card className="w-full max-w-lg relative z-10 bg-gradient-to-br from-gray-900/80 to-gray-800/40 backdrop-blur border border-gray-700">
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+        <Card className="w-full max-w-lg bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl">
           <CardContent className="pt-8 pb-8 text-center">
             <div className="space-y-6">
-              <div className="text-green-400 text-6xl mb-6 animate-bounce">✓</div>
+              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                <CheckCircle className="w-8 h-8 text-white" />
+              </div>
               <h2 className="text-3xl font-light mb-2">
                 Consultation <span className="font-normal bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Request Submitted</span>!
               </h2>
@@ -286,29 +278,31 @@ export default function BookConsultation() {
                     Now let's schedule your consultation session!
                   </p>
                   
-                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg p-6 border border-blue-500/20">
-                    <h3 className="text-xl font-semibold mb-4 text-blue-300">Schedule Your Meeting</h3>
+                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl p-6 border border-blue-500/20">
+                    <h3 className="text-xl font-semibold mb-4 text-blue-300 flex items-center">
+                      <Calendar className="w-5 h-5 mr-2" />
+                      Schedule Your Meeting
+                    </h3>
                     <p className="text-gray-400 text-sm mb-6">
                       Click the link below to choose a convenient time for your consultation session with our blockchain experts.
                     </p>
                     
                     <div className="space-y-4">
-                      <Button asChild className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-3 rounded-lg transition-all duration-300 hover:scale-105">
+                      <Button asChild className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-3 rounded-lg transition-all duration-300">
                         <a 
                           href="https://calendly.com/diligence-labs/consultation" 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="flex items-center justify-center"
                         >
+                          <Calendar className="w-4 h-4 mr-2" />
                           Schedule on Calendly
-                          <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                          </svg>
                         </a>
                       </Button>
                       
                       <Button asChild variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
                         <Link href={session ? "/dashboard" : "/"}>
+                          <ArrowLeft className="w-4 h-4 mr-2" />
                           {session ? "Back to Dashboard" : "Back to Home"}
                         </Link>
                       </Button>
@@ -324,35 +318,36 @@ export default function BookConsultation() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      <PageStructureLines />
-      <FormGridLines />
-      <ParallaxBackground />
-      <FloatingElements />
-      
-      <div className="relative z-10 container mx-auto px-4 py-8">
-        <div className={`flex items-center gap-4 mb-12 transition-all duration-1000 ${isPageLoaded ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'}`}>
+    <div className="min-h-screen bg-black text-white">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
           <Link href={session ? "/dashboard" : "/"}>
-            <Button variant="outline" size="sm" className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
-              ← {session ? "Back to Dashboard" : "Back to Home"}
+            <Button variant="ghost" size="sm" className="mb-6 text-gray-400 hover:text-white">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {session ? "Back to Dashboard" : "Back to Home"}
             </Button>
           </Link>
-          <div>
-            <h1 className="text-4xl font-light mb-2">
-              Book <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Consultation</span>
-            </h1>
-            <p className="text-gray-400 text-lg">Schedule your blockchain advisory session</p>
+          
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div>
+              <h1 className="text-4xl lg:text-5xl font-light mb-3">
+                Book <span className="font-normal bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Consultation</span>
+              </h1>
+              <p className="text-gray-400 text-lg max-w-2xl">
+                Schedule your blockchain advisory session with our experts
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Section Divider */}
-        <HorizontalDivider style="subtle" />
-
-        <div className={`max-w-4xl mx-auto transition-all duration-1000 delay-300 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <ProminentBorder className="rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/10" animated={true} movingBorder={true}>
-            <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
+        <div className="max-w-4xl mx-auto">
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl">
             <CardHeader className="text-center pb-8">
-              <CardTitle className="text-3xl font-light text-white">Consultation Details</CardTitle>
+              <CardTitle className="text-3xl font-light text-white flex items-center justify-center">
+                <Calendar className="w-8 h-8 mr-3 text-blue-400" />
+                Consultation Details
+              </CardTitle>
               <CardDescription className="text-gray-400 text-lg">
                 Select your service, duration, and provide consultation details. Payment is required to secure your session.
               </CardDescription>
@@ -680,10 +675,13 @@ export default function BookConsultation() {
                       )}
                     />
 
-                    <div className="bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl p-4 border border-blue-500/10">
-                      <div className="text-center">
-                        <h4 className="text-lg font-semibold text-blue-300 mb-2">Session Investment</h4>
-                        <p className="text-sm text-gray-400 mb-3">
+                    <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700">
+                      <CardContent className="p-6 text-center">
+                        <div className="flex items-center justify-center mb-4">
+                          <DollarSign className="w-6 h-6 text-blue-400 mr-2" />
+                          <h4 className="text-lg font-semibold text-blue-300">Session Investment</h4>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-4">
                           All consultations require upfront payment to secure your session with our blockchain experts.
                         </p>
                         <div className="text-2xl font-bold text-white">
@@ -693,8 +691,8 @@ export default function BookConsultation() {
                             <span className="text-gray-500">Select service & duration</span>
                           )}
                         </div>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   </div>
 
                   {/* Payment Required Notice */}
@@ -789,8 +787,7 @@ export default function BookConsultation() {
                 </form>
               </Form>
             </CardContent>
-            </Card>
-          </ProminentBorder>
+          </Card>
         </div>
 
         {/* Stripe Payment Modal */}

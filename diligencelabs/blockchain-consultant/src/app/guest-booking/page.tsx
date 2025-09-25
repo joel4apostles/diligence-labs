@@ -10,12 +10,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ParallaxBackground } from "@/components/ui/parallax-background"
-import { FloatingElements } from "@/components/ui/animated-background"
-import { FormGridLines } from "@/components/ui/grid-lines"
-import { ProminentBorder, SubtleBorder } from "@/components/ui/border-effects"
-import { PageStructureLines } from "@/components/ui/page-structure"
-import { HorizontalDivider } from "@/components/ui/section-divider"
+import { ErrorBoundary } from "@/components/ui/error-boundary"
+import { LoadingSpinner } from "@/components/ui/loading-states"
+import { 
+  PageWrapper, 
+  GlassMorphismCard, 
+  FloatingOrb,
+  theme,
+  animations
+} from "@/components/ui/consistent-theme"
+import { motion } from "framer-motion"
 
 const consultationTypes = [
   {
@@ -119,15 +123,11 @@ export default function GuestBooking() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-black text-white relative overflow-hidden">
-        <PageStructureLines />
-        <FormGridLines />
-        <ParallaxBackground />
-        <FloatingElements />
-
-        <div className="relative z-10 container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
+      <ErrorBoundary>
+        <PageWrapper>
+          <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
           <div className="w-full max-w-2xl">
-            <ProminentBorder className="rounded-2xl overflow-hidden" animated={true} movingBorder={true}>
+            <GlassMorphismCard variant="primary" hover={true}>
               <div className="relative group bg-gradient-to-br from-gray-900/80 to-gray-800/50 backdrop-blur-xl">
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-all duration-700 rounded-2xl bg-gradient-to-br from-green-500/20 to-emerald-500/20" />
                 
@@ -195,25 +195,18 @@ export default function GuestBooking() {
                   </CardContent>
                 </Card>
               </div>
-            </ProminentBorder>
+            </GlassMorphismCard>
           </div>
-        </div>
-      </div>
+          </div>
+        </PageWrapper>
+      </ErrorBoundary>
     )
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      <PageStructureLines />
-      <FormGridLines />
-      <ParallaxBackground />
-      <FloatingElements />
-      
-      {/* Animated Background Elements */}
-      <div className="absolute top-1/4 right-1/6 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full filter blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 left-1/6 w-96 h-96 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-full filter blur-3xl animate-pulse" style={{ animationDelay: '3s' }} />
-
-      <div className="relative z-10 container mx-auto px-4 py-8">
+    <ErrorBoundary>
+      <PageWrapper>
+        <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Back to Homepage Link */}
           <div className="mb-8">
@@ -264,7 +257,7 @@ export default function GuestBooking() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Consultation Types */}
             <div>
-              <ProminentBorder className="rounded-xl overflow-hidden" animated={true} movingBorder={true}>
+              <GlassMorphismCard variant="secondary" hover={true}>
                 <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl rounded-xl">
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
                   
@@ -306,12 +299,12 @@ export default function GuestBooking() {
                     </CardContent>
                   </Card>
                 </div>
-              </ProminentBorder>
+              </GlassMorphismCard>
             </div>
 
             {/* Contact Form */}
             <div>
-              <ProminentBorder className="rounded-xl overflow-hidden" animated={true} movingBorder={true}>
+              <GlassMorphismCard variant="secondary" hover={true}>
                 <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl rounded-xl">
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
                   
@@ -386,25 +379,30 @@ export default function GuestBooking() {
                           </div>
                         )}
 
-                        <Button
-                          type="submit"
-                          disabled={isLoading || !formData.consultationType}
-                          className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white transition-all duration-300 hover:scale-105"
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                         >
-                          {isLoading ? (
-                            <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                              Claiming Your Free Consultation...
-                            </>
-                          ) : (
-                            <>
-                              🎉 Claim My FREE Consultation (Worth $300+)
-                              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                              </svg>
-                            </>
-                          )}
-                        </Button>
+                          <Button
+                            type="submit"
+                            disabled={isLoading || !formData.consultationType}
+                            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white transition-all duration-300"
+                          >
+                            {isLoading ? (
+                              <>
+                                <LoadingSpinner size="sm" color="white" className="mr-2" />
+                                Claiming Your Free Consultation...
+                              </>
+                            ) : (
+                              <>
+                                🎉 Claim My FREE Consultation (Worth $300+)
+                                <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                              </>
+                            )}
+                          </Button>
+                        </motion.div>
 
                         <div className="text-center text-sm text-gray-500 space-y-2">
                           <p>Already have an account? <Link href="/auth/signin" className="text-blue-400 hover:text-blue-300">Sign in</Link></p>
@@ -421,11 +419,12 @@ export default function GuestBooking() {
                     </CardContent>
                   </Card>
                 </div>
-              </ProminentBorder>
+              </GlassMorphismCard>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+        </div>
+      </PageWrapper>
+    </ErrorBoundary>
   )
 }

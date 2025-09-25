@@ -2,6 +2,8 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { ErrorBoundary } from "@/components/ui/error-boundary"
+import { PageLoading } from "@/components/ui/loading-states"
 
 export default function AdminPage() {
   const router = useRouter()
@@ -20,11 +22,8 @@ export default function AdminPage() {
   }, [router])
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
-        <p>Redirecting...</p>
-      </div>
-    </div>
+    <ErrorBoundary>
+      <PageLoading message="Redirecting to admin panel..." showLogo={true} />
+    </ErrorBoundary>
   )
 }

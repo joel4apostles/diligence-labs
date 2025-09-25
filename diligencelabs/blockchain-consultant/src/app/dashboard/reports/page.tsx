@@ -17,6 +17,10 @@ import { DynamicPageBackground } from "@/components/ui/dynamic-page-background"
 import { HorizontalDivider } from "@/components/ui/section-divider"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
+import { AnalyticsDashboard } from "@/components/ui/analytics-dashboard"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AdvancedSearch, REPORT_FILTERS, COMMON_SORT_OPTIONS } from "@/components/ui/advanced-search"
+import { SearchResults, transformApiResults } from "@/components/ui/search-results"
 
 type Report = {
   id: string
@@ -52,6 +56,9 @@ export default function Reports() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null)
   const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false)
   const [isModifyRequestOpen, setIsModifyRequestOpen] = useState(false)
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [showSearchResults, setShowSearchResults] = useState(false)
 
   useEffect(() => {
     if (status === "loading") return
@@ -107,6 +114,48 @@ export default function Reports() {
     }
   }
 
+  const handleSearch = async (query: string, filters: Record<string, any>, sort?: { field: string; direction: 'asc' | 'desc' }) => {
+    if (!query && Object.keys(filters).length === 0) {
+      setShowSearchResults(false)
+      return
+    }
+
+    setIsSearching(true)
+    setShowSearchResults(true)
+
+    try {
+      const params = new URLSearchParams({
+        query,
+        type: 'reports',
+        ...(sort && {
+          sortField: sort.field,
+          sortDirection: sort.direction
+        })
+      })
+
+      // Add filters to params
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== '' && value !== null && value !== undefined) {
+          if (key === 'dateRange' && value.from && value.to) {
+            params.append(`filter_dateRange`, JSON.stringify(value))
+          } else {
+            params.append(`filter_${key}`, value.toString())
+          }
+        }
+      })
+
+      const response = await fetch(`/api/search?${params}`)
+      if (response.ok) {
+        const data = await response.json()
+        setSearchResults(transformApiResults(data.data, 'reports'))
+      }
+    } catch (error) {
+      console.error('Search failed:', error)
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -140,19 +189,73 @@ export default function Reports() {
           </div>
         </div>
 
-        <div className="flex justify-end mb-8">
-          <Link href="/dashboard/request-report">
-            <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium px-6 py-2 rounded-lg transition-all duration-300 hover:scale-105">
-              Request New Report
-            </Button>
-          </Link>
-        </div>
-
         <HorizontalDivider style="subtle" />
 
         <div className={`max-w-6xl mx-auto transition-all duration-1000 delay-300 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <Tabs defaultValue="reports" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-gray-800/30 border border-gray-700/50 rounded-lg p-1 mb-8">
+              <TabsTrigger 
+                value="reports" 
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white text-gray-400 transition-all duration-300"
+              >
+                My Reports
+              </TabsTrigger>
+              <TabsTrigger 
+                value="analytics" 
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white text-gray-400 transition-all duration-300"
+              >
+                Analytics Dashboard
+              </TabsTrigger>
+            </TabsList>
 
-        {reports.length === 0 ? (
+            <TabsContent value="reports" className="space-y-6">
+              {/* Advanced Search */}
+              <div className="space-y-6">
+                <AdvancedSearch
+                  filters={REPORT_FILTERS}
+                  sortOptions={COMMON_SORT_OPTIONS}
+                  onSearch={handleSearch}
+                  placeholder="Search reports..."
+                  className="mb-6"
+                />
+                
+                <div className="flex justify-end">
+                  <Link href="/dashboard/request-report">
+                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium px-6 py-2 rounded-lg transition-all duration-300 hover:scale-105">
+                      Request New Report
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Search Results or Regular Reports */}
+              {showSearchResults ? (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-light text-white">Search Results</h3>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowSearchResults(false)}
+                      className="border-gray-600/50 text-gray-300 hover:bg-gray-700/50"
+                    >
+                      Show All Reports
+                    </Button>
+                  </div>
+                  <SearchResults
+                    results={searchResults}
+                    isLoading={isSearching}
+                    onViewDetails={(id, type) => {
+                      const report = reports.find(r => r.id === id)
+                      if (report) {
+                        setSelectedReport(report)
+                        setIsViewDetailsOpen(true)
+                      }
+                    }}
+                  />
+                </div>
+              ) : (
+                <div>
+                  {reports.length === 0 ? (
           <ProminentBorder className="rounded-3xl overflow-hidden shadow-2xl shadow-purple-500/10" animated={true} movingBorder={true}>
             <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0 text-center py-12">
               <CardContent>
@@ -253,8 +356,15 @@ export default function Reports() {
               </ProminentBorder>
             ))}
           </div>
-        )}
+                  )}
+                </div>
+              )}
+            </TabsContent>
 
+            <TabsContent value="analytics" className="space-y-6">
+              <AnalyticsDashboard />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 

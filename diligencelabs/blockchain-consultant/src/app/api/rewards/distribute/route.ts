@@ -8,9 +8,15 @@ const prisma = new PrismaClient()
 // POST /api/rewards/distribute - Distribute rewards for a completed project evaluation
 export async function POST(request: NextRequest) {
   try {
-    const user = await verifyAuthAndGetUser(headers())
+    const authResult = await verifyAuthAndGetUser(request)
     
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'TEAM_MEMBER')) {
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+    }
+    
+    const user = authResult.user
+    
+    if (user.role !== 'ADMIN' && user.role !== 'TEAM_MEMBER') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 

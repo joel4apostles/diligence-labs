@@ -11,14 +11,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { FloatingElements } from "@/components/ui/animated-background"
-import { ParallaxBackground } from "@/components/ui/parallax-background"
-import { FormGridLines } from "@/components/ui/grid-lines"
-import { ProminentBorder } from "@/components/ui/border-effects"
-import { PageStructureLines } from "@/components/ui/page-structure"
-import { DynamicPageBackground } from "@/components/ui/dynamic-page-background"
 import { Logo } from "@/components/ui/logo"
 import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator"
+import { AuthErrorBoundary } from "@/components/ui/error-boundary"
+import { PageLoading, LoadingSpinner } from "@/components/ui/loading-states"
+import { 
+  PageWrapper, 
+  GlassMorphismCard, 
+  FloatingOrb,
+  theme,
+  animations
+} from "@/components/ui/consistent-theme"
+import { motion } from "framer-motion"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -77,14 +81,27 @@ export default function SignUp() {
       })
 
       if (response.ok) {
+        const data = await response.json()
         setSuccess(true)
-        setTimeout(() => {
-          router.push("/auth/unified-signin")
-        }, 2000)
+        
+        // Show success message with email verification reminder
+        if (data.emailVerificationSent) {
+          setError(null)
+          // Redirect to login with email verification message
+          setTimeout(() => {
+            router.push("/auth/unified-signin?message=check-email")
+          }, 3000)
+        } else {
+          setTimeout(() => {
+            router.push("/auth/unified-signin")
+          }, 2000)
+        }
       } else {
         const data = await response.json()
         if (data.passwordStrength && data.failedRequirements) {
           setPasswordStrengthError(`Password security requirements not met: ${data.failedRequirements.join(', ')}`)
+        } else if (data.message?.includes('already exists')) {
+          setError('An account with this email already exists. Try logging in instead.')
         } else {
           setError(data.message || "Registration failed")
         }
@@ -98,78 +115,145 @@ export default function SignUp() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center p-4">
-        <FloatingElements />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full filter blur-3xl animate-pulse" />
-        
-        <Card className="w-full max-w-md relative z-10 bg-gradient-to-br from-gray-900/80 to-gray-800/40 backdrop-blur border border-gray-700">
-          <CardContent className="pt-8 pb-8 text-center">
-            <div className="space-y-4">
-              <div className="text-green-400 text-6xl mb-6 animate-bounce">✓</div>
-              <h2 className="text-2xl font-light mb-2">
-                Account <span className="font-normal bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Created</span> Successfully!
-              </h2>
-              <p className="text-gray-400 text-lg">
-                Redirecting you to sign in...
-              </p>
-              <div className="flex justify-center mt-6">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <AuthErrorBoundary>
+        <PageWrapper>
+          <div className="min-h-screen flex items-center justify-center p-4">
+            <motion.div
+              {...animations.fadeIn}
+              transition={{ duration: 0.8 }}
+              className="w-full max-w-md"
+            >
+              <GlassMorphismCard variant="accent" hover={false}>
+                <Card className="bg-transparent border-0">
+                  <CardContent className="pt-8 pb-8 text-center">
+                    <motion.div 
+                      {...animations.slideUp}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                      className="space-y-4"
+                    >
+                      <motion.div 
+                        animate={{ 
+                          scale: [1, 1.2, 1],
+                          rotate: [0, 10, -10, 0]
+                        }}
+                        transition={{ 
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatType: "reverse"
+                        }}
+                        className="text-green-400 text-6xl mb-6"
+                      >
+                        ✓
+                      </motion.div>
+                      <h2 className="text-2xl font-light mb-2">
+                        Account <span className="font-normal bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Created</span> Successfully!
+                      </h2>
+                      <p className="text-gray-400 text-lg">
+                        Redirecting you to sign in...
+                      </p>
+                      <div className="flex justify-center mt-6">
+                        <LoadingSpinner size="lg" color="green" />
+                      </div>
+                    </motion.div>
+                  </CardContent>
+                </Card>
+              </GlassMorphismCard>
+            </motion.div>
+          </div>
+        </PageWrapper>
+      </AuthErrorBoundary>
     )
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center p-4">
-      {/* Dynamic Auth Background */}
-      <DynamicPageBackground variant="auth" opacity={0.25} />
-      
-      <PageStructureLines />
-      <FormGridLines />
-      <ParallaxBackground />
-      <FloatingElements />
-
-      <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-6 sm:p-8">
-        <div className={`transition-all duration-1000 ${isPageLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+    <AuthErrorBoundary>
+      <PageWrapper>
+        {/* Navigation */}
+        <motion.nav 
+          {...animations.slideDown}
+          className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-6 sm:p-8"
+        >
           <Logo size="large" />
-        </div>
-      </nav>
+          <Link href="/">
+            <motion.button
+              whileHover={{ scale: 1.05, y: -1 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-4 py-2 text-gray-300 hover:text-white border border-gray-600 hover:border-gray-400 rounded-lg transition-all duration-300 backdrop-blur-sm"
+            >
+              ← Back to Home
+            </motion.button>
+          </Link>
+        </motion.nav>
 
-      <ProminentBorder 
-        className={`w-full max-w-md relative z-10 rounded-2xl overflow-hidden transition-all duration-1000 delay-300 ${isPageLoaded ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}
-        animated={true}
-      >
-        <Card className="bg-gradient-to-br from-gray-900/80 to-gray-800/40 backdrop-blur border-0">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-6">
-            <Logo size="xl" href={null} />
-          </div>
-          <CardTitle className="text-3xl font-light mb-2">
-            Join Our Platform
-          </CardTitle>
-          <CardDescription className="text-gray-400 text-lg">
-            Create your account to get started
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6 p-8">
-          {error && (
-            <div className="bg-red-500/20 border border-red-500/30 text-red-300 text-sm p-4 rounded-lg backdrop-blur">
-              {error}
-            </div>
-          )}
-          
-          {passwordStrengthError && (
-            <div className="bg-orange-500/20 border border-orange-500/30 text-orange-300 text-sm p-4 rounded-lg backdrop-blur">
-              {passwordStrengthError}
-            </div>
-          )}
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <motion.div
+            {...animations.fadeIn}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="w-full max-w-md"
+          >
+            <GlassMorphismCard variant="primary" hover={true}>
+              <Card className="bg-transparent border-0 shadow-2xl">
+                <CardHeader className="space-y-1 text-center pb-6">
+                  <motion.div 
+                    {...animations.fadeIn}
+                    transition={{ duration: 0.6, delay: 0.5 }}
+                    className="flex justify-center mb-4"
+                  >
+                    <Logo size="xl" href={null} />
+                  </motion.div>
+                  <motion.div 
+                    {...animations.slideUp}
+                    transition={{ duration: 0.6, delay: 0.7 }}
+                  >
+                    <CardTitle className="text-3xl font-light mb-2">
+                      <span className="bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400 bg-clip-text text-transparent">
+                        Join Our Platform
+                      </span>
+                    </CardTitle>
+                    <CardDescription className="text-gray-400 text-lg">
+                      Create your account to get started
+                    </CardDescription>
+                  </motion.div>
+                </CardHeader>
+                <CardContent className="space-y-6 px-8 pb-8">
+                  {error && (
+                    <motion.div 
+                      {...animations.slideUp}
+                      className="bg-red-500/10 border border-red-500/20 text-red-300 text-sm p-4 rounded-xl backdrop-blur"
+                      role="alert"
+                      aria-live="polite"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>{error}</span>
+                      </div>
+                    </motion.div>
+                  )}
+                  
+                  {passwordStrengthError && (
+                    <motion.div 
+                      {...animations.slideUp}
+                      className="bg-orange-500/10 border border-orange-500/20 text-orange-300 text-sm p-4 rounded-xl backdrop-blur"
+                      role="alert"
+                      aria-live="polite"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                        <span>{passwordStrengthError}</span>
+                      </div>
+                    </motion.div>
+                  )}
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <motion.div
+                    {...animations.slideUp}
+                    transition={{ duration: 0.6, delay: 0.9 }}
+                  >
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -248,25 +332,45 @@ export default function SignUp() {
                   </FormItem>
                 )}
               />
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-3 rounded-lg transition-all duration-300 hover:scale-105" 
-                disabled={isLoading}
-              >
-                {isLoading ? "Creating account..." : "Create account"}
-              </Button>
-            </form>
-          </Form>
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <Button 
+                            type="submit" 
+                            className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300 hover:brightness-110 disabled:opacity-70 flex items-center justify-center" 
+                            disabled={isLoading}
+                          >
+                            {isLoading ? (
+                              <>
+                                <LoadingSpinner size="sm" color="white" />
+                                <span className="ml-2">Creating account...</span>
+                              </>
+                            ) : (
+                              "Create account"
+                            )}
+                          </Button>
+                        </motion.div>
+                      </form>
+                    </Form>
+                  </motion.div>
 
-          <div className="text-center text-sm text-gray-400">
-            Already have an account?{" "}
-            <Link href="/auth/unified-signin" className="text-blue-400 hover:text-blue-300 underline underline-offset-4 transition-colors">
-              Sign in
-            </Link>
-          </div>
-        </CardContent>
-        </Card>
-      </ProminentBorder>
-    </div>
+                  <motion.div 
+                    {...animations.fadeIn}
+                    transition={{ duration: 0.6, delay: 1.1 }}
+                    className="text-center text-sm text-gray-400"
+                  >
+                    Already have an account?{" "}
+                    <Link href="/auth/unified-signin" className="text-orange-400 hover:text-orange-300 transition-colors duration-300">
+                      Sign in
+                    </Link>
+                  </motion.div>
+                </CardContent>
+              </Card>
+            </GlassMorphismCard>
+          </motion.div>
+        </div>
+      </PageWrapper>
+    </AuthErrorBoundary>
   )
 }

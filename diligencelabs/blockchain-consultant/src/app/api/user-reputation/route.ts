@@ -12,7 +12,13 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId')
     const leaderboard = searchParams.get('leaderboard') === 'true'
 
-    const user = await verifyAuthAndGetUser(headers())
+    const authResult = await verifyAuthAndGetUser(request)
+    
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+    }
+    
+    const user = authResult.user
     
     if (!leaderboard && !user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
@@ -55,7 +61,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ leaderboard: rankedUsers })
     }
 
-    // Get specific user reputation (current user or specified user)
+    // Get specific user reputation (current user or specified user)  
     const targetUserId = userId || user!.id
 
     let userReputation = await prisma.userReputation.findUnique({
@@ -189,7 +195,13 @@ export async function GET(request: NextRequest) {
 // POST /api/user-reputation/award-points - Award reputation points
 export async function POST(request: NextRequest) {
   try {
-    const user = await verifyAuthAndGetUser(headers())
+    const authResult = await verifyAuthAndGetUser(request)
+    
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+    }
+    
+    const user = authResult.user
     
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })

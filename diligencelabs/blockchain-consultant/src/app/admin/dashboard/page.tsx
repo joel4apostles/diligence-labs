@@ -5,33 +5,32 @@ import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ProminentBorder } from "@/components/ui/border-effects"
-import { HorizontalDivider } from "@/components/ui/section-divider"
-import { MinimalBackground } from "@/components/ui/minimal-background"
 import { Logo } from "@/components/ui/logo"
-import dynamic from "next/dynamic"
+import { ErrorBoundary } from "@/components/ui/error-boundary"
+import { PageLoading, CardSkeleton } from "@/components/ui/loading-states"
+import { AdvancedAdminStats } from "@/components/admin/advanced-admin-stats"
+import { 
+  Users, 
+  Calendar, 
+  BarChart3, 
+  AlertTriangle,
+  Settings,
+  Shield,
+  Key,
+  UserCheck,
+  FileText,
+  Bell,
+  ChevronRight,
+  Activity
+} from "lucide-react"
 
 // Lazy load heavy components to improve initial load time
-const DynamicPageBackground = dynamic(() => import("@/components/ui/dynamic-page-background").then(mod => ({ default: mod.DynamicPageBackground })), {
-  ssr: false, // Don't render on server to speed up initial load
-  loading: () => null
-})
-
-const PageStructureLines = dynamic(() => import("@/components/ui/page-structure").then(mod => ({ default: mod.PageStructureLines })), {
-  ssr: false,
-  loading: () => null
-})
-
 const NotificationDashboard = dynamic(() => import("@/components/admin/NotificationDashboard").then(mod => ({ default: mod.NotificationDashboard })), {
-  loading: () => <div className="h-32 animate-pulse bg-gray-800/50 rounded-xl" />
+  loading: () => <CardSkeleton showHeader={true} lines={4} />
 })
 
 const WalletMonitoring = dynamic(() => import("@/components/admin/WalletMonitoring").then(mod => ({ default: mod.WalletMonitoring })), {
-  loading: () => <div className="h-32 animate-pulse bg-gray-800/50 rounded-xl" />
-})
-
-const DashboardSkeleton = dynamic(() => import("@/components/admin/DashboardSkeleton").then(mod => ({ default: mod.DashboardSkeleton })), {
-  loading: () => <div className="min-h-screen bg-black" />
+  loading: () => <CardSkeleton showHeader={true} lines={3} />
 })
 
 
@@ -195,270 +194,252 @@ export default function AdminDashboardPage() {
   }), [isPageLoaded, memoizedNotificationSummary, memoizedPermissions, loading])
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white relative overflow-hidden">
-        <MinimalBackground variant="admin" opacity={0.15} />
-        <DashboardSkeleton isPageLoaded={isPageLoaded} />
-      </div>
-    )
+    return <PageLoading message="Loading admin dashboard..." showLogo={true} />
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* Dynamic Admin Background */}
-      <DynamicPageBackground variant="admin" opacity={0.25} />
-      <PageStructureLines />
-      
-      <div className="container mx-auto px-4 py-8 relative z-10">
-      <div className={`flex justify-between items-center mb-12 transition-all duration-1000 ${isPageLoaded ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'}`}>
-        <div>
-          <div className="flex items-center gap-4 mb-4">
-            <Logo size="xl" href={null} />
-            <div className="w-px h-8 bg-gradient-to-b from-orange-400 to-red-400"></div>
-            <div className="text-lg text-gray-400">Admin Dashboard</div>
-          </div>
-          <h1 className="text-4xl font-light mb-2">
-            <span className="font-normal bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">Administrative Control</span>
-          </h1>
-          <p className="text-gray-400 text-lg">Manage clients, sessions, and reports</p>
-        </div>
-      </div>
-
-      <HorizontalDivider style="subtle" />
-
-      {/* Statistics Cards */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 transition-all duration-1000 delay-300 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-        <ProminentBorder className="rounded-xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Total Users</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{memoizedStats.totalUsers}</div>
-              <p className="text-xs text-gray-400">Registered clients</p>
-            </CardContent>
-          </Card>
-        </ProminentBorder>
-
-        <ProminentBorder className="rounded-xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Total Sessions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{memoizedStats.totalSessions}</div>
-              <p className="text-xs text-gray-400">Consultation sessions</p>
-            </CardContent>
-          </Card>
-        </ProminentBorder>
-
-        <ProminentBorder className="rounded-xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Reports Generated</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{memoizedStats.totalReports}</div>
-              <p className="text-xs text-gray-400">Analysis reports</p>
-            </CardContent>
-          </Card>
-        </ProminentBorder>
-
-        <ProminentBorder className="rounded-xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Pending Sessions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-400">{memoizedStats.pendingSessions}</div>
-              <p className="text-xs text-gray-400">Requires attention</p>
-            </CardContent>
-          </Card>
-        </ProminentBorder>
-      </div>
-
-      {/* Notification Center */}
-      <NotificationDashboard {...notificationDashboardProps} />
-
-      <HorizontalDivider style="subtle" />
-
-      {/* Wallet Monitoring */}
-      <WalletMonitoring />
-
-      <HorizontalDivider style="subtle" />
-
-      {/* Admin Actions Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
-        <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
-            <CardHeader>
-              <CardTitle className="text-white text-xl">Task Assignments</CardTitle>
-              <CardDescription className="text-gray-400">Assign and track reports and consultations</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Link href="/admin/assignments">
-                <Button className="w-full justify-start bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white transition-all duration-300 hover:scale-105">Manage Assignments</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </ProminentBorder>
-
-        <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
-            <CardHeader>
-              <CardTitle className="text-white text-xl">Team Management</CardTitle>
-              <CardDescription className="text-gray-400">Manage team members, roles, and specializations</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Team Members Preview */}
-              {teamMembers.length > 0 ? (
-                <div className="space-y-3 mb-4">
-                  <h4 className="text-sm font-medium text-gray-300">Active Team Members</h4>
-                  <div className="space-y-2">
-                    {teamMembers.slice(0, 3).map((member) => (
-                      <div key={member.id} className="flex items-center justify-between p-2 bg-gray-800/30 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs font-medium">
-                              {member.user.name?.charAt(0) || member.user.email.charAt(0)}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="text-white text-sm font-medium">
-                              {member.user.name || 'No Name'}
-                            </p>
-                            <p className="text-gray-400 text-xs">{member.position}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            member.department === 'BLOCKCHAIN_INTEGRATION' ? 'bg-blue-500/20 text-blue-400' :
-                            member.department === 'STRATEGY_CONSULTING' ? 'bg-purple-500/20 text-purple-400' :
-                            member.department === 'DUE_DILIGENCE' ? 'bg-green-500/20 text-green-400' :
-                            'bg-gray-500/20 text-gray-400'
-                          }`}>
-                            {member.department.replace(/_/g, ' ')}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                    {teamMembers.length > 3 && (
-                      <p className="text-xs text-gray-400 text-center">
-                        +{teamMembers.length - 3} more team members
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-4 text-gray-400 text-sm">
-                  No team members found
-                </div>
-              )}
+    <ErrorBoundary>
+      <div className="min-h-screen bg-black text-white">
+        <div className="container mx-auto px-4 py-8">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-6">
+              <Logo size="xl" href={null} />
+              <div className="w-px h-8 bg-gradient-to-b from-orange-400 to-red-400"></div>
+              <div className="text-lg text-gray-400">Admin Dashboard</div>
+            </div>
+            
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div>
+                <h1 className="text-4xl lg:text-5xl font-light mb-3">
+                  <span className="font-normal bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">Administrative Control</span>
+                </h1>
+                <p className="text-gray-400 text-lg max-w-2xl">
+                  Manage users, sessions, reports, and system monitoring
+                </p>
+              </div>
               
-              <Link href="/admin/team">
-                <Button className="w-full justify-start bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white transition-all duration-300 hover:scale-105">
-                  {teamMembers.length > 0 ? 'View All Team Members' : 'Manage Team'}
+              <div className="flex items-center gap-4">
+                <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500">
+                  <Activity className="w-4 h-4 mr-2" />
+                  System Health
+                </Button>
+              </div>
+            </div>
+          </div>
+
+        {/* Enhanced Statistics Dashboard */}
+        <div className={`mb-12 transition-all duration-1000 delay-200 ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <AdvancedAdminStats timeRange="30d" autoRefresh={true} />
+        </div>
+
+        {/* Basic Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-800 hover:bg-gray-900/70 transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-400">Total Users</p>
+                  <p className="text-2xl font-bold text-white">{memoizedStats.totalUsers}</p>
+                </div>
+                <Users className="w-8 h-8 text-blue-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-800 hover:bg-gray-900/70 transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-400">Total Sessions</p>
+                  <p className="text-2xl font-bold text-white">{memoizedStats.totalSessions}</p>
+                </div>
+                <Calendar className="w-8 h-8 text-purple-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-800 hover:bg-gray-900/70 transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-400">Reports Generated</p>
+                  <p className="text-2xl font-bold text-white">{memoizedStats.totalReports}</p>
+                </div>
+                <BarChart3 className="w-8 h-8 text-green-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-800 hover:bg-gray-900/70 transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-400">Pending Sessions</p>
+                  <p className="text-2xl font-bold text-orange-400">{memoizedStats.pendingSessions}</p>
+                </div>
+                <AlertTriangle className="w-8 h-8 text-orange-400" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Notification Center */}
+        <NotificationDashboard {...notificationDashboardProps} />
+
+        {/* Wallet Monitoring */}
+        <WalletMonitoring />
+
+        {/* Admin Actions Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center">
+                <Settings className="w-5 h-5 mr-2 text-blue-400" />
+                Task Assignments
+              </CardTitle>
+              <CardDescription className="text-gray-400">Assign and track consultations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/admin/assignments">
+                <Button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white flex items-center justify-center">
+                  Manage Assignments
+                  <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </CardContent>
           </Card>
-        </ProminentBorder>
 
-        <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-teal-500/10 transition-all duration-300">
             <CardHeader>
-              <CardTitle className="text-white text-xl">User Management</CardTitle>
-              <CardDescription className="text-gray-400">Manage registered users and permissions</CardDescription>
+              <CardTitle className="text-white flex items-center">
+                <Users className="w-5 h-5 mr-2 text-teal-400" />
+                Team Management
+              </CardTitle>
+              <CardDescription className="text-gray-400">Manage team members and roles</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
+              <Link href="/admin/team">
+                <Button className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white flex items-center justify-center">
+                  Manage Team
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-purple-500/10 transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center">
+                <UserCheck className="w-5 h-5 mr-2 text-purple-400" />
+                User Management
+              </CardTitle>
+              <CardDescription className="text-gray-400">Manage users and permissions</CardDescription>
+            </CardHeader>
+            <CardContent>
               <Link href="/admin/users">
-                <Button className="w-full justify-start bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white transition-all duration-300 hover:scale-105">View All Users</Button>
+                <Button className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white flex items-center justify-center">
+                  View All Users
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
               </Link>
             </CardContent>
           </Card>
-        </ProminentBorder>
 
-        <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-green-500/10 transition-all duration-300">
             <CardHeader>
-              <CardTitle className="text-white text-xl">Reports & Analytics</CardTitle>
-              <CardDescription className="text-gray-400">Monitor reports and system analytics</CardDescription>
+              <CardTitle className="text-white flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-green-400" />
+                Reports & Analytics
+              </CardTitle>
+              <CardDescription className="text-gray-400">Monitor reports and analytics</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               <Link href="/admin/reports">
-                <Button className="w-full justify-start bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white transition-all duration-300 hover:scale-105">View Reports</Button>
+                <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white flex items-center justify-center">
+                  View Reports
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
               </Link>
             </CardContent>
           </Card>
-        </ProminentBorder>
 
-        {memoizedPermissions.canViewHistory && (
-          <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
-            <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
+          {memoizedPermissions.canViewHistory && (
+            <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-orange-500/10 transition-all duration-300">
               <CardHeader>
-                <CardTitle className="text-white text-xl">Notification Management</CardTitle>
-                <CardDescription className="text-gray-400">Advanced user notifications and monitoring</CardDescription>
+                <CardTitle className="text-white flex items-center">
+                  <Bell className="w-5 h-5 mr-2 text-orange-400" />
+                  Notifications
+                </CardTitle>
+                <CardDescription className="text-gray-400">User notifications and monitoring</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent>
                 <Link href="/admin/notifications">
-                  <Button className="w-full justify-start bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white transition-all duration-300 hover:scale-105">
+                  <Button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white flex items-center justify-center">
                     Manage Notifications
+                    <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
               </CardContent>
             </Card>
-          </ProminentBorder>
-        )}
+          )}
 
-        <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300">
             <CardHeader>
-              <CardTitle className="text-white text-xl">Admin Key Management</CardTitle>
-              <CardDescription className="text-gray-400">Generate and manage dynamic admin registration keys</CardDescription>
+              <CardTitle className="text-white flex items-center">
+                <Key className="w-5 h-5 mr-2 text-indigo-400" />
+                Admin Keys
+              </CardTitle>
+              <CardDescription className="text-gray-400">Manage admin registration keys</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               <Link href="/admin/keys">
-                <Button className="w-full justify-start bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white transition-all duration-300 hover:scale-105">
-                  🔐 Manage Admin Keys
+                <Button className="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white flex items-center justify-center">
+                  Manage Keys
+                  <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </CardContent>
           </Card>
-        </ProminentBorder>
 
-        <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-red-500/10 transition-all duration-300">
             <CardHeader>
-              <CardTitle className="text-white text-xl">Fraud Prevention</CardTitle>
-              <CardDescription className="text-gray-400">Monitor and analyze potential fraud activities</CardDescription>
+              <CardTitle className="text-white flex items-center">
+                <Shield className="w-5 h-5 mr-2 text-red-400" />
+                Fraud Prevention
+              </CardTitle>
+              <CardDescription className="text-gray-400">Monitor potential fraud activities</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               <Link href="/admin/fraud-prevention">
-                <Button className="w-full justify-start bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white transition-all duration-300 hover:scale-105">
-                  Fraud Prevention Report
+                <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white flex items-center justify-center">
+                  View Report
+                  <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </CardContent>
           </Card>
-        </ProminentBorder>
 
-        <ProminentBorder className="rounded-2xl overflow-hidden" animated={false}>
-          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border-0">
+          <Card className="bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl border border-gray-700 shadow-2xl hover:shadow-pink-500/10 transition-all duration-300">
             <CardHeader>
-              <CardTitle className="text-white text-xl">Expert Applications</CardTitle>
-              <CardDescription className="text-gray-400">Review and approve expert verification requests</CardDescription>
+              <CardTitle className="text-white flex items-center">
+                <UserCheck className="w-5 h-5 mr-2 text-pink-400" />
+                Expert Applications
+              </CardTitle>
+              <CardDescription className="text-gray-400">Review expert verification requests</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               <Link href="/admin/expert-applications">
-                <Button className="w-full justify-start bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white transition-all duration-300 hover:scale-105">
-                  👨‍💼 Review Applications
+                <Button className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white flex items-center justify-center">
+                  Review Applications
+                  <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </CardContent>
           </Card>
-        </ProminentBorder>
+        </div>
+        </div>
       </div>
-      </div>
-    </div>
+    </ErrorBoundary>
   )
 }

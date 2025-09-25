@@ -8,6 +8,8 @@ import bcrypt from 'bcryptjs'
 import { sendEmail, getPasswordResetTemplate } from './email'
 import { logger, log } from './logger'
 import crypto from 'crypto'
+import { getServerSession } from 'next-auth/next'
+import { NextRequest } from 'next/server'
 
 const providers = [
   CredentialsProvider({
@@ -204,5 +206,52 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/unified-signin',
     signUp: '/auth/signup',
     signOut: '/',
+  }
+}
+
+// Helper function to verify authentication and get user data
+export async function verifyAuthAndGetUser(request?: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.id) {
+      return { 
+        error: 'Unauthorized', 
+        status: 401 
+      }
+    }
+
+    // Get full user data from database
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        walletAddress: true,
+        accountStatus: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    })
+
+    if (!user) {
+      return { 
+        error: 'User not found', 
+        status: 404 
+      }
+    }
+
+    return { 
+      user, 
+      session 
+    }
+  } catch (error) {
+    console.error('Error in verifyAuthAndGetUser:', error)
+    return { 
+      error: 'Internal server error', 
+      status: 500 
+    }
   }
 }

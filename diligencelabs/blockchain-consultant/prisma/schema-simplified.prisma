@@ -1,0 +1,960 @@
+// Simplified Prisma schema for Diligence Labs
+// Removed complex reputation system for business focus
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  role          Role      @default(USER)
+  
+  // Social login IDs
+  googleId      String?   @unique
+  githubId      String?   @unique
+  twitterId     String?   @unique
+  
+  // Basic wallet connection
+  walletAddress String?   @unique
+  walletConnected Boolean @default(false)
+  
+  // Authentication
+  password      String?
+  
+  // Password reset
+  passwordResetToken String?
+  passwordResetExpiry DateTime?
+  failedLoginAttempts Int @default(0)
+  lastFailedLogin DateTime?
+  accountLockedUntil DateTime?
+  
+  // Account management
+  accountStatus AccountStatus @default(ACTIVE)
+  accountStatusReason String?
+  statusChangedAt DateTime?
+  statusChangedBy String?
+  
+  // Email verification
+  emailVerificationToken String?
+  emailVerificationExpiry DateTime?
+  
+  // Free consultation tracking
+  freeConsultationUsed Boolean   @default(false)
+  freeConsultationDate DateTime?
+  
+  // Subscription tracking
+  stripeCustomerId String?
+  
+  // Simplified project tracking
+  totalProjectsSubmitted Int @default(0)
+  successfulProjects Int @default(0)
+  
+  // Subscription limits
+  monthlyProjectLimit Int @default(1)
+  monthlyProjectsUsed Int @default(0)
+  lastResetDate DateTime @default(now())
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  sessions      Session[]
+  reports       Report[]
+  accounts      Account[]
+  teamMember    TeamMember?
+  assignedReports  ReportAssignment[]
+  assignedSessions SessionAssignment[]
+  createdAssignments ReportAssignment[] @relation("AssignedBy")
+  subscriptions Subscription[]
+  notificationLogs AdminNotificationLog[]
+  activityLogs UserActivityLog[]
+  
+  // Due Diligence Relations
+  submittedProjects Project[]
+  expertProfile     ExpertProfile?
+  
+  // Performance indexes
+  @@index([email])
+  @@index([role])
+  @@index([accountStatus])
+  @@index([failedLoginAttempts])
+  @@index([createdAt])
+  @@index([role, accountStatus])
+  @@index([failedLoginAttempts, lastFailedLogin])
+  
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@index([type])
+  @@map("accounts")
+}
+
+model Session {
+  id               String           @id @default(cuid())
+  userId           String?
+  consultationType ConsultationType
+  status           SessionStatus    @default(PENDING)
+  description      String?
+  scheduledAt      DateTime?
+  completedAt      DateTime?
+  notes            String?
+  priority         Priority         @default(MEDIUM)
+  estimatedHours   Int?
+  
+  // Guest session data (for non-authenticated users) - Removed due to optimization
+  
+  // Free consultation tracking
+  isFreeConsultation Boolean         @default(false)
+  clientIpAddress    String?
+  clientFingerprint  String?
+  
+  // Timestamps
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  
+  // Relations
+  user             User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignments      SessionAssignment[]
+  
+  // Performance indexes
+  @@index([userId])
+  @@index([status])
+  @@index([consultationType])
+  @@index([scheduledAt])
+  @@index([createdAt])
+  @@index([isFreeConsultation])
+  @@index([status, userId])
+  @@index([status, createdAt])
+  
+  @@map("sessions")
+}
+
+model Report {
+  id          String       @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  fileUrl     String?
+  status      ReportStatus @default(PENDING)
+  type        ReportType
+  priority    Priority     @default(MEDIUM)
+  complexity  Complexity   @default(MEDIUM)
+  estimatedHours Int?
+  actualHours    Int?
+  deadline    DateTime?
+  
+  // Timestamps
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  // Relations
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignments ReportAssignment[]
+  
+  // Performance indexes
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([priority])
+  @@index([createdAt])
+  @@index([deadline])
+  @@index([status, userId])
+  @@index([status, createdAt])
+  @@index([type, status])
+  
+  @@map("reports")
+}
+
+model TeamMember {
+  id             String           @id @default(cuid())
+  userId         String           @unique
+  position       String
+  department     Department
+  hourlyRate     Float?
+  isActive       Boolean          @default(true)
+  maxHoursPerWeek Int             @default(40)
+  currentWorkload Int             @default(0)
+  
+  // Timestamps
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  
+  // Relations
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specializations TeamMemberSpecialization[]
+  
+  // Performance indexes
+  @@index([userId])
+  @@index([department])
+  @@index([isActive])
+  @@index([isActive, department])
+  
+  @@map("team_members")
+}
+
+model TeamMemberSpecialization {
+  id             String         @id @default(cuid())
+  teamMemberId   String
+  specialization Specialization
+  
+  // Timestamps
+  createdAt      DateTime       @default(now())
+  
+  // Relations
+  teamMember     TeamMember     @relation(fields: [teamMemberId], references: [id], onDelete: Cascade)
+  
+  @@unique([teamMemberId, specialization])
+  @@index([teamMemberId])
+  @@index([specialization])
+  
+  @@map("team_member_specializations")
+}
+
+model ReportAssignment {
+  id           String              @id @default(cuid())
+  reportId     String
+  assigneeId   String
+  assignedById String
+  role         AssignmentRole      @default(CONTRIBUTOR)
+  status       AssignmentStatus    @default(ASSIGNED)
+  estimatedHours Int?
+  actualHours    Int?
+  notes        String?
+  
+  // Timestamps
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  startedAt    DateTime?
+  completedAt  DateTime?
+  
+  // Relations
+  report       Report              @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  assignee     User                @relation(fields: [assigneeId], references: [id], onDelete: Cascade)
+  assignedBy   User                @relation("AssignedBy", fields: [assignedById], references: [id])
+  
+  @@unique([reportId, assigneeId])
+  @@index([reportId])
+  @@index([assigneeId])
+  @@index([assignedById])
+  @@index([status])
+  @@index([createdAt])
+  @@index([status, assigneeId])
+  
+  @@map("report_assignments")
+}
+
+model SessionAssignment {
+  id           String              @id @default(cuid())
+  sessionId    String
+  assigneeId   String
+  role         AssignmentRole      @default(LEAD)
+  status       AssignmentStatus    @default(ASSIGNED)
+  estimatedHours Int?
+  actualHours    Int?
+  notes        String?
+  
+  // Timestamps
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  startedAt    DateTime?
+  completedAt  DateTime?
+  
+  // Relations
+  session      Session             @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  assignee     User                @relation(fields: [assigneeId], references: [id], onDelete: Cascade)
+  
+  @@unique([sessionId, assigneeId])
+  @@index([sessionId])
+  @@index([assigneeId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([status, assigneeId])
+  
+  @@map("session_assignments")
+}
+
+model Subscription {
+  id                String              @id @default(cuid())
+  userId            String
+  stripeSubscriptionId String           @unique
+  status            SubscriptionStatus  @default(ACTIVE)
+  planType          SubscriptionPlan
+  planId            String?             // For API references like 'basic', 'professional', etc.
+  billingCycle      BillingCycle       @default(MONTHLY)
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean            @default(false)
+  canceledAt        DateTime?
+  trialEnd          DateTime?
+  
+  // Pricing
+  amount            Float              // Amount in dollars
+  currency          String             @default("usd")
+  
+  // Timestamps
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  
+  // Relations
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Performance indexes
+  @@index([userId])
+  @@index([status])
+  @@index([planType])
+  @@index([currentPeriodEnd])
+  @@index([status, userId])
+  @@index([status, currentPeriodEnd])
+  
+  @@map("subscriptions")
+}
+
+model AdminUser {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String
+  hashedPassword   String
+  role             AdminRole @default(ADMIN)
+  isActive         Boolean   @default(true)
+  lastLogin        DateTime?
+  
+  // Timestamps
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  // Relations
+  notificationLogs AdminNotificationLog[]
+  
+  // Performance indexes
+  @@index([email])
+  @@index([role])
+  @@index([isActive])
+  @@index([role, isActive])
+  
+  @@map("admin_users")
+}
+
+model AdminNotificationLog {
+  id               String    @id @default(cuid())
+  userId           String
+  adminId          String
+  notificationType String    // 'subscription_status', 'malicious_activity', 'subscription_expiration'
+  emailSent        Boolean   @default(false)
+  details          String? // JSON string with notification details
+  
+  // Timestamps
+  createdAt        DateTime  @default(now())
+  
+  // Relations
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  admin            AdminUser @relation(fields: [adminId], references: [id])
+  
+  // Performance indexes
+  @@index([userId])
+  @@index([adminId])
+  @@index([notificationType])
+  @@index([emailSent])
+  @@index([createdAt])
+  @@index([emailSent, createdAt])
+  @@index([notificationType, emailSent])
+  
+  @@map("admin_notification_logs")
+}
+
+model UserActivityLog {
+  id          String   @id @default(cuid())
+  userId      String
+  action      String   // 'LOGIN', 'LOGOUT', 'FAILED_LOGIN', 'PASSWORD_RESET', 'SECURITY_NOTIFICATION_SENT', etc.
+  details     String?
+  ipAddress   String?
+  userAgent   String?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Performance indexes
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([userId, action])
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  
+  @@map("user_activity_logs")
+}
+
+model AdminKey {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  description String?
+  createdBy   String
+  isActive    Boolean   @default(true)
+  usageCount  Int       @default(0)
+  maxUsages   Int?
+  expiresAt   DateTime?
+  
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Performance indexes
+  @@index([key])
+  @@index([isActive])
+  @@index([createdBy])
+  @@index([expiresAt])
+  @@index([isActive, expiresAt])
+  
+  @@map("admin_keys")
+}
+
+// Simplified Due Diligence Models
+
+model Project {
+  id                String           @id @default(cuid())
+  name              String
+  description       String
+  website           String?
+  category          ProjectCategory
+  status            ProjectStatus    @default(SUBMITTED)
+  submitterId       String
+  
+  // Team information
+  foundingTeam      String?          // JSON string with founder details
+  teamSize          Int?
+  keyPersonnel      String?          // JSON string with key team members
+  
+  // Technical details
+  blockchain        String?          // Which blockchain(s)
+  technologyStack   String?          // JSON string with tech details
+  smartContract     String?          // Contract address if applicable
+  repository        String?          // GitHub repo URL
+  whitepaper        String?          // URL to whitepaper
+  
+  // Business metrics
+  fundingRaised     Float?           // Amount in USD
+  currentTraction   String?          // JSON string with traction metrics
+  userBase          Int?
+  monthlyRevenue    Float?
+  
+  // Due diligence requirements
+  evaluationDeadline DateTime?
+  priorityLevel     Priority         @default(MEDIUM)
+  evaluationBudget  Float?           // Budget in tokens/USD
+  
+  // Social verification
+  twitterHandle     String?
+  linkedinProfile   String?
+  discordServer     String?
+  telegramGroup     String?
+  
+  // Final scores (calculated from evaluations)
+  overallScore      Float?
+  teamScore         Float?
+  pmfScore          Float?
+  infrastructureScore Float?
+  statusScore       Float?
+  competitiveScore  Float?
+  riskScore         Float?
+  
+  // Timestamps
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  evaluationStartedAt DateTime?
+  evaluationCompletedAt DateTime?
+  
+  // Relations
+  submitter         User             @relation(fields: [submitterId], references: [id], onDelete: Cascade)
+  evaluations       ProjectEvaluation[]
+  assignments       ProjectAssignment[]
+  rewardDistributions RewardDistribution[]
+  
+  // Performance indexes
+  @@index([submitterId])
+  @@index([status])
+  @@index([category])
+  @@index([priorityLevel])
+  @@index([createdAt])
+  @@index([evaluationDeadline])
+  @@index([status, category])
+  @@index([status, createdAt])
+  
+  @@map("projects")
+}
+
+model ExpertProfile {
+  id                String              @id @default(cuid())
+  userId            String              @unique
+  
+  // Verification status
+  verificationStatus VerificationStatus @default(PENDING)
+  kycStatus         KYCStatus          @default(PENDING)
+  
+  // Professional information
+  linkedinUrl       String?
+  githubUrl         String?
+  twitterHandle     String?
+  company           String?
+  position          String?
+  yearsExperience   Int?
+  bio               String?
+  
+  // Expertise areas
+  primaryExpertise  String?            // JSON array of expertise areas
+  secondaryExpertise String?           // JSON array of secondary areas
+  
+  // Simplified Performance tracking
+  totalEvaluations  Int                @default(0)
+  accuracyRate      Float              @default(0.0)
+  averageRating     Float              @default(0.0)
+  
+  // Rewards
+  totalRewards      Float              @default(0.0)
+  
+  // Activity metrics
+  monthlyEvaluations Int               @default(0)
+  lastActiveAt      DateTime?
+  
+  // Timestamps
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  verifiedAt        DateTime?
+  
+  // Relations
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  evaluations       ProjectEvaluation[]
+  assignments       ProjectAssignment[]
+  payouts           ExpertPayout[]
+  
+  // Performance indexes
+  @@index([userId])
+  @@index([verificationStatus])
+  @@index([totalEvaluations])
+  @@index([accuracyRate])
+  
+  @@map("expert_profiles")
+}
+
+model ProjectEvaluation {
+  id              String                 @id @default(cuid())
+  projectId       String
+  expertId        String
+  
+  // Evaluation scores (0-10)
+  teamScore       Float?
+  teamComments    String?
+  
+  pmfScore        Float?
+  pmfComments     String?
+  
+  infrastructureScore Float?
+  infrastructureComments String?
+  
+  statusScore     Float?
+  statusComments  String?
+  
+  competitiveScore Float?
+  competitiveComments String?
+  
+  riskScore       Float?
+  riskComments    String?
+  
+  // Overall assessment
+  overallScore    Float?
+  overallComments String?
+  recommendation  EvaluationRecommendation?
+  confidenceLevel Float?                 // 0-1 (how confident the expert is)
+  
+  // Evaluation metadata
+  status          EvaluationStatus       @default(ASSIGNED)
+  timeSpent       Int?                   // Minutes spent on evaluation
+  difficulty      EvaluationDifficulty   @default(MEDIUM)
+  
+  // Reward calculation
+  baseReward      Float?                 // Base reward for evaluation
+  qualityBonus    Float?                 // Bonus for high-quality evaluation
+  consensusBonus  Float?                 // Bonus for agreement with other experts
+  totalReward     Float?                 // Final reward amount
+  
+  // Timestamps
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  startedAt       DateTime?
+  submittedAt     DateTime?
+  approvedAt      DateTime?
+  
+  // Relations
+  project         Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  expert          ExpertProfile          @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  
+  // Performance indexes
+  @@index([projectId])
+  @@index([expertId])
+  @@index([status])
+  @@index([submittedAt])
+  @@index([overallScore])
+  @@index([status, expertId])
+  @@index([status, projectId])
+  
+  @@unique([projectId, expertId])
+  @@map("project_evaluations")
+}
+
+model ProjectAssignment {
+  id              String              @id @default(cuid())
+  projectId       String
+  expertId        String
+  assignmentType  AssignmentType      @default(PRIMARY)
+  status          AssignmentStatus    @default(ASSIGNED)
+  
+  // Assignment details
+  estimatedHours  Int?
+  deadline        DateTime?
+  specialization  String?             // Required specialization for this assignment
+  
+  // Timestamps
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  acceptedAt      DateTime?
+  completedAt     DateTime?
+  
+  // Relations
+  project         Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  expert          ExpertProfile       @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  
+  // Performance indexes
+  @@index([projectId])
+  @@index([expertId])
+  @@index([status])
+  @@index([assignmentType])
+  @@index([deadline])
+  @@index([status, expertId])
+  
+  @@unique([projectId, expertId])
+  @@map("project_assignments")
+}
+
+model RewardDistribution {
+  id                String    @id @default(cuid())
+  projectId         String
+  totalFee          Float     // Total fee paid by subscriber
+  platformFee       Float     // Platform's share
+  expertsPool       Float     // Pool for experts
+  
+  // Distribution details
+  distributionDate  DateTime  @default(now())
+  status           RewardStatus @default(PENDING)
+  
+  // Relations
+  project          Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  payouts          ExpertPayout[]
+  
+  // Timestamps
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  // Performance indexes
+  @@index([projectId])
+  @@index([status])
+  @@index([distributionDate])
+  
+  @@map("reward_distributions")
+}
+
+model ExpertPayout {
+  id                   String              @id @default(cuid())
+  rewardDistributionId String
+  expertId             String
+  amount               Float
+  payoutType           PayoutType
+  
+  // Payout details
+  status               PayoutStatus        @default(PENDING)
+  transactionHash      String?             // Blockchain transaction hash
+  payoutDate           DateTime?
+  
+  // Relations
+  rewardDistribution   RewardDistribution  @relation(fields: [rewardDistributionId], references: [id], onDelete: Cascade)
+  expert               ExpertProfile       @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  
+  // Performance indexes
+  @@index([rewardDistributionId])
+  @@index([expertId])
+  @@index([status])
+  @@index([payoutDate])
+  
+  @@map("expert_payouts")
+}
+
+// Core Enums
+
+enum Role {
+  USER
+  ADMIN
+  TEAM_MEMBER
+}
+
+enum ConsultationType {
+  STRATEGIC_ADVISORY
+  DUE_DILIGENCE
+  TOKENOMICS_DESIGN
+  TOKEN_LAUNCH
+}
+
+enum SessionStatus {
+  PENDING
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ReportStatus {
+  PENDING
+  IN_REVIEW
+  COMPLETED
+  REJECTED
+}
+
+enum ReportType {
+  DUE_DILIGENCE
+  ADVISORY_NOTES
+  BLOCKCHAIN_INTEGRATION_ADVISORY
+  MARKET_RESEARCH
+}
+
+enum Department {
+  BLOCKCHAIN_INTEGRATION
+  STRATEGY_CONSULTING
+  DUE_DILIGENCE
+  TOKEN_ECONOMICS
+  MARKETING
+  BUSINESS_DEVELOPMENT
+  PROJECT_MANAGEMENT
+  RESEARCH
+}
+
+enum Specialization {
+  SMART_CONTRACTS
+  DEFI_PROTOCOLS
+  TOKENOMICS
+  MARKET_ANALYSIS
+  REGULATORY_COMPLIANCE
+  SECURITY_AUDITING
+  BLOCKCHAIN_ARCHITECTURE
+  INVESTMENT_ANALYSIS
+  CRYPTO_TRADING
+  NFT_MARKETS
+  DAO_GOVERNANCE
+  LAYER2_SOLUTIONS
+  BLOCKCHAIN_SELECTION
+  INFRASTRUCTURE_PARTNERS
+  WHITE_LABEL_SOLUTIONS
+  DEVELOPMENT_FRAMEWORKS
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum Complexity {
+  SIMPLE
+  MEDIUM
+  COMPLEX
+  VERY_COMPLEX
+}
+
+enum AssignmentRole {
+  LEAD
+  CONTRIBUTOR
+  REVIEWER
+  ADVISOR
+}
+
+enum AssignmentStatus {
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+  CANCELLED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELED
+  PAST_DUE
+  INCOMPLETE
+  TRIALING
+}
+
+enum SubscriptionPlan {
+  BASIC_MONTHLY
+  PROFESSIONAL_MONTHLY
+  ENTERPRISE_MONTHLY
+  VC_TIER_MONTHLY
+  ECOSYSTEM_PARTNER_MONTHLY
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  MODERATOR
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  RESTRICTED
+  DISABLED
+  PENDING_VERIFICATION
+}
+
+// Due Diligence Enums
+
+enum ProjectCategory {
+  DEFI
+  NFT
+  GAMEFI
+  INFRASTRUCTURE
+  LAYER2
+  DAO
+  METAVERSE
+  SOCIAL
+  PRIVACY
+  LENDING
+  DEX
+  STABLECOIN
+  BRIDGE
+  WALLET
+  TOOLING
+  OTHER
+}
+
+enum ProjectStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  EXPERT_ASSIGNMENT
+  EVALUATION_IN_PROGRESS
+  EVALUATION_COMPLETED
+  REPORT_GENERATED
+  PUBLISHED
+  REJECTED
+  CANCELLED
+}
+
+enum VerificationStatus {
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+enum KYCStatus {
+  PENDING
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum EvaluationRecommendation {
+  STRONG_BUY
+  BUY
+  HOLD
+  CAUTION
+  AVOID
+}
+
+enum EvaluationStatus {
+  ASSIGNED
+  ACCEPTED
+  IN_PROGRESS
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum EvaluationDifficulty {
+  SIMPLE
+  MEDIUM
+  COMPLEX
+  VERY_COMPLEX
+}
+
+enum AssignmentType {
+  PRIMARY
+  SECONDARY
+  REVIEWER
+  SPECIALIST
+}
+
+enum RewardStatus {
+  PENDING
+  PROCESSING
+  DISTRIBUTED
+  FAILED
+  CANCELLED
+}
+
+enum PayoutType {
+  EVALUATION_REWARD
+  QUALITY_BONUS
+  CONSENSUS_BONUS
+  MONTHLY_BONUS
+  TIER_BONUS
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}

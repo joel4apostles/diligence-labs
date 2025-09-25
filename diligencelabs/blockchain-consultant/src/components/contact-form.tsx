@@ -3,11 +3,16 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ProminentBorder } from "@/components/ui/border-effects"
+import { GlassMorphismCard } from "@/components/ui/consistent-theme"
+import { 
+  AccessibleInput, 
+  AccessibleTextarea, 
+  AccessibleSelect, 
+  AccessibleButton,
+  useFormValidation 
+} from "@/components/ui/accessible-form"
+import { useAccessibility } from "@/components/ui/accessibility"
+import { motion } from "framer-motion"
 
 const contactSubjects = [
   { value: "general", label: "General Inquiry" },
@@ -28,22 +33,27 @@ export function ContactForm() {
     subject: "",
     message: ""
   })
+  const { errors, validateField, setFieldError, clearErrors } = useFormValidation()
+  const { announceToScreenReader } = useAccessibility()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
+    clearErrors()
 
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.message) {
-      setError("Please fill in all required fields")
-      setIsLoading(false)
-      return
-    }
+    // Enhanced validation
+    const nameError = validateField("Name", formData.name, { required: true })
+    const emailError = validateField("Email", formData.email, { required: true, email: true })
+    const messageError = validateField("Message", formData.message, { required: true, minLength: 10 })
 
-    if (formData.message.length < 10) {
-      setError("Message must be at least 10 characters")
+    if (nameError) setFieldError("name", nameError)
+    if (emailError) setFieldError("email", emailError)
+    if (messageError) setFieldError("message", messageError)
+
+    if (nameError || emailError || messageError) {
       setIsLoading(false)
+      announceToScreenReader("Form contains errors. Please review and correct.")
       return
     }
 
@@ -58,6 +68,7 @@ export function ContactForm() {
 
       if (response.ok) {
         setIsSubmitted(true)
+        announceToScreenReader("Message sent successfully! We'll get back to you soon.")
         // Reset form
         setFormData({
           name: "",
@@ -66,10 +77,14 @@ export function ContactForm() {
           message: ""
         })
       } else {
-        setError(data.error || "Failed to send message")
+        const errorMsg = data.error || "Failed to send message"
+        setError(errorMsg)
+        announceToScreenReader(`Error: ${errorMsg}`)
       }
     } catch (error) {
-      setError("An error occurred while sending your message")
+      const errorMsg = "An error occurred while sending your message"
+      setError(errorMsg)
+      announceToScreenReader(`Error: ${errorMsg}`)
     } finally {
       setIsLoading(false)
     }
@@ -92,10 +107,12 @@ export function ContactForm() {
   if (isSubmitted) {
     return (
       <div className="max-w-2xl mx-auto">
-        <ProminentBorder className="rounded-2xl overflow-hidden" animated={true} movingBorder={true}>
-          <div className="relative group bg-gradient-to-br from-gray-900/80 to-gray-800/50 backdrop-blur-xl">
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-all duration-700 rounded-2xl bg-gradient-to-br from-green-500/20 to-emerald-500/20" />
-            
+        <GlassMorphismCard variant="accent" hover={true}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative group"
+          >
             <Card className="bg-transparent border-0 relative z-10">
               <CardHeader className="text-center pb-8">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4">
@@ -125,18 +142,20 @@ export function ContactForm() {
                 </Button>
               </CardContent>
             </Card>
-          </div>
-        </ProminentBorder>
+          </motion.div>
+        </GlassMorphismCard>
       </div>
     )
   }
 
   return (
     <div className="max-w-2xl mx-auto">
-      <ProminentBorder className="rounded-2xl overflow-hidden" animated={true} movingBorder={true}>
-        <div className="relative group bg-gradient-to-br from-gray-900/60 to-gray-800/30 backdrop-blur-xl">
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 rounded-2xl bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
-          
+      <GlassMorphismCard variant="primary" hover={true}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative group"
+        >
           <Card className="bg-transparent border-0 relative z-10">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-light text-white">
@@ -148,100 +167,123 @@ export function ContactForm() {
             </CardHeader>
 
             <CardContent className="px-4 sm:px-6">
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6" role="form" aria-label="Contact form">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name" className="text-gray-300 text-sm">Full Name *</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="mt-1 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400 h-12 text-base"
-                      placeholder="Your full name"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="email" className="text-gray-300 text-sm">Email Address *</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="mt-1 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400 h-12 text-base"
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="subject" className="text-gray-300 text-sm">Subject</Label>
-                  <Select onValueChange={handleSelectChange}>
-                    <SelectTrigger className="mt-1 bg-gray-800/50 border-gray-600 text-white h-12">
-                      <SelectValue placeholder="Select a subject" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                      {contactSubjects.map((subject) => (
-                        <SelectItem 
-                          key={subject.value} 
-                          value={subject.value}
-                          className="hover:bg-gray-700 py-3"
-                        >
-                          {subject.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="message" className="text-gray-300 text-sm">Message *</Label>
-                  <Textarea
-                    id="message"
-                    name="message"
+                  <AccessibleInput
+                    label="Full Name"
+                    type="text"
+                    value={formData.name}
+                    onChange={(value) => setFormData(prev => ({ ...prev, name: value }))}
                     required
-                    value={formData.message}
-                    onChange={handleChange}
-                    className="mt-1 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400 min-h-[120px] text-base"
-                    placeholder="Tell us about your project or question (minimum 10 characters)..."
+                    placeholder="Your full name"
+                    errorMessage={errors.name}
+                    helpText="Enter your full name as you'd like us to address you"
+                    autoComplete="name"
+                  />
+
+                  <AccessibleInput
+                    label="Email Address"
+                    type="email"
+                    value={formData.email}
+                    onChange={(value) => setFormData(prev => ({ ...prev, email: value }))}
+                    required
+                    placeholder="your@email.com"
+                    errorMessage={errors.email}
+                    helpText="We'll use this to respond to your inquiry"
+                    autoComplete="email"
                   />
                 </div>
 
+                <AccessibleSelect
+                  label="Subject"
+                  value={formData.subject}
+                  onChange={(value) => setFormData(prev => ({ ...prev, subject: contactSubjects.find(s => s.value === value)?.label || "" }))}
+                  options={contactSubjects}
+                  placeholder="Select a subject"
+                  helpText="Choose the topic that best describes your inquiry"
+                />
+
+                <AccessibleTextarea
+                  label="Message"
+                  value={formData.message}
+                  onChange={(value) => setFormData(prev => ({ ...prev, message: value }))}
+                  required
+                  placeholder="Tell us about your project or question..."
+                  errorMessage={errors.message}
+                  helpText="Please provide details about your inquiry (minimum 10 characters)"
+                  minLength={10}
+                  maxLength={1000}
+                  rows={5}
+                />
+
                 {error && (
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                    <p className="text-red-400 text-sm">{error}</p>
-                  </div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-red-500/10 border border-red-500/20 rounded-lg p-3"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    <p className="text-red-400 text-sm flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {error}
+                    </p>
+                  </motion.div>
                 )}
 
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transition-all duration-300 hover:scale-105 h-12 text-base font-medium"
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      Send Message
-                      <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                      </svg>
-                    </>
-                  )}
-                </Button>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    aria-label="Send contact message"
+                    aria-busy={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <svg 
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          fill="none" 
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <circle 
+                            className="opacity-25" 
+                            cx="12" 
+                            cy="12" 
+                            r="10" 
+                            stroke="currentColor" 
+                            strokeWidth="4"
+                          />
+                          <path 
+                            className="opacity-75" 
+                            fill="currentColor" 
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                        <span>Sending...</span>
+                      </>
+                    ) : (
+                      <>
+                        Send Message
+                        <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                </motion.div>
               </form>
             </CardContent>
           </Card>
-        </div>
-      </ProminentBorder>
+        </motion.div>
+      </GlassMorphismCard>
     </div>
   )
 }
