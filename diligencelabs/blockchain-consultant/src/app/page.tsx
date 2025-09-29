@@ -91,7 +91,7 @@ export default function Home() {
     if (urlParams.get('success')) {
       setShowSuccess(true)
       // Clean URL
-      router.replace('/', undefined, { shallow: true })
+      router.replace('/')
     }
     
     if (isAuthenticated) {

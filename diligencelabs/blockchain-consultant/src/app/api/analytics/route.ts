@@ -125,6 +125,7 @@ export async function GET(request: NextRequest) {
         const revenueMap = {
           'STRATEGIC_ADVISORY': 500,
           'DUE_DILIGENCE': 1000,
+          'BLOCKCHAIN_INTEGRATION_ADVISORY': 800,
           'TOKEN_LAUNCH': 2000,
           'TOKENOMICS_DESIGN': 1500
         }
@@ -138,6 +139,7 @@ export async function GET(request: NextRequest) {
     const serviceTypes = {
       'STRATEGIC_ADVISORY': 0,
       'DUE_DILIGENCE': 0,
+      'BLOCKCHAIN_INTEGRATION_ADVISORY': 0,
       'TOKEN_LAUNCH': 0,
       'TOKENOMICS_DESIGN': 0
     }
@@ -154,6 +156,7 @@ export async function GET(request: NextRequest) {
       color: {
         'STRATEGIC_ADVISORY': '#3B82F6',
         'DUE_DILIGENCE': '#10B981',
+        'BLOCKCHAIN_INTEGRATION_ADVISORY': '#8B5CF6',
         'TOKEN_LAUNCH': '#F59E0B',
         'TOKENOMICS_DESIGN': '#EF4444'
       }[key] || '#6B7280'

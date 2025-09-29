@@ -14,6 +14,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({ 
+      message: 'Expert assignment not available - ExpertProfile model not implemented yet',
+      action: 'mock-response'
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     const body = await request.json()
     const { projectId, assignmentType, estimatedHours, specialization } = body
 
@@ -189,6 +196,7 @@ export async function POST(request: NextRequest) {
       pointsAwarded,
       projectStatus: project.status === 'EXPERT_ASSIGNMENT' ? 'EVALUATION_IN_PROGRESS' : project.status
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Project assignment error:', error)
@@ -208,6 +216,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({ 
+      message: 'Expert unassignment not available - ExpertProfile model not implemented yet',
+      action: 'mock-response'
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     const { searchParams } = new URL(request.url)
     const projectId = searchParams.get('projectId')
 
@@ -301,6 +316,7 @@ export async function DELETE(request: NextRequest) {
       projectId,
       remainingAssignments
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Project unassignment error:', error)

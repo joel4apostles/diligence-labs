@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -12,19 +12,19 @@ export async function POST(request: NextRequest) {
         id: 'sample-user-1',
         email: 'expert1@blockchain.com',
         name: 'Alice Johnson',
-        role: 'USER'
+        role: Role.USER
       },
       {
         id: 'sample-user-2', 
         email: 'expert2@defi.com',
         name: 'Bob Chen',
-        role: 'USER'
+        role: Role.USER
       },
       {
         id: 'sample-user-3',
         email: 'expert3@web3.com', 
         name: 'Carol Martinez',
-        role: 'USER'
+        role: Role.USER
       }
     ]
 
@@ -37,6 +37,14 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({
+      message: 'Expert applications seeded successfully (users only)',
+      created: sampleUsers.length,
+      note: 'ExpertProfile model not implemented yet'
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     // Create sample expert profiles
     const expertProfiles = [
       {
@@ -117,6 +125,7 @@ export async function POST(request: NextRequest) {
       count: created.length,
       profiles: created
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Seed expert applications error:', error)

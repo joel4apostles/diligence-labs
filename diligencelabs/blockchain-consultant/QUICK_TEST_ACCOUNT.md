@@ -11,7 +11,7 @@ Use email/password authentication until Google Console is configured.
 ### Option 1: Create Account via Signup Page
 1. Go to http://localhost:3000/auth/signup
 2. Fill in the form with test credentials:
-   - **Email**: test@diligencelabs.com
+   - **Email**: test@diligencelabs.xyz
    - **Password**: Test123456
    - **Name**: Test User
 3. Click "Create Account"
@@ -24,7 +24,7 @@ Use email/password authentication until Google Console is configured.
 
 ### Test Credentials (if database has seed data)
 ```
-Email: admin@diligencelabs.com
+Email: admin@diligencelabs.xyz
 Password: admin123
 ```
 

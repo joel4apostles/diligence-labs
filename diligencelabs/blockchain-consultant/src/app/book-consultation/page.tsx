@@ -22,6 +22,7 @@ import { ProminentBorder } from "@/components/ui/border-effects"
 import { PageStructureLines } from "@/components/ui/page-structure"
 import { HorizontalDivider } from "@/components/ui/section-divider"
 import { Logo } from "@/components/ui/logo"
+import { formTheme } from "@/lib/form-theme"
 
 const bookingSchema = z.object({
   consultationType: z.enum(["STRATEGIC_ADVISORY", "DUE_DILIGENCE", "TOKENOMICS_DESIGN", "TOKEN_LAUNCH"], {
@@ -358,16 +359,16 @@ export default function BookConsultation() {
                       name="consultationType"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300 text-lg">Consultation Type</FormLabel>
+                          <FormLabel className={formTheme.label.base}>Consultation Type</FormLabel>
                           <Select onValueChange={(value) => { field.onChange(value); setSelectedType(value) }} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white h-12">
+                              <SelectTrigger className={`${formTheme.select.trigger} h-12`}>
                                 <SelectValue placeholder="Select consultation type" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="bg-gray-800 border-gray-700 text-white max-h-64">
+                            <SelectContent className={`${formTheme.select.content} max-h-64">
                               {consultationTypes.map((type) => (
-                                <SelectItem key={type.value} value={type.value} className="hover:bg-gray-700 py-3">
+                                <SelectItem key={type.value} value={type.value} className={formTheme.select.item} py-3">
                                   <div className="flex items-center justify-between w-full">
                                     <div className="flex-1">
                                       <div className="font-medium text-white">{type.label}</div>
@@ -391,16 +392,16 @@ export default function BookConsultation() {
                       name="duration"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300 text-lg">Session Duration</FormLabel>
+                          <FormLabel className={formTheme.label.base}>Session Duration</FormLabel>
                           <Select onValueChange={(value) => { field.onChange(value); setSelectedDuration(value) }} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white h-12">
+                              <SelectTrigger className={`${formTheme.select.trigger} h-12`}>
                                 <SelectValue placeholder="Select duration" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                            <SelectContent className={`${formTheme.select.content}">
                               {durationOptions.map((duration) => (
-                                <SelectItem key={duration.value} value={duration.value} className="hover:bg-gray-700">
+                                <SelectItem key={duration.value} value={duration.value} className={formTheme.select.item}">
                                   <div className="flex items-center justify-between w-full">
                                     <span className="font-medium">{duration.label}</span>
                                     <span className="text-sm text-gray-400 ml-3">
@@ -442,13 +443,13 @@ export default function BookConsultation() {
                       name="projectName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300 text-lg">Project Name</FormLabel>
+                          <FormLabel className={formTheme.label.base}>Project Name</FormLabel>
                           <FormControl>
                             <Input 
                               placeholder="Enter your project name" 
                               {...field} 
                               disabled={isLoading}
-                              className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 h-12"
+                              className={`${formTheme.input.base} h-12`}
                             />
                           </FormControl>
                           <FormMessage />
@@ -461,14 +462,14 @@ export default function BookConsultation() {
                       name="contactEmail"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300 text-lg">Contact Email</FormLabel>
+                          <FormLabel className={formTheme.label.base}>Contact Email</FormLabel>
                           <FormControl>
                             <Input 
                               placeholder="Enter your email" 
                               type="email" 
                               {...field} 
                               disabled={isLoading}
-                              className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 h-12"
+                              className={`${formTheme.input.base} h-12`}
                             />
                           </FormControl>
                           <FormMessage />
@@ -488,7 +489,7 @@ export default function BookConsultation() {
                             placeholder="Brief title for your consultation" 
                             {...field} 
                             disabled={isLoading}
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 h-12"
+                            className={`${formTheme.input.base} h-12`}
                           />
                         </FormControl>
                         <FormMessage />
@@ -505,7 +506,7 @@ export default function BookConsultation() {
                         <FormControl>
                           <Textarea 
                             placeholder="Provide detailed information about your project, challenges, and what you hope to achieve from this consultation..."
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 min-h-[120px]"
+                            className={`${formTheme.input.base} min-h-[120px]`}
                             {...field}
                             disabled={isLoading}
                           />
@@ -524,17 +525,17 @@ export default function BookConsultation() {
                       name="urgency"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300 text-lg">Urgency Level</FormLabel>
+                          <FormLabel className={formTheme.label.base}>Urgency Level</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white h-12">
+                              <SelectTrigger className={`${formTheme.select.trigger} h-12`}>
                                 <SelectValue />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                              <SelectItem value="LOW" className="hover:bg-gray-700">Low - Within 2 weeks</SelectItem>
-                              <SelectItem value="MEDIUM" className="hover:bg-gray-700">Medium - Within 1 week</SelectItem>
-                              <SelectItem value="HIGH" className="hover:bg-gray-700">High - Within 2-3 days</SelectItem>
+                            <SelectContent className={`${formTheme.select.content}">
+                              <SelectItem value="LOW" className={formTheme.select.item}">Low - Within 2 weeks</SelectItem>
+                              <SelectItem value="MEDIUM" className={formTheme.select.item}">Medium - Within 1 week</SelectItem>
+                              <SelectItem value="HIGH" className={formTheme.select.item}">High - Within 2-3 days</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -547,13 +548,13 @@ export default function BookConsultation() {
                       name="preferredDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300 text-lg">Preferred Date</FormLabel>
+                          <FormLabel className={formTheme.label.base}>Preferred Date</FormLabel>
                           <FormControl>
                             <Input 
                               type="date" 
                               {...field} 
                               disabled={isLoading}
-                              className="bg-gray-800/50 border-gray-600 text-white focus:border-blue-500 h-12"
+                              className={`${formTheme.input.base} h-12`}
                             />
                           </FormControl>
                           <FormMessage />
@@ -600,7 +601,7 @@ export default function BookConsultation() {
                     <Button 
                       type="submit" 
                       disabled={isLoading || !selectedType || !selectedDuration || totalPrice <= 0}
-                      className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:from-gray-500 disabled:to-gray-600 disabled:opacity-50 text-white font-medium py-4 text-lg rounded-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+                      className={`flex-1 ${formTheme.button.primary} py-4 text-lg rounded-lg disabled:opacity-50 hover:scale-105 flex items-center justify-center gap-2`}
                     >
                       {isLoading ? (
                         <>
@@ -620,7 +621,7 @@ export default function BookConsultation() {
                       <Button 
                         type="button" 
                         variant="outline"
-                        className="w-full sm:w-auto border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 py-4 px-8 text-lg transition-all duration-300"
+                        className={`w-full sm:w-auto ${formTheme.button.secondary} py-4 px-8 text-lg`}
                       >
                         Cancel
                       </Button>

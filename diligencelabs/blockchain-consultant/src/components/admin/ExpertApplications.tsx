@@ -126,7 +126,9 @@ export default function ExpertApplications() {
           if (tokenResponse.ok) {
             const tokenData = await tokenResponse.json()
             token = tokenData.token
-            localStorage.setItem('adminToken', token)
+            if (token) {
+              localStorage.setItem('adminToken', token)
+            }
             console.log('Test token obtained and stored')
           }
         } catch (tokenError) {

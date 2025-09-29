@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { ProminentBorder } from "@/components/ui/border-effects"
 import { SubscriptionPlanConfig } from "@/lib/subscription-plans"
+import { formTheme, formSpacing } from "@/lib/form-theme"
 
 const subscriptionFormSchema = z.object({
   // Account Information (for non-authenticated users)
@@ -280,10 +281,10 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div className={formTheme.modalOverlay}>
       <div className="w-full max-w-4xl max-h-[98vh] sm:max-h-[90vh] overflow-y-auto my-2 sm:my-4">
         <ProminentBorder className="rounded-2xl overflow-hidden" animated={true} movingBorder={true}>
-          <Card className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl border-0">
+          <Card className={formTheme.card.base}>
             <CardHeader className="text-center pb-4 sm:pb-6 px-4 sm:px-6">
               <div className="flex items-center justify-between mb-4">
                 <Badge className={`${
@@ -337,12 +338,12 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                           name="fullName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Full Name *</FormLabel>
+                              <FormLabel className={formTheme.label.base}>Full Name *</FormLabel>
                               <FormControl>
                                 <Input 
                                   placeholder="Your full name" 
                                   {...field} 
-                                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+                                  className={formTheme.input.base}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -355,13 +356,13 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Email Address *</FormLabel>
+                              <FormLabel className={formTheme.label.base}>Email Address *</FormLabel>
                               <FormControl>
                                 <Input 
                                   type="email"
                                   placeholder="your@email.com" 
                                   {...field} 
-                                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+                                  className={formTheme.input.base}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -376,13 +377,13 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Password *</FormLabel>
+                              <FormLabel className={formTheme.label.base}>Password *</FormLabel>
                               <FormControl>
                                 <Input 
                                   type="password"
                                   placeholder="Create a password" 
                                   {...field} 
-                                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+                                  className={formTheme.input.base}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -395,13 +396,13 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                           name="confirmPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Confirm Password *</FormLabel>
+                              <FormLabel className={formTheme.label.base}>Confirm Password *</FormLabel>
                               <FormControl>
                                 <Input 
                                   type="password"
                                   placeholder="Confirm your password" 
                                   {...field} 
-                                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+                                  className={formTheme.input.base}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -415,12 +416,12 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                         name="company"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Company (Optional)</FormLabel>
+                            <FormLabel className={formTheme.label.base}>Company (Optional)</FormLabel>
                             <FormControl>
                               <Input 
                                 placeholder="Your company name" 
                                 {...field} 
-                                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+                                className={formTheme.input.base}
                               />
                             </FormControl>
                             <FormMessage />
@@ -442,16 +443,16 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                       name="primaryService"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300">Primary Service Need *</FormLabel>
+                          <FormLabel className={formTheme.label.base}>Primary Service Need *</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                              <SelectTrigger className={formTheme.select.trigger}>
                                 <SelectValue placeholder="Select your main service requirement" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="bg-gray-800 border-gray-700 text-white max-h-64">
+                            <SelectContent className={`${formTheme.select.content} max-h-64`}>
                               {serviceOptions.map((service) => (
-                                <SelectItem key={service.value} value={service.value} className="hover:bg-gray-700 py-3">
+                                <SelectItem key={service.value} value={service.value} className={`${formTheme.select.item} py-3`}>
                                   <div className="flex items-start justify-between w-full">
                                     <div className="flex-1">
                                       <div className="font-medium text-white">{service.label}</div>
@@ -473,18 +474,18 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                         name="preferredSchedule"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Preferred Schedule</FormLabel>
+                            <FormLabel className={formTheme.label.base}>Preferred Schedule</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                                <SelectTrigger className={formTheme.select.trigger}>
                                   <SelectValue placeholder="When do you prefer consultations?" />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                                <SelectItem value="MORNING">Morning (9AM - 12PM)</SelectItem>
-                                <SelectItem value="AFTERNOON">Afternoon (12PM - 6PM)</SelectItem>
-                                <SelectItem value="EVENING">Evening (6PM - 9PM)</SelectItem>
-                                <SelectItem value="FLEXIBLE">Flexible</SelectItem>
+                              <SelectContent className={formTheme.select.content}>
+                                <SelectItem value="MORNING" className={formTheme.select.item}>Morning (9AM - 12PM)</SelectItem>
+                                <SelectItem value="AFTERNOON" className={formTheme.select.item}>Afternoon (12PM - 6PM)</SelectItem>
+                                <SelectItem value="EVENING" className={formTheme.select.item}>Evening (6PM - 9PM)</SelectItem>
+                                <SelectItem value="FLEXIBLE" className={formTheme.select.item}>Flexible</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -497,18 +498,18 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                         name="communicationPreference"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Communication Preference</FormLabel>
+                            <FormLabel className={formTheme.label.base}>Communication Preference</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                                <SelectTrigger className={formTheme.select.trigger}>
                                   <SelectValue placeholder="How should we contact you?" />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                                <SelectItem value="EMAIL">Email</SelectItem>
-                                <SelectItem value="PHONE">Phone</SelectItem>
-                                <SelectItem value="SLACK">Slack</SelectItem>
-                                <SelectItem value="VIDEO_CALL">Video Call</SelectItem>
+                              <SelectContent className={formTheme.select.content}>
+                                <SelectItem value="EMAIL" className={formTheme.select.item}>Email</SelectItem>
+                                <SelectItem value="PHONE" className={formTheme.select.item}>Phone</SelectItem>
+                                <SelectItem value="SLACK" className={formTheme.select.item}>Slack</SelectItem>
+                                <SelectItem value="VIDEO_CALL" className={formTheme.select.item}>Video Call</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -531,12 +532,12 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                         name="projectName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Project Name *</FormLabel>
+                            <FormLabel className={formTheme.label.base}>Project Name *</FormLabel>
                             <FormControl>
                               <Input 
                                 placeholder="Your blockchain project name" 
                                 {...field} 
-                                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+                                className={formTheme.input.base}
                               />
                             </FormControl>
                             <FormMessage />
@@ -549,12 +550,12 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                         name="industryFocus"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Industry Focus *</FormLabel>
+                            <FormLabel className={formTheme.label.base}>Industry Focus *</FormLabel>
                             <FormControl>
                               <Input 
                                 placeholder="e.g., DeFi, Gaming, Healthcare" 
                                 {...field} 
-                                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+                                className={formTheme.input.base}
                               />
                             </FormControl>
                             <FormMessage />
@@ -569,11 +570,11 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                     name="projectDescription"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300">Project Description *</FormLabel>
+                        <FormLabel className={formTheme.label.base}>Project Description *</FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="Describe your blockchain project, what you're building, and the challenges you're facing..."
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 min-h-[100px]"
+                            className={formTheme.textarea.base}
                             {...field}
                           />
                         </FormControl>
@@ -587,11 +588,11 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                     name="primaryGoals"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300">Primary Goals *</FormLabel>
+                        <FormLabel className={formTheme.label.base}>Primary Goals *</FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="What are your main objectives for this subscription? What do you hope to achieve?"
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 min-h-[80px]"
+                            className={`${formTheme.textarea.base} min-h-[80px]`}
                             {...field}
                           />
                         </FormControl>
@@ -606,18 +607,18 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                       name="timeline"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300">Timeline *</FormLabel>
+                          <FormLabel className={formTheme.label.base}>Timeline *</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                              <SelectTrigger className={formTheme.select.trigger}>
                                 <SelectValue placeholder="Select timeline" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                              <SelectItem value="IMMEDIATE">Immediate (ASAP)</SelectItem>
-                              <SelectItem value="1_MONTH">Within 1 month</SelectItem>
-                              <SelectItem value="3_MONTHS">Within 3 months</SelectItem>
-                              <SelectItem value="6_MONTHS">Within 6 months</SelectItem>
+                            <SelectContent className={formTheme.select.content}>
+                              <SelectItem value="IMMEDIATE" className={formTheme.select.item}>Immediate (ASAP)</SelectItem>
+                              <SelectItem value="1_MONTH" className={formTheme.select.item}>Within 1 month</SelectItem>
+                              <SelectItem value="3_MONTHS" className={formTheme.select.item}>Within 3 months</SelectItem>
+                              <SelectItem value="6_MONTHS" className={formTheme.select.item}>Within 6 months</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -630,18 +631,18 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                       name="budgetRange"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300">Budget Range *</FormLabel>
+                          <FormLabel className={formTheme.label.base}>Budget Range *</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                              <SelectTrigger className={formTheme.select.trigger}>
                                 <SelectValue placeholder="Select budget" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                              <SelectItem value="UNDER_10K">Under $10K</SelectItem>
-                              <SelectItem value="10K_50K">$10K - $50K</SelectItem>
-                              <SelectItem value="50K_100K">$50K - $100K</SelectItem>
-                              <SelectItem value="100K_PLUS">$100K+</SelectItem>
+                            <SelectContent className={formTheme.select.content}>
+                              <SelectItem value="UNDER_10K" className={formTheme.select.item}>Under $10K</SelectItem>
+                              <SelectItem value="10K_50K" className={formTheme.select.item}>$10K - $50K</SelectItem>
+                              <SelectItem value="50K_100K" className={formTheme.select.item}>$50K - $100K</SelectItem>
+                              <SelectItem value="100K_PLUS" className={formTheme.select.item}>$100K+</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -654,18 +655,18 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                       name="teamSize"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-300">Team Size *</FormLabel>
+                          <FormLabel className={formTheme.label.base}>Team Size *</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                              <SelectTrigger className={formTheme.select.trigger}>
                                 <SelectValue placeholder="Select team size" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                              <SelectItem value="SOLO">Solo founder</SelectItem>
-                              <SelectItem value="2_5">2-5 people</SelectItem>
-                              <SelectItem value="6_10">6-10 people</SelectItem>
-                              <SelectItem value="11_PLUS">11+ people</SelectItem>
+                            <SelectContent className={formTheme.select.content}>
+                              <SelectItem value="SOLO" className={formTheme.select.item}>Solo founder</SelectItem>
+                              <SelectItem value="2_5" className={formTheme.select.item}>2-5 people</SelectItem>
+                              <SelectItem value="6_10" className={formTheme.select.item}>6-10 people</SelectItem>
+                              <SelectItem value="11_PLUS" className={formTheme.select.item}>11+ people</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -679,11 +680,11 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                     name="specificChallenges"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300">Specific Challenges (Optional)</FormLabel>
+                        <FormLabel className={formTheme.label.base}>Specific Challenges (Optional)</FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="Any specific challenges or roadblocks you're currently facing?"
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 min-h-[80px]"
+                            className={`${formTheme.textarea.base} min-h-[80px]`}
                             {...field}
                           />
                         </FormControl>
@@ -724,7 +725,7 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                     <Button 
                       type="submit" 
                       disabled={isLoading}
-                      className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium py-4 text-lg rounded-lg transition-all duration-300 hover:scale-105"
+                      className={`flex-1 ${formTheme.button.primary} py-4 text-lg rounded-lg`}
                     >
                       {isLoading ? (
                         <>
@@ -741,7 +742,7 @@ export function SubscriptionForm({ plan, isOpen, onClose, onSuccess, context = '
                       type="button" 
                       variant="outline"
                       onClick={onClose}
-                      className="sm:w-auto border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 py-4 px-8 text-lg transition-all duration-300"
+                      className={`sm:w-auto ${formTheme.button.secondary} py-4 px-8 text-lg`}
                     >
                       Cancel
                     </Button>

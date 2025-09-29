@@ -310,7 +310,7 @@ export function AnalyticsDashboard({ timeRange = '30d', className = '' }: Analyt
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={(props: any) => `${props.name} ${(props.percent * 100).toFixed(0)}%`}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
@@ -382,10 +382,8 @@ export function AnalyticsDashboard({ timeRange = '30d', className = '' }: Analyt
           <ResponsiveContainer width="100%" height={300}>
             <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="90%" data={data.performance}>
               <RadialBar
-                minAngle={15}
                 label={{ position: 'insideStart', fill: '#fff' }}
                 background
-                clockWise
                 dataKey="value"
               />
               <Legend

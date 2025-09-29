@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ErrorBoundary } from "@/components/ui/error-boundary"
 import { LoadingSpinner } from "@/components/ui/loading-states"
+import { HorizontalDivider } from "@/components/ui/section-divider"
 import { 
   PageWrapper, 
   GlassMorphismCard, 

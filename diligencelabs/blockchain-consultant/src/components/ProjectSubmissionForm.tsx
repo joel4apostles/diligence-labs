@@ -52,7 +52,7 @@ export default function ProjectSubmissionForm({ onClose, onSuccess }: ProjectSub
     
     // Technical Details
     blockchain: '',
-    technologyStack: [],
+    technologyStack: [] as string[],
     smartContract: '',
     repository: '',
     whitepaper: '',

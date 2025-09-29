@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { authOptions } from "@/lib/auth"
 
 const sessionSchema = z.object({
-  consultationType: z.enum(["STRATEGIC_ADVISORY", "DUE_DILIGENCE", "TOKENOMICS_DESIGN", "TOKEN_LAUNCH"]),
+  consultationType: z.enum(["STRATEGIC_ADVISORY", "DUE_DILIGENCE", "BLOCKCHAIN_INTEGRATION_ADVISORY", "TOKEN_LAUNCH"]),
   description: z.string().min(20),
   urgency: z.enum(["LOW", "MEDIUM", "HIGH"]),
   contactEmail: z.string().email(),

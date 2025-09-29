@@ -10,9 +10,14 @@ export async function GET(request: NextRequest) {
     
     const tests = {
       userTable: false,
-      expertProfileTable: false,
+      subscriptionTable: false,
+      sessionTable: false,
+      reportTable: false,
       userCount: 0,
-      expertProfileCount: 0,
+      subscriptionCount: 0,
+      sessionCount: 0,
+      reportCount: 0,
+      adminUserCount: 0,
       error: null as string | null
     }
     
@@ -27,15 +32,39 @@ export async function GET(request: NextRequest) {
       tests.error = `User table: ${error instanceof Error ? error.message : 'Unknown error'}`
     }
     
-    // Test ExpertProfile table
+    // Test other key tables
     try {
-      const expertCount = await prisma.expertProfile.count()
-      tests.expertProfileTable = true
-      tests.expertProfileCount = expertCount
-      console.log(`ExpertProfile table exists with ${expertCount} records`)
+      const subscriptionCount = await prisma.subscription.count()
+      tests.subscriptionTable = true
+      tests.subscriptionCount = subscriptionCount
+      console.log(`Subscription table exists with ${subscriptionCount} records`)
     } catch (error) {
-      console.log('ExpertProfile table error:', error)
-      tests.error = `ExpertProfile table: ${error instanceof Error ? error.message : 'Unknown error'}`
+      console.log('Subscription table error:', error)
+      tests.error = `Subscription table: ${error instanceof Error ? error.message : 'Unknown error'}`
+    }
+    
+    try {
+      const sessionCount = await prisma.session.count()
+      tests.sessionCount = sessionCount
+      console.log(`Session table exists with ${sessionCount} records`)
+    } catch (error) {
+      console.log('Session table error:', error)
+    }
+    
+    try {
+      const reportCount = await prisma.report.count()
+      tests.reportCount = reportCount
+      console.log(`Report table exists with ${reportCount} records`)
+    } catch (error) {
+      console.log('Report table error:', error)
+    }
+    
+    try {
+      const adminUserCount = await prisma.adminUser.count()
+      tests.adminUserCount = adminUserCount
+      console.log(`AdminUser table exists with ${adminUserCount} records`)
+    } catch (error) {
+      console.log('AdminUser table error:', error)
     }
     
     return NextResponse.json({

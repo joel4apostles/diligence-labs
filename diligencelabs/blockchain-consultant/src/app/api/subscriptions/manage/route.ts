@@ -12,14 +12,18 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const subscription = await prisma.subscription.findFirst({
-      where: { 
-        userId: session.user.id,
-        status: { in: ['ACTIVE', 'TRIALING'] }
-      },
-      orderBy: { createdAt: 'desc' }
-    })
+    // TODO: Implement when subscription model is added to schema
+    // For now, return mock subscription data for free tier users
+    const subscription = {
+      id: 'free-tier',
+      userId: session.user.id,
+      planType: 'FREE',
+      status: 'ACTIVE',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
 
+    console.log('Subscription API called - returning mock data for user:', session.user.id)
     return NextResponse.json({ subscription })
 
   } catch (error) {
@@ -92,9 +96,9 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error(`Failed to ${body.action} subscription:`, error)
+    console.error(`Failed to manage subscription:`, error)
     return NextResponse.json(
-      { error: `Failed to ${body.action} subscription` },
+      { error: `Failed to manage subscription` },
       { status: 500 }
     )
   }

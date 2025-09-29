@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 import { verifyAdminAuth } from '@/lib/admin-auth'
 
 const prisma = new PrismaClient()
@@ -18,19 +18,19 @@ export async function POST(request: NextRequest) {
       {
         email: 'alice.blockchain@example.com',
         name: 'Alice Johnson',
-        role: 'USER',
+        role: Role.USER,
         reputationPoints: 150
       },
       {
         email: 'bob.defi@example.com', 
         name: 'Bob Chen',
-        role: 'USER',
+        role: Role.USER,
         reputationPoints: 280
       },
       {
         email: 'carol.web3@example.com',
         name: 'Carol Martinez', 
-        role: 'USER',
+        role: Role.USER,
         reputationPoints: 85
       }
     ]
@@ -111,17 +111,10 @@ export async function POST(request: NextRequest) {
         }
       ][i]
 
-      try {
-        const profile = await prisma.expertProfile.create({
-          data: profileData,
-          include: {
-            user: true
-          }
-        })
-        expertProfiles.push(profile)
-      } catch (error) {
-        console.log(`Profile for user ${user.email} might already exist`)
-      }
+      // Note: ExpertProfile model not implemented yet in schema
+      // Will create profiles when model is added to Prisma schema
+      console.log(`Would create expert profile for ${user.email}`)
+      expertProfiles.push({ userId: user.id, created: false })
     }
 
     return NextResponse.json({

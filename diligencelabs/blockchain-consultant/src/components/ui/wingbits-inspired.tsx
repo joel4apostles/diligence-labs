@@ -13,6 +13,9 @@ interface NetworkNode {
   connections: string[]
   type: 'user' | 'consultant' | 'expert'
   activity: number
+  vx?: number
+  vy?: number
+  pulse?: number
 }
 
 export const BlockchainNetworkViz: React.FC<{
@@ -24,20 +27,24 @@ export const BlockchainNetworkViz: React.FC<{
   const [nodes, setNodes] = useState<NetworkNode[]>([])
   const [hoveredNode, setHoveredNode] = useState<string | null>(null)
 
-  // Generate network nodes
+  // Generate network nodes with animation properties
   useEffect(() => {
     const generateNodes = (): NetworkNode[] => {
       const nodeTypes: NetworkNode['type'][] = ['user', 'consultant', 'expert']
       const newNodes: NetworkNode[] = []
       
-      for (let i = 0; i < 25; i++) {
+      for (let i = 0; i < 35; i++) {
         const node: NetworkNode = {
           id: `node-${i}`,
           x: Math.random() * 800,
           y: Math.random() * 600,
           connections: [],
           type: nodeTypes[Math.floor(Math.random() * nodeTypes.length)],
-          activity: Math.random()
+          activity: Math.random(),
+          // Add animation properties
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          pulse: Math.random() * Math.PI * 2
         }
         newNodes.push(node)
       }
@@ -49,9 +56,9 @@ export const BlockchainNetworkViz: React.FC<{
           const distance = Math.sqrt(
             Math.pow(node.x - other.x, 2) + Math.pow(node.y - other.y, 2)
           )
-          return distance < 150 && Math.random() > 0.6
+          return distance < 120 && Math.random() > 0.7
         })
-        node.connections = nearbyNodes.slice(0, 3).map(n => n.id)
+        node.connections = nearbyNodes.slice(0, 2).map(n => n.id)
       })
 
       return newNodes
@@ -78,25 +85,56 @@ export const BlockchainNetworkViz: React.FC<{
     window.addEventListener('resize', resizeCanvas)
 
     let animationFrame: number
+    let time = 0
 
     const animate = () => {
+      time += 0.01
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // Draw connections
+      // Update node positions with floating animation
+      nodes.forEach(node => {
+        if (node.vx !== undefined && node.vy !== undefined && node.pulse !== undefined) {
+          // Gentle floating motion
+          node.x += Math.sin(time + node.pulse) * 0.3
+          node.y += Math.cos(time + node.pulse * 1.3) * 0.2
+          
+          // Boundary checking with smooth wrap-around
+          if (node.x < -20) node.x = canvas.width + 20
+          if (node.x > canvas.width + 20) node.x = -20
+          if (node.y < -20) node.y = canvas.height + 20
+          if (node.y > canvas.height + 20) node.y = -20
+        }
+      })
+
+      // Draw animated connections with pulsing effect
       nodes.forEach(node => {
         node.connections.forEach(connectionId => {
           const connectedNode = nodes.find(n => n.id === connectionId)
           if (!connectedNode) return
 
+          const distance = Math.sqrt(
+            Math.pow(node.x - connectedNode.x, 2) + Math.pow(node.y - connectedNode.y, 2)
+          )
+          
+          // Skip connections that are too far apart due to movement
+          if (distance > 200) return
+
+          const pulseIntensity = 0.3 + Math.sin(time * 2) * 0.2
           const gradient = ctx.createLinearGradient(
             node.x, node.y, connectedNode.x, connectedNode.y
           )
-          gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)')
-          gradient.addColorStop(1, 'rgba(147, 51, 234, 0.1)')
+          gradient.addColorStop(0, `rgba(59, 130, 246, ${pulseIntensity})`)
+          gradient.addColorStop(0.5, `rgba(147, 51, 234, ${pulseIntensity * 1.2})`)
+          gradient.addColorStop(1, `rgba(251, 146, 60, ${pulseIntensity * 0.8})`)
 
           ctx.strokeStyle = gradient
-          ctx.lineWidth = 1
-          ctx.setLineDash([5, 5])
+          ctx.lineWidth = 1 + Math.sin(time * 3) * 0.5
+          
+          // Animated dash pattern
+          const dashOffset = time * 20
+          ctx.setLineDash([8, 4])
+          ctx.lineDashOffset = dashOffset
+          
           ctx.beginPath()
           ctx.moveTo(node.x, node.y)
           ctx.lineTo(connectedNode.x, connectedNode.y)
@@ -104,37 +142,53 @@ export const BlockchainNetworkViz: React.FC<{
         })
       })
 
-      // Draw nodes
+      // Draw nodes with pulsing animations
       nodes.forEach(node => {
         const isHovered = hoveredNode === node.id
-        const baseSize = 4
-        const size = isHovered ? baseSize * 1.5 : baseSize
+        const baseSize = 3
+        const pulseSize = baseSize + Math.sin(time * 2 + (node.pulse || 0)) * 1
+        const size = isHovered ? pulseSize * 1.8 : pulseSize
         
-        // Node colors based on type
+        // Node colors based on type with animation
         const colors = {
           user: '#3B82F6',      // Blue
           consultant: '#F59E0B', // Orange
           expert: '#8B5CF6'     // Purple
         }
 
-        // Outer glow for activity
-        if (node.activity > 0.7) {
+        // Animated outer glow
+        const glowIntensity = 0.5 + Math.sin(time * 1.5 + (node.pulse || 0)) * 0.3
+        if (node.activity > 0.6 || isHovered) {
           ctx.shadowColor = colors[node.type]
-          ctx.shadowBlur = 15
+          ctx.shadowBlur = 15 + Math.sin(time * 3) * 5
         } else {
           ctx.shadowBlur = 0
         }
 
-        ctx.fillStyle = colors[node.type]
+        // Main node with pulsing opacity
+        const opacity = 0.8 + Math.sin(time + (node.pulse || 0)) * 0.2
+        ctx.fillStyle = colors[node.type] + Math.floor(opacity * 255).toString(16).padStart(2, '0')
         ctx.beginPath()
         ctx.arc(node.x, node.y, size, 0, Math.PI * 2)
         ctx.fill()
 
-        // Inner core
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
+        // Animated inner core
+        const coreOpacity = 0.6 + Math.sin(time * 2 + (node.pulse || 0)) * 0.4
+        ctx.fillStyle = `rgba(255, 255, 255, ${coreOpacity})`
         ctx.beginPath()
-        ctx.arc(node.x, node.y, size * 0.4, 0, Math.PI * 2)
+        ctx.arc(node.x, node.y, size * 0.3, 0, Math.PI * 2)
         ctx.fill()
+
+        // Activity ring for highly active nodes
+        if (node.activity > 0.8) {
+          const ringRadius = size + 8 + Math.sin(time * 4) * 3
+          ctx.strokeStyle = colors[node.type] + '40'
+          ctx.lineWidth = 2
+          ctx.setLineDash([])
+          ctx.beginPath()
+          ctx.arc(node.x, node.y, ringRadius, 0, Math.PI * 2)
+          ctx.stroke()
+        }
 
         ctx.shadowBlur = 0
       })
@@ -225,9 +279,105 @@ export const WingbitsInspiredHero: React.FC = () => {
         <BlockchainNetworkViz className="w-full h-full" />
       </motion.div>
 
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-black/70" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black" />
+      {/* Additional moving background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Floating particles */}
+        {Array.from({ length: 12 }, (_, i) => (
+          <motion.div
+            key={`particle-${i}`}
+            className="absolute w-2 h-2 bg-orange-400/20 rounded-full"
+            animate={{
+              x: [0, 100, -50, 0],
+              y: [0, -80, 120, 0],
+              opacity: [0.2, 0.8, 0.3, 0.2],
+              scale: [0.5, 1.2, 0.8, 0.5]
+            }}
+            transition={{
+              duration: 15 + i * 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 1.5
+            }}
+            style={{
+              left: `${10 + (i * 8)}%`,
+              top: `${20 + (i * 5)}%`,
+            }}
+          />
+        ))}
+
+        {/* Moving gradient orbs */}
+        {Array.from({ length: 6 }, (_, i) => (
+          <motion.div
+            key={`orb-${i}`}
+            className="absolute w-32 h-32 rounded-full opacity-10"
+            style={{
+              background: `radial-gradient(circle, ${
+                i % 3 === 0 ? '#3B82F6' : 
+                i % 3 === 1 ? '#F59E0B' : '#8B5CF6'
+              }40 0%, transparent 70%)`,
+              left: `${15 + (i * 15)}%`,
+              top: `${25 + (i * 10)}%`,
+            }}
+            animate={{
+              x: [0, 200, -100, 0],
+              y: [0, -150, 200, 0],
+              scale: [0.8, 1.2, 0.9, 0.8],
+              rotate: [0, 180, 360]
+            }}
+            transition={{
+              duration: 20 + i * 3,
+              repeat: Infinity,
+              ease: "linear",
+              delay: i * 2
+            }}
+          />
+        ))}
+
+        {/* Subtle grid animation */}
+        <motion.div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `
+              linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px),
+              linear-gradient(rgba(59, 130, 246, 0.3) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}
+          animate={{
+            backgroundPosition: ['0% 0%', '100% 100%'],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        />
+      </div>
+
+      {/* Gradient overlays with subtle animation */}
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-black/70" 
+        animate={{
+          opacity: [0.7, 0.5, 0.7]
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black"
+        animate={{
+          opacity: [0.8, 0.6, 0.8]
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2
+        }}
+      />
 
       {/* Content */}
       <motion.div 
@@ -261,8 +411,8 @@ export const WingbitsInspiredHero: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
             >
-              Connecting expertise with innovation through a decentralized network of 
-              blockchain professionals, delivering transparent and verifiable consulting services.
+              We connect you with experienced blockchain professionals who actually know what they're doing. 
+              Get clear, practical advice from consultants who've built successful projects and understand real-world challenges.
             </motion.p>
           </motion.div>
 
@@ -299,10 +449,10 @@ export const WingbitsInspiredHero: React.FC = () => {
             className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8"
           >
             {[
-              { label: 'Active Consultants', value: '1,247' },
-              { label: 'Projects Completed', value: '3,891' },
-              { label: 'Total Value Secured', value: '$2.4B' },
-              { label: 'Success Rate', value: '97.8%' }
+              { label: 'Launch Success', value: 'Zero Failures' },
+              { label: 'Expert Network', value: 'Global Reach' },
+              { label: 'Response Time', value: '< 24 Hours' },
+              { label: 'Client Satisfaction', value: 'Exceptional' }
             ].map((stat, index) => (
               <div key={stat.label} className="text-center">
                 <motion.div

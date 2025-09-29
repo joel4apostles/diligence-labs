@@ -153,8 +153,8 @@ export const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, rese
                 <Logo size="medium" />
                 <p className="text-gray-400 text-sm mt-2">
                   Need help? Contact us at{' '}
-                  <a href="mailto:support@diligencelabs.com" className="text-blue-400 hover:text-blue-300">
-                    support@diligencelabs.com
+                  <a href="mailto:support@diligencelabs.xyz" className="text-blue-400 hover:text-blue-300">
+                    support@diligencelabs.xyz
                   </a>
                 </p>
               </div>

@@ -325,7 +325,7 @@ class AIRecommendationEngine {
   private generateLearningPath(profile: UserProfile) {
     const experienceLevel = this.determineExperienceLevel(profile)
     
-    const paths = {
+    const paths: Record<string, string[]> = {
       'Beginner': [
         'Blockchain Fundamentals',
         'Cryptocurrency Basics',
@@ -391,7 +391,7 @@ class AIRecommendationEngine {
   }
 
   private generateCompanySizeStrategy(companySize: string) {
-    const strategies = {
+    const strategies: Record<string, { description: string; reasoning: string[] }> = {
       'startup': {
         description: 'Lean blockchain approach focusing on MVP and rapid validation',
         reasoning: [

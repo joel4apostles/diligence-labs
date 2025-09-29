@@ -7,6 +7,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { SubscriptionForm } from "@/components/subscription-form"
+import { PAID_SUBSCRIPTION_PLANS } from "@/lib/subscription-plans"
 import { 
   ArrowLeft, 
   Check, 
@@ -24,7 +26,7 @@ import {
 
 const SUBSCRIPTION_PLANS = [
   {
-    id: "PROFESSIONAL",
+    id: "PROFESSIONAL_MONTHLY",
     name: "Professional",
     description: "Perfect for growing blockchain projects",
     icon: Crown,
@@ -42,7 +44,7 @@ const SUBSCRIPTION_PLANS = [
     savings: "Save $590/year"
   },
   {
-    id: "ENTERPRISE",
+    id: "ENTERPRISE_MONTHLY",
     name: "Enterprise",
     description: "Comprehensive support for large organizations",
     icon: Shield,
@@ -69,6 +71,8 @@ export default function UpgradePage() {
   const [billingCycle, setBillingCycle] = useState<'MONTHLY' | 'YEARLY'>('YEARLY')
   const [subscribing, setSubscribing] = useState<string | null>(null)
   const [currentSubscription, setCurrentSubscription] = useState<any>(null)
+  const [showSubscriptionForm, setShowSubscriptionForm] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<any>(null)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -100,32 +104,23 @@ export default function UpgradePage() {
       return
     }
 
-    try {
-      setSubscribing(planId)
-      
-      const response = await fetch('/api/subscriptions/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          planId,
-          billingCycle
-        })
-      })
-
-      const data = await response.json()
-
-      if (response.ok && data.url) {
-        window.location.href = data.url
-      } else {
-        console.error("Failed to create checkout session:", data.error)
-        alert('Failed to create checkout session. Please try again.')
-      }
-    } catch (error) {
-      console.error("Error creating subscription:", error)
-      alert('An error occurred. Please try again.')
-    } finally {
-      setSubscribing(null)
+    // Find the plan from the imported PAID_SUBSCRIPTION_PLANS
+    const planConfig = PAID_SUBSCRIPTION_PLANS.find(p => p.id === planId)
+    
+    if (!planConfig) {
+      alert('Invalid plan selected')
+      return
     }
+
+    // Show subscription form for users to fill in project details
+    setSelectedPlan(planConfig)
+    setShowSubscriptionForm(true)
+  }
+
+  const handleFormSuccess = () => {
+    setShowSubscriptionForm(false)
+    // Redirect to dashboard or show success message
+    router.push('/dashboard')
   }
 
   if (status === 'loading') {
@@ -391,6 +386,17 @@ export default function UpgradePage() {
           </div>
         </div>
       </div>
+
+      {/* Subscription Form Modal */}
+      {selectedPlan && (
+        <SubscriptionForm 
+          plan={selectedPlan}
+          isOpen={showSubscriptionForm}
+          onClose={() => setShowSubscriptionForm(false)}
+          onSuccess={handleFormSuccess}
+          context="dashboard"
+        />
+      )}
     </div>
   )
 }

@@ -20,6 +20,7 @@ import {
   theme,
   animations
 } from "@/components/ui/consistent-theme"
+import { formTheme } from "@/lib/form-theme"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -110,10 +111,8 @@ export default function ForgotPassword() {
                     {...animations.slideUp}
                     transition={{ duration: 0.6, delay: 0.7 }}
                   >
-                    <CardTitle className="text-3xl font-light mb-2">
-                      <span className="bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400 bg-clip-text text-transparent">
-                        Reset Password
-                      </span>
+                    <CardTitle className="text-3xl font-light mb-2 text-white">
+                      Reset Password
                     </CardTitle>
                     <CardDescription className="text-gray-400 text-lg">
                       Enter your email address and we'll send you a reset link
@@ -161,17 +160,17 @@ export default function ForgotPassword() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Email Address</FormLabel>
+                              <FormLabel className={formTheme.label.base}>Email Address</FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="Enter your email address"
                                   type="email"
-                                  className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
+                                  className={`${formTheme.input.base} h-12`}
                                   {...field}
                                   disabled={isLoading}
                                 />
                               </FormControl>
-                              <FormMessage className="text-red-400" />
+                              <FormMessage className={formTheme.formMessage.error} />
                             </FormItem>
                           )}
                         />
@@ -183,7 +182,7 @@ export default function ForgotPassword() {
                           <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:brightness-110 disabled:opacity-70"
+                            className={`w-full h-12 ${formTheme.button.primary} disabled:opacity-70`}
                           >
                             {isLoading ? (
                               <div className="flex items-center space-x-2">

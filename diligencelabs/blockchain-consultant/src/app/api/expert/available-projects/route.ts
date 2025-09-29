@@ -14,6 +14,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({ 
+      message: 'Available projects not accessible - ExpertProfile model not implemented yet',
+      action: 'mock-response',
+      projects: [],
+      totalCount: 0,
+      hasMore: false
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     // Get user's expert profile
     const expertProfile = await prisma.expertProfile.findUnique({
       where: { 
@@ -151,6 +161,7 @@ export async function GET(request: NextRequest) {
         specializations: [expertProfile.primaryExpertise, expertProfile.secondaryExpertise]
       }
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Available projects fetch error:', error)

@@ -8,6 +8,19 @@ const prisma = new PrismaClient()
 // GET /api/user-reputation - Get user reputation data
 export async function GET(request: NextRequest) {
   try {
+    // Note: UserReputation model not implemented yet
+    return NextResponse.json({ 
+      message: 'User reputation not accessible - UserReputation model not implemented yet',
+      action: 'mock-response',
+      reputation: {
+        points: 0,
+        level: 'Beginner',
+        rank: 'N/A'
+      },
+      leaderboard: []
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
     const leaderboard = searchParams.get('leaderboard') === 'true'
@@ -185,6 +198,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(response)
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('User reputation fetch error:', error)
@@ -205,6 +219,15 @@ export async function POST(request: NextRequest) {
     
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
+
+    // Note: UserReputation model not implemented yet
+    return NextResponse.json({ 
+      message: 'Reputation points not available - UserReputation model not implemented yet',
+      action: 'mock-response'
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     }
 
     const body = await request.json()
@@ -300,6 +323,7 @@ export async function POST(request: NextRequest) {
       newLevel,
       tierUpgrade: newTier !== userReputation.user.submitterTier ? newTier : null
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Award reputation points error:', error)

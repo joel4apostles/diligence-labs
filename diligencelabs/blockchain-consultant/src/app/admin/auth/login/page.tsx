@@ -52,9 +52,21 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background network visualization placeholder */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.1) 2px, transparent 2px), radial-gradient(circle at 80% 70%, rgba(147, 51, 234, 0.1) 2px, transparent 2px), radial-gradient(circle at 40% 60%, rgba(251, 146, 60, 0.1) 2px, transparent 2px)',
+          backgroundSize: '100px 100px, 150px 150px, 200px 200px'
+        }} />
+      </div>
+      
+      {/* Gradient overlays matching homepage */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-black/70" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black" />
+      
       {/* Dynamic Admin Background */}
-      <DynamicPageBackground variant="admin" opacity={0.25} />
+      <DynamicPageBackground variant="admin" opacity={0.15} />
       <PageStructureLines />
 
       <ProminentBorder className="w-full max-w-md relative z-10 rounded-2xl overflow-hidden" animated={true} movingBorder={true}>

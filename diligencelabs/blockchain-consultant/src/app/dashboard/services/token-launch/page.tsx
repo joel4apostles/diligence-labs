@@ -83,8 +83,7 @@ export default function TokenLaunchConsultation() {
       legalCompliance: undefined as any,
       communitySize: "",
       urgency: "MEDIUM",
-      contactEmail: session?.user?.email || "",
-      preferredDate: ""
+      contactEmail: session?.user?.email || ""
     },
   })
 

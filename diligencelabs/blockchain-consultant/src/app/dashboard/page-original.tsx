@@ -22,11 +22,11 @@ import { Logo } from "@/components/ui/logo"
 import SubscriptionDashboard from "@/components/SubscriptionDashboard"
 import dynamic from "next/dynamic"
 
-// Remove problematic dynamic imports temporarily to fix SSR issue
-// const SubscriptionForm = dynamic(() => import("@/components/subscription").then(mod => ({ default: mod.SubscriptionForm })), {
-//   loading: () => <div className="h-64 animate-pulse bg-gray-800/50 rounded-xl" />,
-//   ssr: false
-// })
+// Dynamic imports for components
+const SubscriptionForm = dynamic(() => import("@/components/subscription").then(mod => ({ default: mod.SubscriptionForm })), {
+  loading: () => <div className="h-64 animate-pulse bg-gray-800/50 rounded-xl" />,
+  ssr: false
+})
 
 function DashboardContent() {
   const { data: session, status } = useSession()
@@ -193,8 +193,8 @@ function DashboardContent() {
       
       <PageStructureLines />
       <SectionGridLines />
-      <ParallaxBackgroundLazy />
-      <FloatingElementsLazy />
+      <ParallaxBackground />
+      <FloatingElements />
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         <div className={`flex justify-between items-center mb-12 transition-all duration-1000 ${isPageLoaded ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'}`}>

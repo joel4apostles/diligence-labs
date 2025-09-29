@@ -8,6 +8,20 @@ const prisma = new PrismaClient()
 // GET /api/experts - Get expert profiles (leaderboard)
 export async function GET(request: NextRequest) {
   try {
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({ 
+      message: 'Expert profiles not accessible - ExpertProfile model not implemented yet',
+      action: 'mock-response',
+      experts: [],
+      pagination: {
+        total: 0,
+        page: 1,
+        limit: 50,
+        pages: 0
+      }
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     const { searchParams } = new URL(request.url)
     const tierFilter = searchParams.get('tier')
     const sortBy = searchParams.get('sortBy') || 'reputationPoints'
@@ -74,6 +88,7 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit)
       }
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Experts fetch error:', error)
@@ -92,6 +107,13 @@ export async function POST(request: NextRequest) {
     
     const user = authResult.user
 
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({ 
+      message: 'Expert profile creation not available - ExpertProfile model not implemented yet',
+      action: 'mock-response'
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     const body = await request.json()
     const {
       linkedinUrl,
@@ -171,6 +193,7 @@ export async function POST(request: NextRequest) {
       message: existingProfile ? 'Expert profile updated successfully' : 'Expert profile created successfully',
       expertProfile 
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Expert profile creation/update error:', error)

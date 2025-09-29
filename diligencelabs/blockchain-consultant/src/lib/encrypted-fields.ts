@@ -130,7 +130,7 @@ export function encryptFields<T extends Record<string, unknown>>(
   for (const [fieldName, fieldType] of Object.entries(fieldsConfig)) {
     if (fieldName in encryptedData && encryptedData[fieldName]) {
       const value = encryptedData[fieldName] as string
-      encryptedData[fieldName] = encryptField(value, fieldType as EncryptionContext, userId, sessionId) as T[keyof T]
+      (encryptedData as any)[fieldName] = encryptField(value, fieldType as EncryptionContext, userId, sessionId)
     }
   }
 
@@ -157,7 +157,7 @@ export function decryptFields<T extends Record<string, unknown>>(
   for (const [fieldName, fieldType] of Object.entries(fieldsConfig)) {
     if (fieldName in decryptedData && decryptedData[fieldName]) {
       const value = decryptedData[fieldName] as string
-      decryptedData[fieldName] = decryptField(value, fieldType as EncryptionContext, userId, sessionId) as T[keyof T]
+      (decryptedData as any)[fieldName] = decryptField(value, fieldType as EncryptionContext, userId, sessionId)
     }
   }
 
@@ -179,18 +179,18 @@ export function createEncryptionMiddleware() {
     try {
       // Encrypt data before create/update operations
       if (['create', 'update', 'upsert'].includes(action) && args.data) {
-        const userId = args.data.userId || args.where?.userId
-        const sessionId = args.data.sessionId || args.data.id
+        const userId = (args.data as any)?.userId || (args.where as any)?.userId
+        const sessionId = (args.data as any)?.sessionId || (args.data as any)?.id
 
         if (action === 'upsert') {
           if (args.create) {
-            args.create = encryptFields(args.create, model, userId, sessionId)
+            args.create = encryptFields(args.create as Record<string, unknown>, model as keyof typeof ENCRYPTED_FIELDS, userId, sessionId)
           }
           if (args.update) {
-            args.update = encryptFields(args.update, model, userId, sessionId)
+            args.update = encryptFields(args.update as Record<string, unknown>, model as keyof typeof ENCRYPTED_FIELDS, userId, sessionId)
           }
         } else {
-          args.data = encryptFields(args.data, model, userId, sessionId)
+          args.data = encryptFields(args.data as Record<string, unknown>, model as keyof typeof ENCRYPTED_FIELDS, userId, sessionId)
         }
       }
 
@@ -201,14 +201,14 @@ export function createEncryptionMiddleware() {
       if (['findUnique', 'findFirst', 'findMany'].includes(action) && result) {
         if (Array.isArray(result)) {
           return result.map((item: Record<string, unknown>) => {
-            const userId = item.userId
-            const sessionId = item.sessionId || item.id
-            return decryptFields(item, model, userId, sessionId)
+            const userId = item.userId as string
+            const sessionId = (item.sessionId || item.id) as string
+            return decryptFields(item, model as keyof typeof ENCRYPTED_FIELDS, userId, sessionId)
           })
         } else {
-          const userId = result.userId
-          const sessionId = result.sessionId || result.id
-          return decryptFields(result, model, userId, sessionId)
+          const userId = (result as any).userId as string
+          const sessionId = ((result as any).sessionId || (result as any).id) as string
+          return decryptFields(result as Record<string, unknown>, model as keyof typeof ENCRYPTED_FIELDS, userId, sessionId)
         }
       }
 
@@ -235,7 +235,7 @@ export async function searchEncryptedField<T>(
     logger.warn('Performing encrypted field search', { model, fieldName, limit })
     
     // Get all records (limited)
-    const records = await prisma[model].findMany({
+    const records = await (prisma as any)[model].findMany({
       take: limit,
       orderBy: { createdAt: 'desc' }
     })

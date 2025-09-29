@@ -234,7 +234,7 @@ export const DebouncedSearch: React.FC<DebouncedSearchProps> = ({
 }) => {
   const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleSearch = useCallback((value: string) => {
     setQuery(value)
@@ -443,7 +443,7 @@ export const withLazyLoading = <P extends object>(
   return (props: P) => (
     <Suspense 
       fallback={
-        fallback ? <fallback /> : 
+        fallback ? React.createElement(fallback) : 
         <div className="flex items-center justify-center p-8">
           <motion.div
             animate={{ rotate: 360 }}
@@ -460,7 +460,7 @@ export const withLazyLoading = <P extends object>(
 
 // ==================== PERFORMANCE MONITORING ====================
 export const usePerformanceMonitor = (componentName: string) => {
-  const renderStartTime = useRef<number>()
+  const renderStartTime = useRef<number>(0)
 
   useEffect(() => {
     renderStartTime.current = performance.now()

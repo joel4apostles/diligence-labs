@@ -29,23 +29,23 @@ export const EnhancedLandingPage: React.FC = () => {
   const faqs = [
     {
       question: "What blockchain consulting services do you offer?",
-      answer: "We provide comprehensive blockchain consulting including strategic advisory, due diligence, token launch consultation, technical integration, regulatory compliance, and market analysis. Our services cover everything from initial feasibility assessment to full implementation support."
+      answer: "We help with strategy, technical integration, due diligence, token launches, regulatory guidance, and market research. Basically, if it involves blockchain and business strategy, we can probably help you figure it out."
     },
     {
       question: "How do I know if blockchain is right for my business?",
-      answer: "Our initial consultation process includes a thorough analysis of your business needs, use case evaluation, and cost-benefit assessment. We help you understand whether blockchain technology adds real value to your specific situation or if traditional solutions might be more appropriate."
+      answer: "During our first conversation, we'll dig into what you're trying to achieve and honestly tell you whether blockchain makes sense for your situation. Sometimes it does, sometimes it doesn't - we'll give you a straight answer either way."
     },
     {
       question: "What is your typical project timeline?",
-      answer: "Project timelines vary based on scope and complexity. Strategic advisory typically takes 2-4 weeks, token launches require 4-8 weeks, and technical integration can range from 1-12 weeks depending on the project requirements. We provide detailed timelines during our initial consultation."
+      answer: "It depends on what you need. Strategy sessions usually take 2-4 weeks, token launches need 4-8 weeks, and technical work can be anywhere from 1-12 weeks. We'll give you realistic timelines upfront so you know what to expect."
     },
     {
       question: "Do you help with regulatory compliance?",
-      answer: "Yes, regulatory compliance is a critical part of our services. We help navigate complex legal requirements across multiple jurisdictions, ensure your project meets regulatory standards, and connect you with specialized legal partners when needed."
+      answer: "Yes, we help you understand what legal requirements apply to your project and connect you with experienced lawyers when needed. Regulations change frequently, so it's important to stay on top of what's current."
     },
     {
       question: "What makes your approach different?",
-      answer: "We operate through a decentralized network of verified blockchain experts, ensuring you get access to the best talent for your specific needs. Our transparent, results-driven approach focuses on practical implementation rather than just theoretical advice."
+      answer: "We focus on practical solutions that actually work in the real world. Our team has hands-on experience building and launching blockchain projects, so we understand both the technical and business sides of what you're dealing with."
     }
   ]
 
@@ -84,15 +84,15 @@ export const EnhancedLandingPage: React.FC = () => {
               </span>
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              From strategic advisory to technical implementation, we provide end-to-end 
-              blockchain consulting services powered by our decentralized network of experts.
+              Whether you're just getting started or need help with complex integration, 
+              our team provides practical guidance that gets results. Real experience, straightforward advice.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <ModularFeatureCard
               title="Strategic Advisory"
-              description="Navigate the complex blockchain landscape with expert guidance on technology selection, tokenomics design, and regulatory compliance."
+              description="We help new projects build successful go-to-market strategies and connect existing businesses with the right blockchain solutions. Our team introduces you to trusted solution providers, whitelabel services, and market makers while guiding you toward genuine product-market fit. Whether you're launching fresh or exploring blockchain integration, we provide practical advice that actually works."
               gradient="from-blue-900/80 via-blue-800/60 to-blue-900/80"
               delay={0.1}
               icon={
@@ -104,7 +104,7 @@ export const EnhancedLandingPage: React.FC = () => {
 
             <ModularFeatureCard
               title="Due Diligence"
-              description="Comprehensive technical and business analysis of blockchain projects, smart contracts, and tokenomics with detailed risk assessments."
+              description="Before you invest or partner with any project, get the full picture. We thoroughly examine the technology, team credentials, financial structure, and business model to spot potential red flags. Our detailed reports help you make informed decisions and avoid costly mistakes in the fast-moving blockchain space."
               gradient="from-purple-900/80 via-purple-800/60 to-purple-900/80"
               delay={0.2}
               icon={
@@ -116,7 +116,7 @@ export const EnhancedLandingPage: React.FC = () => {
 
             <ModularFeatureCard
               title="Token Launch"
-              description="End-to-end support for token launches including technical architecture, legal compliance, and go-to-market strategy."
+              description="Launching a token involves much more than just writing smart contracts. We guide you through the entire process from initial concept to public release, helping with legal requirements, community building, liquidity planning, and launch timing. Our goal is to set your token up for sustainable success, not just a quick launch."
               gradient="from-green-900/80 via-green-800/60 to-green-900/80"
               delay={0.3}
               icon={
@@ -128,7 +128,7 @@ export const EnhancedLandingPage: React.FC = () => {
 
             <ModularFeatureCard
               title="Technical Integration"
-              description="Seamless integration of blockchain technology into existing systems with custom development and implementation support."
+              description="Adding blockchain features to your existing business doesn't have to be overwhelming. We work with your current systems and team to implement the right blockchain solutions without disrupting your operations. From simple payment integrations to complex smart contract systems, we make the technical side manageable."
               gradient="from-orange-900/80 via-orange-800/60 to-orange-900/80"
               delay={0.4}
               icon={
@@ -141,7 +141,7 @@ export const EnhancedLandingPage: React.FC = () => {
 
             <ModularFeatureCard
               title="Regulatory Compliance"
-              description="Navigate complex regulatory landscapes with expert guidance on compliance requirements across multiple jurisdictions."
+              description="Legal requirements for blockchain projects change frequently and vary by location. We help you understand what rules apply to your specific situation and connect you with experienced legal professionals when needed. Better to get it right from the start than deal with problems later."
               gradient="from-red-900/80 via-red-800/60 to-red-900/80"
               delay={0.5}
               icon={
@@ -153,7 +153,7 @@ export const EnhancedLandingPage: React.FC = () => {
 
             <ModularFeatureCard
               title="Market Analysis"
-              description="In-depth market research and competitive analysis to position your blockchain project for maximum impact and success."
+              description="Understanding your competition and target audience is crucial for success. We research the market landscape, identify opportunities, and help you position your project where it has the best chance to succeed. No guesswork - just solid research and practical insights."
               gradient="from-indigo-900/80 via-indigo-800/60 to-indigo-900/80"
               delay={0.6}
               icon={
@@ -185,7 +185,7 @@ export const EnhancedLandingPage: React.FC = () => {
               </span>
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              How we work with you step-by-step to achieve your blockchain goals with clarity and precision.
+              Here's how we work with you to get things done right, without the confusion or unnecessary complexity.
             </p>
           </motion.div>
 
@@ -194,22 +194,22 @@ export const EnhancedLandingPage: React.FC = () => {
               {
                 step: "01",
                 title: "Discovery & Analysis",
-                description: "We analyze your business needs and determine if blockchain is the right solution for your specific use case."
+                description: "First, we take time to understand your business and honestly assess whether blockchain makes sense for what you're trying to achieve."
               },
               {
                 step: "02",
                 title: "Strategy Development", 
-                description: "Create a comprehensive roadmap with clear milestones, timeline, and budget that aligns with your goals."
+                description: "Together, we build a practical roadmap with realistic timelines and clear milestones, so you always know what's happening next."
               },
               {
                 step: "03",
                 title: "Implementation",
-                description: "Execute the plan with hands-on support, regular updates, and expert guidance throughout the process."
+                description: "We roll up our sleeves and work alongside your team, providing regular updates and solving problems as they come up."
               },
               {
                 step: "04",
                 title: "Optimization",
-                description: "Monitor performance, gather feedback, and continuously improve your blockchain solution for maximum impact."
+                description: "After launch, we monitor how everything's working and make improvements based on real user feedback and performance data."
               }
             ].map((process, index) => (
               <motion.div
@@ -256,11 +256,11 @@ export const EnhancedLandingPage: React.FC = () => {
               </span>
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Choose the perfect plan for your blockchain consulting needs. Start with our free consultation or subscribe for ongoing support.
+              Start with a free consultation to see if we're a good fit, then choose ongoing support that matches your needs and budget.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
             {SUBSCRIPTION_PLANS.map((plan, index) => (
               <motion.div
                 key={plan.id}
@@ -268,56 +268,90 @@ export const EnhancedLandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className={`relative group bg-gradient-to-br from-gray-900/50 to-gray-800/40 border border-white/10 rounded-2xl p-8 backdrop-blur-xl hover:border-orange-500/30 transition-all duration-300 ${
-                  plan.popular ? 'border-orange-500/50 shadow-2xl shadow-orange-500/10' : ''
+                className={`relative group bg-gradient-to-br from-gray-900/50 to-gray-800/40 border border-white/10 rounded-2xl backdrop-blur-xl hover:border-orange-500/30 transition-all duration-300 flex flex-col h-full ${
+                  plan.popular ? 'border-orange-500/50 shadow-2xl shadow-orange-500/10 scale-105' : ''
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-1 rounded-full text-sm font-medium">
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
                       Most Popular
                     </div>
                   </div>
                 )}
                 
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-white mb-4">{plan.name}</h3>
-                  <p className="text-gray-300 mb-6">{plan.description}</p>
-                  <div className="mb-6">
+                {/* Header Section - Fixed Height */}
+                <div className="text-center p-6 pb-4 flex-shrink-0">
+                  <h3 className="text-2xl font-bold text-white mb-3">{plan.name}</h3>
+                  <p className="text-gray-300 mb-4 text-sm leading-relaxed min-h-[2.5rem] flex items-center justify-center">{plan.description}</p>
+                  <div className="mb-4">
                     <span className="text-4xl font-bold text-white">${plan.price.monthly}</span>
-                    <span className="text-gray-400">/month</span>
+                    <span className="text-gray-400 text-base">/month</span>
                   </div>
                 </div>
 
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center">
-                      <svg className="w-5 h-5 text-orange-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-gray-300">
-                        {feature.name}
-                        {feature.limit && <span className="text-gray-500"> ({feature.limit})</span>}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                {/* Features Section - Flexible Height */}
+                <div className="px-6 flex-grow">
+                  <ul className="space-y-3 mb-6">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-start">
+                        <svg className="w-4 h-4 text-orange-400 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-gray-300 text-sm leading-relaxed">
+                          {feature.name}
+                          {feature.limit && <span className="text-gray-500 ml-1">({feature.limit})</span>}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-                <Link href={plan.price.monthly === 0 ? "/guest-booking" : "/auth/unified-signin"}>
-                  <motion.button
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`w-full py-4 font-medium rounded-xl transition-all duration-300 ${
-                      plan.price.monthly === 0
-                        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25 hover:shadow-green-500/40'
-                        : plan.popular
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40'
-                        : 'bg-gray-800 text-white border border-gray-700 hover:bg-gray-700'
-                    }`}
-                  >
-                    {plan.price.monthly === 0 ? 'Start Free Consultation' : 'Subscribe & Get Started'}
-                  </motion.button>
-                </Link>
+                {/* CTA Section - Fixed at Bottom */}
+                <div className="p-6 pt-0 mt-auto">
+                  <Link href={plan.price.monthly === 0 ? "/guest-booking" : "/auth/unified-signin"} className="block">
+                    <motion.button
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`
+                        w-full py-3 px-6 font-semibold rounded-xl text-sm
+                        transition-all duration-300 transform
+                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900
+                        ${plan.price.monthly === 0
+                          ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:from-green-600 hover:to-green-700 focus:ring-green-500'
+                          : plan.popular
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:from-orange-600 hover:to-orange-700 focus:ring-orange-500'
+                          : 'bg-gray-800 text-white border border-gray-600 hover:bg-gray-700 hover:border-gray-500 shadow-md hover:shadow-lg focus:ring-gray-500'
+                        }
+                      `}
+                    >
+                      <span className="flex items-center justify-center">
+                        {plan.price.monthly === 0 ? (
+                          <>
+                            <span>Get Started Free</span>
+                            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                          </>
+                        ) : (
+                          <>
+                            <span>Choose Plan</span>
+                            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                          </>
+                        )}
+                      </span>
+                    </motion.button>
+                  </Link>
+                  
+                  {/* Secondary action for popular plan */}
+                  {plan.popular && (
+                    <p className="text-center mt-3 text-xs text-gray-400">
+                      Most chosen by teams
+                    </p>
+                  )}
+                </div>
               </motion.div>
             ))}
           </div>
@@ -344,8 +378,8 @@ export const EnhancedLandingPage: React.FC = () => {
             </h2>
             
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Join thousands of successful blockchain projects that have leveraged our 
-              decentralized network of experts to achieve their goals.
+              Ready to move forward with your blockchain project? Let's have a conversation 
+              about what you're building and how we can help make it successful.
             </p>
           </motion.div>
 
@@ -369,7 +403,7 @@ export const EnhancedLandingPage: React.FC = () => {
                 </span>
               </h3>
               <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                Get answers to common questions about our blockchain consulting services and how we can help transform your project.
+                Common questions about working with us and what to expect from our consulting services.
               </p>
             </motion.div>
 

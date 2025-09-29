@@ -145,7 +145,7 @@ export default function AdminReportsPage() {
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
                               <Badge variant="outline" className="text-xs">
-                                {report.reportType || report.type}
+                                {report.type}
                               </Badge>
                               <Badge className={getPriorityColor(report.priority)}>
                                 {report.priority}
@@ -222,7 +222,7 @@ export default function AdminReportsPage() {
                               )}
                             </div>
                             <h3 className="text-white font-medium mb-1">
-                              {session.title || `${session.consultationType} Consultation`}
+                              {`${session.consultationType} Consultation`}
                             </h3>
                             <p className="text-gray-400 text-sm mb-2">
                               Client: {session.user?.name || session.user?.email || 'Unknown'}

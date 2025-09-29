@@ -34,6 +34,9 @@ interface UserProfile {
   deviceFingerprints: string[]
   riskScore: number
   riskFactors: string[]
+  accountAge: number
+  lastPasswordChange: number
+  suspiciousActivityCount: number
 }
 
 interface FraudAlert {
@@ -174,7 +177,10 @@ export default function FraudPreventionPage() {
               },
               deviceFingerprints: ['fp_abc123', 'fp_def456', 'fp_ghi789'],
               riskScore: 85,
-              riskFactors: ['Multiple failed logins', 'New device', 'Unusual location', 'No 2FA']
+              riskFactors: ['Multiple failed logins', 'New device', 'Unusual location', 'No 2FA'],
+              accountAge: 345,
+              lastPasswordChange: new Date('2024-11-20T09:15:00Z').getTime(),
+              suspiciousActivityCount: 3
             },
             deviceInfo: {
               fingerprint: 'fp_suspicious_001',
@@ -240,7 +246,10 @@ export default function FraudPreventionPage() {
               },
               deviceFingerprints: ['fp_xyz789', 'fp_abc456'],
               riskScore: 95,
-              riskFactors: ['Multiple payment failures', 'High transaction volume', 'Recent password change']
+              riskFactors: ['Multiple payment failures', 'High transaction volume', 'Recent password change'],
+              accountAge: 280,
+              lastPasswordChange: new Date('2024-12-01T16:45:00Z').getTime(),
+              suspiciousActivityCount: 5
             },
             deviceInfo: {
               fingerprint: 'fp_payment_002',
@@ -306,7 +315,10 @@ export default function FraudPreventionPage() {
               },
               deviceFingerprints: ['fp_secure_003'],
               riskScore: 72,
-              riskFactors: ['Recent password change', 'Immediate upgrade attempt', 'No 2FA']
+              riskFactors: ['Recent password change', 'Immediate upgrade attempt', 'No 2FA'],
+              accountAge: 480,
+              lastPasswordChange: new Date('2024-12-08T10:30:00Z').getTime(),
+              suspiciousActivityCount: 2
             },
             deviceInfo: {
               fingerprint: 'fp_takeover_003',

@@ -79,8 +79,7 @@ export default function StrategicAdvisoryConsultation() {
       timeline: undefined as any,
       marketFocus: "",
       urgency: "MEDIUM",
-      contactEmail: session?.user?.email || "",
-      preferredDate: ""
+      contactEmail: session?.user?.email || ""
     },
   })
 

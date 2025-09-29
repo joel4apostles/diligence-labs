@@ -7,7 +7,7 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY
 let stripe: Stripe | null = null
 if (stripeSecretKey && stripeSecretKey !== 'sk_test_your_stripe_secret_key_here') {
   stripe = new Stripe(stripeSecretKey, {
-    apiVersion: "2023-10-16",
+    apiVersion: "2025-08-27.basil",
   })
 }
 

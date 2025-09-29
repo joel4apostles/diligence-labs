@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { PrismaClient } from '@prisma/client'
 
 const ExpertProjectDashboard = dynamic(() => import('@/components/expert/ExpertProjectDashboard'), {
-  ssr: false
+  loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-white">Loading...</div></div>
 })
 
 const prisma = new PrismaClient()
@@ -17,6 +17,10 @@ export default async function ExpertDashboardPage() {
     redirect('/auth/signin')
   }
 
+  // Note: ExpertProfile model not implemented yet - redirect to main dashboard
+  redirect('/dashboard')
+
+  /* COMMENTED OUT - UNREACHABLE CODE
   // Check if user has a verified expert profile
   const expertProfile = await prisma.expertProfile.findUnique({
     where: { 
@@ -97,4 +101,5 @@ export default async function ExpertDashboardPage() {
       </div>
     </div>
   )
+  END COMMENTED OUT CODE */
 }

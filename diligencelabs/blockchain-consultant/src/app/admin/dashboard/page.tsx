@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -199,8 +200,20 @@ export default function AdminDashboardPage() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-black text-white">
-        <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
+        {/* Background network visualization placeholder */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.1) 2px, transparent 2px), radial-gradient(circle at 80% 70%, rgba(147, 51, 234, 0.1) 2px, transparent 2px), radial-gradient(circle at 40% 60%, rgba(251, 146, 60, 0.1) 2px, transparent 2px)',
+            backgroundSize: '100px 100px, 150px 150px, 200px 200px'
+          }} />
+        </div>
+        
+        {/* Gradient overlays matching homepage */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black" />
+        
+        <div className="relative z-10 container mx-auto px-4 py-8">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-6">

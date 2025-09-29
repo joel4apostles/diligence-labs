@@ -34,47 +34,10 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit
 
+    // Note: ExpertProfile model not implemented yet
     const [applications, total] = await Promise.all([
-      prisma.expertProfile.findMany({
-        where,
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-              createdAt: true
-            }
-          },
-          evaluations: {
-            take: 5,
-            orderBy: {
-              submittedAt: 'desc'
-            },
-            include: {
-              project: {
-                select: {
-                  name: true,
-                  category: true
-                }
-              }
-            }
-          },
-          achievements: {
-            take: 3,
-            orderBy: {
-              awardedAt: 'desc'
-            }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        skip,
-        take: limit
-      }),
-      prisma.expertProfile.count({ where })
+      Promise.resolve([]), // Mock empty array
+      Promise.resolve(0)   // Mock zero count
     ])
 
     return NextResponse.json({
@@ -118,18 +81,13 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Get expert profile
-    const expertProfile = await prisma.expertProfile.findUnique({
-      where: { id: expertId },
-      include: {
-        user: true
-      }
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({ 
+      message: 'Expert profile model not implemented yet - cannot process applications',
+      action: 'mock-response'
     })
 
-    if (!expertProfile) {
-      return NextResponse.json({ error: 'Expert profile not found' }, { status: 404 })
-    }
-
+    /* COMMENTED OUT - UNREACHABLE CODE DUE TO EARLY RETURN ABOVE
     // Update verification status based on action
     let newStatus: string
     let tierUpdate: any = {}
@@ -204,7 +162,7 @@ export async function POST(request: NextRequest) {
           position: updatedProfile.position || undefined,
           approvalDate: new Date().toLocaleDateString(),
           dashboardUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/dashboard`,
-          supportEmail: process.env.SUPPORT_EMAIL || 'support@diligencelabs.com'
+          supportEmail: process.env.SUPPORT_EMAIL || 'support@diligencelabs.xyz'
         }
         
         const emailTemplate = expertApprovalEmailTemplate(emailData)
@@ -231,7 +189,7 @@ export async function POST(request: NextRequest) {
           expertEmail: expertProfile.user.email,
           rejectionReason: reviewNotes || undefined,
           rejectionDate: new Date().toLocaleDateString(),
-          supportEmail: process.env.SUPPORT_EMAIL || 'support@diligencelabs.com'
+          supportEmail: process.env.SUPPORT_EMAIL || 'support@diligencelabs.xyz'
         }
         
         const emailTemplate = expertRejectionEmailTemplate(emailData)
@@ -273,6 +231,7 @@ export async function POST(request: NextRequest) {
       newStatus,
       emailSent: action === 'APPROVE' || action === 'REJECT'
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Expert application processing error:', error)
@@ -311,6 +270,13 @@ export async function PUT(request: NextRequest) {
       }, { status: 400 })
     }
 
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({ 
+      message: 'Expert profile model not implemented yet - cannot bulk process applications',
+      action: 'mock-bulk-response'
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE DUE TO EARLY RETURN ABOVE
     // Process each expert application
     const results = []
     
@@ -425,6 +391,7 @@ export async function PUT(request: NextRequest) {
         failed: errorCount
       }
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Bulk expert application processing error:', error)

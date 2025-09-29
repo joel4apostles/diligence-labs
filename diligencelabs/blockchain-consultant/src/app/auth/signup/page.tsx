@@ -23,6 +23,7 @@ import {
   animations
 } from "@/components/ui/consistent-theme"
 import { motion } from "framer-motion"
+import { formTheme } from "@/lib/form-theme"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -124,7 +125,7 @@ export default function SignUp() {
               className="w-full max-w-md"
             >
               <GlassMorphismCard variant="accent" hover={false}>
-                <Card className="bg-transparent border-0">
+                <Card className={`${formTheme.card.base}`}>
                   <CardContent className="pt-8 pb-8 text-center">
                     <motion.div 
                       {...animations.slideUp}
@@ -152,7 +153,7 @@ export default function SignUp() {
                         Redirecting you to sign in...
                       </p>
                       <div className="flex justify-center mt-6">
-                        <LoadingSpinner size="lg" color="green" />
+                        <LoadingSpinner size="lg" color="primary" />
                       </div>
                     </motion.div>
                   </CardContent>
@@ -192,7 +193,7 @@ export default function SignUp() {
             className="w-full max-w-md"
           >
             <GlassMorphismCard variant="primary" hover={true}>
-              <Card className="bg-transparent border-0 shadow-2xl">
+              <Card className={`${formTheme.card.base} shadow-2xl`}>
                 <CardHeader className="space-y-1 text-center pb-6">
                   <motion.div 
                     {...animations.fadeIn}
@@ -205,10 +206,8 @@ export default function SignUp() {
                     {...animations.slideUp}
                     transition={{ duration: 0.6, delay: 0.7 }}
                   >
-                    <CardTitle className="text-3xl font-light mb-2">
-                      <span className="bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400 bg-clip-text text-transparent">
-                        Join Our Platform
-                      </span>
+                    <CardTitle className="text-3xl font-light mb-2 text-white">
+                      Join Our Platform
                     </CardTitle>
                     <CardDescription className="text-gray-400 text-lg">
                       Create your account to get started
@@ -259,15 +258,16 @@ export default function SignUp() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel className={formTheme.label.base}>Full Name</FormLabel>
                     <FormControl>
                       <Input 
+                        className={formTheme.input.base}
                         placeholder="Enter your full name" 
                         {...field} 
                         disabled={isLoading}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className={formTheme.formMessage.error} />
                   </FormItem>
                 )}
               />
@@ -276,16 +276,17 @@ export default function SignUp() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className={formTheme.label.base}>Email</FormLabel>
                     <FormControl>
                       <Input 
+                        className={formTheme.input.base}
                         placeholder="Enter your email" 
                         type="email" 
                         {...field} 
                         disabled={isLoading}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className={formTheme.formMessage.error} />
                   </FormItem>
                 )}
               />
@@ -294,16 +295,17 @@ export default function SignUp() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel className={formTheme.label.base}>Password</FormLabel>
                     <FormControl>
                       <Input 
+                        className={formTheme.input.base}
                         placeholder="Create a secure password" 
                         type="password" 
                         {...field} 
                         disabled={isLoading}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className={formTheme.formMessage.error} />
                     {field.value && (
                       <PasswordStrengthIndicator
                         password={field.value}
@@ -319,16 +321,17 @@ export default function SignUp() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel className={formTheme.label.base}>Confirm Password</FormLabel>
                     <FormControl>
                       <Input 
+                        className={formTheme.input.base}
                         placeholder="Confirm your password" 
                         type="password" 
                         {...field} 
                         disabled={isLoading}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className={formTheme.formMessage.error} />
                   </FormItem>
                 )}
               />
@@ -338,7 +341,7 @@ export default function SignUp() {
                         >
                           <Button 
                             type="submit" 
-                            className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-300 hover:brightness-110 disabled:opacity-70 flex items-center justify-center" 
+                            className={`w-full h-12 ${formTheme.button.primary} rounded-lg disabled:opacity-70 flex items-center justify-center`}
                             disabled={isLoading}
                           >
                             {isLoading ? (

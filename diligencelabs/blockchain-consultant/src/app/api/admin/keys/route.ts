@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if admin has SUPER_ADMIN privileges
-    if (!hasPermission(adminAuth.admin.role, 'SUPER_ADMIN')) {
+    if (!adminAuth.admin || !hasPermission(adminAuth.admin.role, 'SUPER_ADMIN')) {
       return NextResponse.json({ 
         error: 'Access denied. Super Admin privileges required for key management.' 
       }, { status: 403 })
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if admin has SUPER_ADMIN privileges
-    if (!hasPermission(adminAuth.admin.role, 'SUPER_ADMIN')) {
+    if (!adminAuth.admin || !hasPermission(adminAuth.admin.role, 'SUPER_ADMIN')) {
       return NextResponse.json({ 
         error: 'Access denied. Super Admin privileges required for key management.' 
       }, { status: 403 })
@@ -104,7 +104,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check if admin has SUPER_ADMIN privileges
-    if (!hasPermission(adminAuth.admin.role, 'SUPER_ADMIN')) {
+    if (!adminAuth.admin || !hasPermission(adminAuth.admin.role, 'SUPER_ADMIN')) {
       return NextResponse.json({ 
         error: 'Access denied. Super Admin privileges required for key management.' 
       }, { status: 403 })

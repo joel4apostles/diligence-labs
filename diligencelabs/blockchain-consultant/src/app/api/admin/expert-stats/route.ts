@@ -12,6 +12,18 @@ export async function GET(request: NextRequest) {
     //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     // }
 
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({
+      message: 'Expert profile model not implemented yet',
+      stats: {
+        pending: 0,
+        verified: 0,
+        rejected: 0,
+        totalApplications: 0
+      }
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     // Get counts by status
     const statusCounts = await prisma.expertProfile.groupBy({
       by: ['verificationStatus'],
@@ -38,6 +50,7 @@ export async function GET(request: NextRequest) {
       success: true,
       stats
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Expert stats error:', error)

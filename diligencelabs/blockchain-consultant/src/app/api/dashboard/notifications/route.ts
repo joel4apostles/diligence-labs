@@ -233,7 +233,7 @@ export async function GET(request: Request) {
 
     // Generate achievement notifications (example)
     if (sessions.length >= 5) {
-      const completedSessions = sessions.filter(s => s.status === 'COMPLETED').length
+      const completedSessions = sessions.filter((s: any) => s.status === 'COMPLETED').length
       if (completedSessions >= 5) {
         notifications.push({
           id: `achievement-5-sessions`,

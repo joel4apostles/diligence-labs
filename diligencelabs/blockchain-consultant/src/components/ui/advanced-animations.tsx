@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion'
 
 // ==================== ENHANCED BUTTON ANIMATIONS ====================
-interface AnimatedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface AnimatedButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onDrag' | 'onDragEnd' | 'onDragStart' | 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration'> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'glow' | 'magnetic'
   size?: 'sm' | 'md' | 'lg'
   children: React.ReactNode

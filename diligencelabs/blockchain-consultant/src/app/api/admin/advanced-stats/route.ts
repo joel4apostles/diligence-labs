@@ -150,21 +150,21 @@ export async function GET(request: Request) {
       prisma.$queryRaw`
         SELECT AVG(
           CASE 
-            WHEN completedAt IS NOT NULL AND createdAt IS NOT NULL 
-            THEN (julianday(completedAt) - julianday(createdAt)) * 24 * 60 
+            WHEN "completedAt" IS NOT NULL AND "createdAt" IS NOT NULL 
+            THEN EXTRACT(EPOCH FROM ("completedAt" - "createdAt")) / 60
             ELSE NULL 
           END
         ) as avg_duration_minutes
         FROM sessions 
         WHERE status = 'COMPLETED' 
-        AND createdAt >= ${periodStart}
+        AND "createdAt" >= ${periodStart}
       `,
       
       prisma.$queryRaw`
         SELECT 
           (CAST(COUNT(CASE WHEN status = 'COMPLETED' THEN 1 END) AS FLOAT) / COUNT(*)) * 100 as success_rate
         FROM sessions 
-        WHERE createdAt >= ${periodStart}
+        WHERE "createdAt" >= ${periodStart}
       `
     ])
 

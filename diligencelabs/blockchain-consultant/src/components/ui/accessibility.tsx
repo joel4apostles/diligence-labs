@@ -45,7 +45,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     // Detect screen reader usage
     const hasScreenReader = window.navigator.userAgent.includes('NVDA') || 
                            window.navigator.userAgent.includes('JAWS') || 
-                           window.speechSynthesis || 
+                           !!window.speechSynthesis || 
                            'speechSynthesis' in window
 
     setScreenReader(hasScreenReader)
@@ -353,7 +353,7 @@ export const AccessibleHeading: React.FC<{
   className?: string
   id?: string
 }> = ({ level, children, className = '', id }) => {
-  const Tag = `h${level}` as keyof JSX.IntrinsicElements
+  const Tag = `h${level}` as keyof React.JSX.IntrinsicElements
 
   return (
     <Tag 

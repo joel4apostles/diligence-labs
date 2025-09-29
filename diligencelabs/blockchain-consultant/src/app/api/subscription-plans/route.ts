@@ -168,6 +168,13 @@ export async function GET(request: NextRequest) {
 // POST /api/subscription-plans/init - Initialize subscription features in database
 export async function POST(request: NextRequest) {
   try {
+    // Note: SubscriptionFeature model not implemented yet
+    return NextResponse.json({ 
+      message: 'Subscription plan creation not available - SubscriptionFeature model not implemented yet',
+      action: 'mock-response'
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     const plans = [
       'BASIC_MONTHLY',
       'PROFESSIONAL_MONTHLY', 
@@ -278,6 +285,7 @@ export async function POST(request: NextRequest) {
       message: 'Subscription features initialized successfully',
       featuresCreated: createPromises.length
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Subscription features initialization error:', error)

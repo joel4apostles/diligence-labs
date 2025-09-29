@@ -197,12 +197,15 @@ export default function AIRecommendations({
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 layout
               >
-                <GlassMorphismCard 
-                  variant={index % 3 === 0 ? 'primary' : index % 3 === 1 ? 'secondary' : 'accent'}
-                  hover={true}
-                  className="h-full cursor-pointer"
+                <div 
+                  className="cursor-pointer h-full"
                   onClick={() => setExpandedCard(isExpanded ? null : recommendation.id)}
                 >
+                  <GlassMorphismCard 
+                    variant={index % 3 === 0 ? 'primary' : index % 3 === 1 ? 'secondary' : 'accent'}
+                    hover={true}
+                    className="h-full"
+                  >
                   <Card className="bg-transparent border-0 h-full">
                     <CardHeader>
                       <div className="flex items-start justify-between">
@@ -300,6 +303,7 @@ export default function AIRecommendations({
                     </CardContent>
                   </Card>
                 </GlassMorphismCard>
+                </div>
               </motion.div>
             )
           })}

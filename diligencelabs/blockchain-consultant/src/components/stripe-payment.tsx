@@ -119,7 +119,8 @@ export function StripePayment({
       
     } catch (error) {
       console.error("Payment failed:", error)
-      onError(`Payment processing failed: ${error.message}`)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      onError(`Payment processing failed: ${errorMessage}`)
     } finally {
       setIsLoading(false)
     }

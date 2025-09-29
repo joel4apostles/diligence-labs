@@ -75,7 +75,7 @@ class ClientEncryption {
     return await window.crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
-        salt,
+        salt: salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength) as ArrayBuffer,
         iterations: this.config.keyDerivationIterations,
         hash: 'SHA-256'
       },

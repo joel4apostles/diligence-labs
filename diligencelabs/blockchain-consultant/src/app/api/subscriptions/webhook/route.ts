@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.text()
-  const headersList = headers()
+  const headersList = await headers()
   const signature = headersList.get("stripe-signature")
 
   if (!signature) {
@@ -99,10 +99,10 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     where: { stripeSubscriptionId: subscription.id },
     update: {
       status: status as any,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
+      currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+      cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+      canceledAt: (subscription as any).canceled_at ? new Date((subscription as any).canceled_at * 1000) : null,
       trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
       amount,
     },
@@ -112,10 +112,10 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       status: status as any,
       planType: (planId || 'BASIC_MONTHLY') as any,
       billingCycle: (billingCycle || 'MONTHLY') as any,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
+      currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+      cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
+      canceledAt: (subscription as any).canceled_at ? new Date((subscription as any).canceled_at * 1000) : null,
       trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
       amount,
     },
@@ -133,21 +133,21 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  if (!invoice.subscription) return
+  if (!(invoice as any).subscription) return
 
   // Update subscription status to active if payment succeeded
   await prisma.subscription.update({
-    where: { stripeSubscriptionId: invoice.subscription as string },
+    where: { stripeSubscriptionId: (invoice as any).subscription as string },
     data: { status: 'ACTIVE' },
   })
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
-  if (!invoice.subscription) return
+  if (!(invoice as any).subscription) return
 
   // Update subscription status to past due if payment failed
   await prisma.subscription.update({
-    where: { stripeSubscriptionId: invoice.subscription as string },
+    where: { stripeSubscriptionId: (invoice as any).subscription as string },
     data: { status: 'PAST_DUE' },
   })
 }

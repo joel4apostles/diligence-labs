@@ -25,6 +25,7 @@ import {
   theme,
   animations
 } from "@/components/ui/consistent-theme"
+import { formTheme } from "@/lib/form-theme"
 import { motion } from "framer-motion"
 
 const formSchema = z.object({
@@ -87,26 +88,38 @@ function UnifiedSignInContent() {
     }
   }
 
-  // Privy setup
-  const { ready, authenticated, user } = usePrivy()
-  const { login } = useLogin({
-    onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {
-      console.log('🔥 Privy user authenticated!', { user, isNewUser, wasAlreadyAuthenticated })
-      // Don't redirect immediately - let the useEffect handle it to prevent loops
-    },
-    onError: (error) => {
-      console.error('Privy login error:', error)
-      // Provide a more user-friendly error message
-      const errorMessage = error?.message || 'Unknown error'
-      if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
-        setError("Network connection error. Please check your internet connection and try again.")
-      } else if (errorMessage.includes('configuration') || errorMessage.includes('app')) {
-        setError("Authentication service temporarily unavailable. Please try traditional email/password login.")
-      } else {
-        setError(`Web3 authentication failed: ${errorMessage}`)
+  // Privy setup with error handling
+  let ready = false, authenticated = false, user = null, login = null
+  
+  try {
+    const privyData = usePrivy()
+    const loginData = useLogin({
+      onComplete: ({ user, isNewUser, wasAlreadyAuthenticated }) => {
+        console.log('🔥 Privy user authenticated!', { user, isNewUser, wasAlreadyAuthenticated })
+        // Don't redirect immediately - let the useEffect handle it to prevent loops
+      },
+      onError: (error) => {
+        console.error('Privy login error:', error)
+        // Provide a more user-friendly error message
+        const errorMessage = String(error) || 'Unknown error'
+        if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+          setError("Network connection error. Please check your internet connection and try again.")
+        } else if (errorMessage.includes('configuration') || errorMessage.includes('app')) {
+          setError("Authentication service temporarily unavailable. Please try traditional email/password login.")
+        } else {
+          setError(`Web3 authentication failed: ${errorMessage}`)
+        }
       }
-    }
-  })
+    })
+    
+    ready = privyData.ready
+    authenticated = privyData.authenticated
+    user = privyData.user
+    login = loginData.login
+  } catch (error) {
+    console.log('Privy hooks not available, wallet login disabled:', error)
+    // Privy provider not available - wallet features will be disabled
+  }
 
   useEffect(() => {
     setIsPageLoaded(true)
@@ -161,14 +174,14 @@ function UnifiedSignInContent() {
     
     // Only redirect if we have a valid session and we're not currently in a loading state
     if (status === "authenticated" && session?.user?.id) {
-      console.log('Valid NextAuth session found, redirecting...', session.user.id)
-      // Add a small delay to show the success state before redirecting
-      setTimeout(() => handlePostAuthRedirect(), 1000)
+      console.log('Valid NextAuth session found, redirecting immediately...', session.user.id)
+      // Redirect immediately without delay
+      handlePostAuthRedirect()
     } else if (authenticated && user?.id && status !== "authenticated") {
       // Only Privy authenticated, no NextAuth session - redirect
-      console.log('Privy authenticated, no NextAuth session, redirecting...', user.id)
-      // Add a small delay to show the success state before redirecting
-      setTimeout(() => handlePostAuthRedirect(), 1000)
+      console.log('Privy authenticated, no NextAuth session, redirecting immediately...', user.id)
+      // Redirect immediately without delay  
+      handlePostAuthRedirect()
     } else {
       console.log('No valid authentication found, staying on login page')
     }
@@ -214,7 +227,8 @@ function UnifiedSignInContent() {
         setError(userFriendlyError)
       } else if (result?.ok) {
         console.log("Credentials sign in successful")
-        // The useEffect will handle the redirect when the session updates
+        // Redirect immediately to dashboard
+        handlePostAuthRedirect()
       }
     } catch (error) {
       console.error("Login error:", error)
@@ -283,7 +297,11 @@ function UnifiedSignInContent() {
   // Privy login handler
   const handlePrivyLogin = () => {
     setError(null)
-    login()
+    if (login) {
+      login()
+    } else {
+      setError("Web3 wallet authentication is temporarily unavailable. Please try email/password login.")
+    }
   }
 
   const getProviderIcon = (providerId: string) => {
@@ -341,7 +359,7 @@ function UnifiedSignInContent() {
             className="w-full max-w-lg"
           >
             <GlassMorphismCard variant="primary" hover={true}>
-              <Card className="bg-transparent border-0 shadow-2xl">
+              <Card className={`${formTheme.card.base} shadow-2xl`}>
                 <CardHeader className="space-y-1 text-center pb-6">
                   <motion.div 
                     {...animations.fadeIn}
@@ -354,10 +372,8 @@ function UnifiedSignInContent() {
                     {...animations.slideUp}
                     transition={{ duration: 0.6, delay: 0.7 }}
                   >
-                    <CardTitle className="text-3xl font-light mb-2">
-                      <span className="bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400 bg-clip-text text-transparent">
-                        Welcome Back
-                      </span>
+                    <CardTitle className="text-3xl font-light mb-2 text-white">
+                      Welcome Back
                     </CardTitle>
                     <CardDescription className="text-gray-400 text-lg">
                       Sign in to continue to your dashboard
@@ -411,17 +427,17 @@ function UnifiedSignInContent() {
                   </div>
                   
                   <Select value={selectedProvider} onValueChange={setSelectedProvider}>
-                    <SelectTrigger className="w-full h-12 bg-gray-800/50 border-gray-600 text-white hover:border-gray-500 focus:border-blue-500 focus:ring-blue-500">
+                    <SelectTrigger className={`w-full h-12 ${formTheme.select.trigger} focus:border-blue-500 focus:ring-blue-500`}>
                       <SelectValue placeholder="Select a sign-in method" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-600">
+                    <SelectContent className={formTheme.select.content}>
                       {Object.entries(availableProviders)
                         .filter(([key, provider]: [string, any]) => key !== 'credentials')
                         .map(([key, provider]: [string, any]) => (
                           <SelectItem 
                             key={provider.id} 
                             value={provider.id}
-                            className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                            className={formTheme.select.item}
                           >
                             <div className="flex items-center space-x-3">
                               <span className="text-lg">{getProviderIcon(provider.id)}</span>
@@ -434,7 +450,7 @@ function UnifiedSignInContent() {
                         <SelectItem 
                           key="web3-wallet" 
                           value="web3-wallet"
-                          className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                          className={formTheme.select.item}
                         >
                           <div className="flex items-center space-x-3">
                             <span className="text-lg">🔗</span>
@@ -453,7 +469,7 @@ function UnifiedSignInContent() {
                       <Button
                         onClick={() => selectedProvider === 'web3-wallet' ? handlePrivyLogin() : handleOAuthSignIn(selectedProvider)}
                         disabled={!!oAuthLoading}
-                        className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 hover:brightness-110 disabled:opacity-70"
+                        className={`w-full h-12 ${formTheme.button.primary} transform hover:scale-[1.02] disabled:opacity-70`}
                       >
                         {oAuthLoading === selectedProvider ? (
                           <div className="flex items-center space-x-2">
@@ -512,16 +528,16 @@ function UnifiedSignInContent() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300">Email</FormLabel>
+                        <FormLabel className={formTheme.label.base}>Email</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Enter your email"
                             type="email"
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
+                            className={`${formTheme.input.base} h-12 transition-all duration-200 hover:border-gray-500`}
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage className="text-red-400" />
+                        <FormMessage className={formTheme.formMessage.error} />
                       </FormItem>
                     )}
                   />
@@ -530,16 +546,16 @@ function UnifiedSignInContent() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300">Password</FormLabel>
+                        <FormLabel className={formTheme.label.base}>Password</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
                             placeholder="Enter your password"
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
+                            className={`${formTheme.input.base} h-12 transition-all duration-200 hover:border-gray-500`}
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage className="text-red-400" />
+                        <FormMessage className={formTheme.formMessage.error} />
                       </FormItem>
                     )}
                   />
@@ -550,7 +566,7 @@ function UnifiedSignInContent() {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:brightness-110 disabled:opacity-70"
+                      className={`w-full h-12 ${formTheme.button.primary} disabled:opacity-70`}
                     >
                       {isLoading ? (
                         <div className="flex items-center space-x-2">

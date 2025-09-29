@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type') // 'recommendations' | 'notifications' | 'all'
 
     // Build user profile for AI analysis
-    const userProfile = await buildUserProfile(user.id)
+    const userProfile = await buildUserProfile(user?.id || '')
 
     const insights: any = {}
 
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     // Store feedback for ML improvement (in a real implementation)
     const feedbackRecord = {
-      userId: user.id,
+      userId: user?.id || '',
       recommendationId,
       feedback,
       rating,

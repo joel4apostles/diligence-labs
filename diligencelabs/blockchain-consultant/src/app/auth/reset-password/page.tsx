@@ -21,6 +21,7 @@ import {
   theme,
   animations
 } from "@/components/ui/consistent-theme"
+import { formTheme } from "@/lib/form-theme"
 
 const formSchema = z.object({
   password: z.string().min(6, {
@@ -149,14 +150,14 @@ function ResetPasswordContent() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <Button className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:brightness-110 mb-4">
+                        <Button className={`w-full h-12 ${formTheme.button.primary} mb-4`}>
                           Request New Reset Link
                         </Button>
                       </motion.div>
                     </Link>
                     
                     <Link href="/auth/unified-signin">
-                      <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
+                      <Button className={`w-full ${formTheme.button.secondary}`}>
                         Back to Sign In
                       </Button>
                     </Link>
@@ -211,10 +212,8 @@ function ResetPasswordContent() {
                     {...animations.slideUp}
                     transition={{ duration: 0.6, delay: 0.7 }}
                   >
-                    <CardTitle className="text-3xl font-light mb-2">
-                      <span className="bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400 bg-clip-text text-transparent">
-                        Set New Password
-                      </span>
+                    <CardTitle className="text-3xl font-light mb-2 text-white">
+                      Set New Password
                     </CardTitle>
                     <CardDescription className="text-gray-400 text-lg">
                       Enter your new password below
@@ -262,17 +261,17 @@ function ResetPasswordContent() {
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">New Password</FormLabel>
+                              <FormLabel className={formTheme.label.base}>New Password</FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="Enter your new password"
                                   type="password"
-                                  className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
+                                  className={`${formTheme.input.base} h-12`}
                                   {...field}
                                   disabled={isLoading}
                                 />
                               </FormControl>
-                              <FormMessage className="text-red-400" />
+                              <FormMessage className={formTheme.formMessage.error} />
                             </FormItem>
                           )}
                         />
@@ -282,17 +281,17 @@ function ResetPasswordContent() {
                           name="confirmPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-gray-300">Confirm Password</FormLabel>
+                              <FormLabel className={formTheme.label.base}>Confirm Password</FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="Confirm your new password"
                                   type="password"
-                                  className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 h-12 transition-all duration-200 hover:border-gray-500"
+                                  className={`${formTheme.input.base} h-12`}
                                   {...field}
                                   disabled={isLoading}
                                 />
                               </FormControl>
-                              <FormMessage className="text-red-400" />
+                              <FormMessage className={formTheme.formMessage.error} />
                             </FormItem>
                           )}
                         />
@@ -304,7 +303,7 @@ function ResetPasswordContent() {
                           <Button
                             type="submit"
                             disabled={isLoading || success !== null}
-                            className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:brightness-110 disabled:opacity-70"
+                            className={`w-full h-12 ${formTheme.button.primary} disabled:opacity-70`}
                           >
                             {isLoading ? (
                               <div className="flex items-center space-x-2">

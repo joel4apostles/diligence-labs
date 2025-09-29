@@ -24,6 +24,7 @@ import {
   theme,
   animations
 } from "@/components/ui/consistent-theme"
+import { formTheme } from "@/lib/form-theme"
 import { motion } from "framer-motion"
 
 export default function Profile() {
@@ -185,7 +186,7 @@ export default function Profile() {
           className="flex items-center gap-4 mb-12"
         >
           <Link href="/dashboard">
-            <Button variant="outline" size="sm" className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
+            <Button variant="outline" size="sm" className={formTheme.button.secondary}>
               ← Back to Dashboard
             </Button>
           </Link>
@@ -223,25 +224,25 @@ export default function Profile() {
                 <CardContent>
                   <form onSubmit={handleProfileUpdate} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-sm font-medium text-gray-300">Full Name</Label>
+                      <Label htmlFor="name" className={formTheme.label.base}>Full Name</Label>
                       <Input
                         id="name"
                         value={profileData.name}
                         onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
                         placeholder="Enter your full name"
-                        className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400"
+                        className={formTheme.input.base}
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-medium text-gray-300">Email Address</Label>
+                      <Label htmlFor="email" className={formTheme.label.base}>Email Address</Label>
                       <Input
                         id="email"
                         type="email"
                         value={profileData.email}
                         onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
                         placeholder="Enter your email"
-                        className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-400"
+                        className={formTheme.input.base}
                       />
                       <p className="text-xs text-gray-500">
                         This is used for account login and important notifications
@@ -249,11 +250,11 @@ export default function Profile() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium text-gray-300">Account Role</Label>
+                      <Label className={formTheme.label.base}>Account Role</Label>
                       <div className="flex items-center space-x-2">
-                        <span className="px-3 py-1 text-sm bg-blue-500/20 text-blue-300 rounded-lg border border-blue-500/30">
+                        <Badge className={formTheme.badge.primary}>
                           {session.user?.role || "USER"}
-                        </span>
+                        </Badge>
                       </div>
                       <p className="text-xs text-gray-500">
                         Your current access level in the platform
@@ -263,7 +264,7 @@ export default function Profile() {
                     <Button 
                       type="submit" 
                       disabled={isUpdating}
-                      className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300"
+                      className={`w-full ${formTheme.button.primary}`}
                     >
                       {isUpdating ? "Updating..." : "Update Profile"}
                     </Button>
@@ -308,7 +309,7 @@ export default function Profile() {
                               router.push('/auth/unified-signin')
                             }
                           }}
-                          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                          className={formTheme.badge.purple}
                         >
                           Connect Wallet
                         </Button>
@@ -341,7 +342,7 @@ export default function Profile() {
                             onClick={handleDisconnectWallet}
                             variant="outline"
                             size="sm"
-                            className="border-red-500 text-red-400 hover:bg-red-500/10"
+                            className={formTheme.button.danger}
                           >
                             Disconnect
                           </Button>
@@ -395,11 +396,11 @@ export default function Profile() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-300">Password</Label>
+                    <Label className={formTheme.label.base}>Password</Label>
                     <Button 
                       variant="outline" 
                       onClick={() => setShowChangePasswordModal(true)}
-                      className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300"
+                      className={`w-full justify-start ${formTheme.button.secondary}`}
                     >
                       Change Password
                     </Button>
@@ -411,8 +412,8 @@ export default function Profile() {
                   <Separator className="bg-gray-700" />
 
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-300">Two-Factor Authentication</Label>
-                    <Button variant="outline" className="w-full justify-start border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
+                    <Label className={formTheme.label.base}>Two-Factor Authentication</Label>
+                    <Button variant="outline" className={`w-full justify-start ${formTheme.button.secondary}`}>
                       Enable 2FA (Coming Soon)
                     </Button>
                     <p className="text-xs text-gray-500">
@@ -423,7 +424,7 @@ export default function Profile() {
                   <Separator className="bg-gray-700" />
 
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-300">Data & Privacy</Label>
+                    <Label className={formTheme.label.base}>Data & Privacy</Label>
                     <div className="grid grid-cols-1 gap-2">
                       <Button 
                         variant="outline" 
@@ -450,7 +451,7 @@ export default function Profile() {
                             console.error('Failed to download data:', error)
                           }
                         }}
-                        className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300"
+                        className={formTheme.button.secondary}
                       >
                         Download My Data
                       </Button>
@@ -458,7 +459,7 @@ export default function Profile() {
                         variant="outline" 
                         size="sm" 
                         onClick={() => setShowPrivacySettingsModal(true)}
-                        className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300"
+                        className={formTheme.button.secondary}
                       >
                         Privacy Settings
                       </Button>
@@ -496,7 +497,7 @@ export default function Profile() {
                       <div className="p-4 border border-blue-500/30 rounded-lg bg-blue-500/10">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-medium text-white">Current Plan</h4>
-                          <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                          <Badge className={formTheme.badge.primary}>
                             {currentSubscription.status}
                           </Badge>
                         </div>
@@ -548,11 +549,11 @@ export default function Profile() {
                       {/* Actions */}
                       <div className="space-y-2">
                         <Link href="/#subscription">
-                          <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white transition-all duration-300">
+                          <Button className={`w-full ${formTheme.badge.warning}`}>
                             View All Plans
                           </Button>
                         </Link>
-                        <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500 transition-all duration-300">
+                        <Button variant="outline" className={`w-full ${formTheme.button.secondary}`}>
                           Manage Billing
                         </Button>
                       </div>
@@ -578,7 +579,7 @@ export default function Profile() {
                       </div>
                       
                       <Link href="/#subscription">
-                        <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white transition-all duration-300">
+                        <Button className={`w-full ${formTheme.badge.warning}`}>
                           View Subscription Plans
                         </Button>
                       </Link>

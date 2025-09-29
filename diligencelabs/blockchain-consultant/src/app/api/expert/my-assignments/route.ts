@@ -14,6 +14,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({ 
+      message: 'Expert assignments not accessible - ExpertProfile model not implemented yet',
+      action: 'mock-response',
+      assignments: []
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     // Get expert profile
     const expertProfile = await prisma.expertProfile.findUnique({
       where: { 
@@ -151,6 +159,7 @@ export async function GET(request: NextRequest) {
         pendingEvaluations: enhancedAssignments.filter(a => !a.hasEvaluated && a.status === 'ASSIGNED').length
       }
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('My assignments fetch error:', error)

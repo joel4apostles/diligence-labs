@@ -718,8 +718,8 @@ function RequestReportContent() {
         <StripePayment
           amount={totalPrice}
           description={selectedType ? `${reportTypes.find(t => t.value === selectedType)?.label} Report` : "Blockchain Analysis Report"}
-          reportType={selectedType}
-          priority={selectedPriority}
+          consultationType={selectedType || 'blockchain-analysis'}
+          duration={selectedPriority || 'standard'}
           onSuccess={handlePaymentSuccess}
           onError={handlePaymentError}
           isOpen={showPaymentModal}

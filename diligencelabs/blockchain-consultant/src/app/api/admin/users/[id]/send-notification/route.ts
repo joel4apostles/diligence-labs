@@ -10,8 +10,9 @@ import {
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params
   try {
     // Only ADMIN and SUPER_ADMIN can send notifications
     const adminData = verifyAdminPermission(request, 'ADMIN')

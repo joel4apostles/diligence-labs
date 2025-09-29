@@ -793,7 +793,7 @@ export default function BookConsultation() {
         {/* Stripe Payment Modal */}
         <StripePayment
           amount={totalPrice}
-          description={selectedType ? `${consultationTypes.find(t => t.value === selectedType)?.title} Consultation` : "Blockchain Consultation"}
+          description={selectedType ? `${consultationTypes.find(t => t.value === selectedType)?.label} Consultation` : "Blockchain Consultation"}
           consultationType={selectedType}
           duration={selectedDuration}
           onSuccess={handlePaymentSuccess}

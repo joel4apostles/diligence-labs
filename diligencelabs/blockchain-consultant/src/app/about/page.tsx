@@ -128,19 +128,19 @@ export default function AboutPage() {
               {/* Stats Section */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-2">100+</div>
-                  <div className="text-gray-400 text-sm">Projects Analyzed</div>
+                  <div className="text-3xl font-bold text-white mb-2">Deep Dive</div>
+                  <div className="text-gray-400 text-sm">Project Analysis</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-2">$50M+</div>
-                  <div className="text-gray-400 text-sm">Capital Evaluated</div>
+                  <div className="text-3xl font-bold text-white mb-2">Risk First</div>
+                  <div className="text-gray-400 text-sm">Due Diligence</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-2">98%</div>
-                  <div className="text-gray-400 text-sm">Success Rate</div>
+                  <div className="text-3xl font-bold text-white mb-2">Proven</div>
+                  <div className="text-gray-400 text-sm">Track Record</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-2">24/7</div>
+                  <div className="text-3xl font-bold text-white mb-2">Always On</div>
                   <div className="text-gray-400 text-sm">Expert Support</div>
                 </div>
               </div>
@@ -343,7 +343,7 @@ export default function AboutPage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-white">Email</h3>
-                    <p className="text-gray-300">hello@diligencelabs.com</p>
+                    <p className="text-gray-300">info@diligencelabs.xyz</p>
                   </div>
                 </div>
 

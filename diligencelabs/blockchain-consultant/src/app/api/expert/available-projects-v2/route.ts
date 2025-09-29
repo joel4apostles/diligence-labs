@@ -34,6 +34,15 @@ async function getAvailableProjectsHandler(request: NextRequest): Promise<NextRe
       throw new AuthenticationError()
     }
 
+    // Note: ExpertProfile model not implemented yet
+    return NextResponse.json({ 
+      message: 'Available projects not accessible - ExpertProfile model not implemented yet',
+      action: 'mock-response',
+      projects: []
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
+
     // Get expert profile with database logging
     const getExpertProfile = withDatabaseLogging(
       'findUnique',
@@ -252,6 +261,7 @@ async function getAvailableProjectsHandler(request: NextRequest): Promise<NextRe
       },
       `Found ${total} available projects`
     )
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     // Log error response

@@ -5,7 +5,6 @@ import { createSubscriptionCheckoutSession } from "@/lib/stripe-subscription"
 
 // Hardcoded enums to match Prisma schema until client generation is fixed
 const SubscriptionPlan = {
-  BASIC_MONTHLY: 'BASIC_MONTHLY',
   PROFESSIONAL_MONTHLY: 'PROFESSIONAL_MONTHLY', 
   ENTERPRISE_MONTHLY: 'ENTERPRISE_MONTHLY'
 } as const

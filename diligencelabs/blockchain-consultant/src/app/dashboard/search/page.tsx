@@ -91,7 +91,7 @@ export default function SearchPage() {
 
   const handleCategorySearch = async (query: string, filters: Record<string, any>, sort?: { field: string; direction: 'asc' | 'desc' }, type: string = activeTab) => {
     if (!query && Object.keys(filters).length === 0) {
-      setSearchResults(prev => ({ ...prev, [type]: [] }))
+      setSearchResults((prev: any) => ({ ...prev, [type]: [] }))
       return
     }
 
@@ -121,7 +121,7 @@ export default function SearchPage() {
       const response = await fetch(`/api/search?${params}`)
       if (response.ok) {
         const data = await response.json()
-        setSearchResults(prev => ({
+        setSearchResults((prev: any) => ({
           ...prev,
           [type]: transformApiResults(data.data, type)
         }))

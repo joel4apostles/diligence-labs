@@ -24,7 +24,7 @@ const HeroSection = memo(function HeroSection() {
         <div className="text-center max-w-4xl mx-auto">
           {/* Logo */}
           <div className="mb-8">
-            <Logo size="2xl" href={null} />
+            <Logo size="xl" href={null} />
           </div>
 
           {/* Main Headline */}

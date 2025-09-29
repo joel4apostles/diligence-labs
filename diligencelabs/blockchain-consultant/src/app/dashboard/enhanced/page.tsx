@@ -56,22 +56,22 @@ function DashboardContent() {
   // Prepare user data for the dashboard
   const dashboardUser = session?.user ? {
     id: session.user.id!,
-    name: session.user.name,
+    name: session.user.name || null,
     email: session.user.email!,
     role: session.user.role || 'USER',
-    industry: (session.user as any).industry,
-    experience: (session.user as any).experience,
-    companySize: (session.user as any).companySize,
-    budget: (session.user as any).budget
+    industry: (session.user as any).industry || 'Not specified',
+    experience: (session.user as any).experience || 'Not specified',
+    companySize: (session.user as any).companySize || 'Not specified',
+    budget: (session.user as any).budget || 0
   } : unifiedUser ? {
     id: unifiedUser.id,
-    name: unifiedUser.name,
-    email: unifiedUser.email,
+    name: unifiedUser.name || null,
+    email: unifiedUser.email || '',
     role: unifiedUser.role || 'USER',
-    industry: unifiedUser.industry,
-    experience: unifiedUser.experience,
-    companySize: unifiedUser.companySize,
-    budget: unifiedUser.budget
+    industry: (unifiedUser as any).industry || 'Not specified',
+    experience: (unifiedUser as any).experience || 'Not specified',
+    companySize: (unifiedUser as any).companySize || 'Not specified',
+    budget: (unifiedUser as any).budget || 0
   } : null
 
   if (!dashboardUser) {

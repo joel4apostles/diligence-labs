@@ -16,10 +16,17 @@ export async function POST(request: NextRequest) {
     
     const user = authResult.user
     
-    if (user.role !== 'ADMIN' && user.role !== 'TEAM_MEMBER') {
+    if (!user || (user.role !== 'ADMIN' && user.role !== 'TEAM_MEMBER')) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
+    // Note: Project model not implemented yet
+    return NextResponse.json({ 
+      message: 'Reward distribution not available - Project model not implemented yet',
+      action: 'mock-response'
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     const body = await request.json()
     const { projectId, totalFee, distribution } = body
 
@@ -245,6 +252,7 @@ export async function POST(request: NextRequest) {
       },
       rewardDistributionId: rewardDistribution.id
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Reward distribution error:', error)
@@ -255,12 +263,32 @@ export async function POST(request: NextRequest) {
 // GET /api/rewards/distribute - Get reward distribution history
 export async function GET(request: NextRequest) {
   try {
+    // Note: Project model not implemented yet
+    return NextResponse.json({ 
+      message: 'Reward distribution history not available - Project model not implemented yet',
+      action: 'mock-response',
+      distributions: [],
+      pagination: {
+        total: 0,
+        page: 1,
+        limit: 10,
+        pages: 0
+      }
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     const { searchParams } = new URL(request.url)
     const projectId = searchParams.get('projectId')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    const user = await verifyAuthAndGetUser(headers())
+    const authResult = await verifyAuthAndGetUser(request)
+    
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+    }
+    
+    const user = authResult.user
     
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
@@ -353,6 +381,7 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit)
       }
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Reward distribution history error:', error)

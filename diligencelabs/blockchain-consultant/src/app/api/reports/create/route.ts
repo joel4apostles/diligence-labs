@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { authOptions } from "@/lib/auth"
 
 const reportSchema = z.object({
-  type: z.enum(["DUE_DILIGENCE", "ADVISORY_NOTES", "TECHNICAL_ANALYSIS", "MARKET_RESEARCH"]),
+  type: z.enum(["DUE_DILIGENCE", "ADVISORY_NOTES", "BLOCKCHAIN_INTEGRATION_ADVISORY", "MARKET_RESEARCH"]),
   title: z.string().min(5),
   description: z.string().min(20),
   projectName: z.string().min(2),

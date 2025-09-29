@@ -73,6 +73,16 @@ class DatabaseOptimizer {
    * Optimized expert queries with performance considerations
    */
   async getExpertDashboardData(expertId: string, page = 1, limit = 10) {
+    // ExpertProfile model not implemented yet - return mock data
+    return {
+      expert: null,
+      availableProjects: [],
+      assignments: [],
+      evaluations: [],
+      stats: { totalProjects: 0, completedProjects: 0, averageRating: 0 }
+    }
+    
+    /* TODO: Uncomment when ExpertProfile model is implemented
     const cacheKey = `expert:${expertId}:dashboard:${page}:${limit}`
     
     return cache.cacheQuery(
@@ -154,12 +164,17 @@ class DatabaseOptimizer {
       },
       { ttl: CacheTTL.SHORT }
     )
+    */
   }
 
   /**
    * Optimized available projects query
    */
   private async getAvailableProjectsOptimized(page: number, limit: number) {
+    // Project model not implemented yet - return empty array
+    return []
+    
+    /* TODO: Uncomment when Project model is implemented
     const skip = (page - 1) * limit
 
     // Use cursor-based pagination for better performance on large datasets
@@ -212,12 +227,23 @@ class DatabaseOptimizer {
       skip,
       take: limit
     })
+    */
   }
 
   /**
    * Optimized expert statistics calculation
    */
   private async getExpertStatsOptimized(expertId: string) {
+    // Project assignment models not implemented yet - return mock stats
+    return {
+      totalProjects: 0,
+      completedProjects: 0,
+      averageRating: 0,
+      totalHours: 0,
+      reputationPoints: 0
+    }
+    
+    /* TODO: Uncomment when ProjectAssignment and related models are implemented
     const cacheKey = CacheKeys.expertStats(expertId)
     
     return cache.cacheQuery(
@@ -273,6 +299,7 @@ class DatabaseOptimizer {
       },
       { ttl: CacheTTL.LONG }
     )
+    */
   }
 
   /**
@@ -291,18 +318,19 @@ class DatabaseOptimizer {
             _count: { id: true }
           }),
 
-          // Project statistics grouped by status
-          this.prisma.project.groupBy({
-            by: ['status'],
-            _count: { id: true },
-            orderBy: { status: 'asc' }
-          }),
+          // Project statistics grouped by status (mock data - project model not implemented)
+          Promise.resolve([
+            { status: 'ACTIVE', _count: { id: 0 } },
+            { status: 'COMPLETED', _count: { id: 0 } },
+            { status: 'PENDING', _count: { id: 0 } }
+          ]),
 
-          // Expert verification status
-          this.prisma.expertProfile.groupBy({
-            by: ['verificationStatus'],
-            _count: { id: true }
-          }),
+          // Expert verification status (mock data - expertProfile model not implemented)
+          Promise.resolve([
+            { verificationStatus: 'PENDING', _count: { id: 0 } },
+            { verificationStatus: 'VERIFIED', _count: { id: 0 } },
+            { verificationStatus: 'REJECTED', _count: { id: 0 } }
+          ]),
 
           // Recent activity (last 24 hours)
           this.getRecentActivityOptimized()
@@ -331,26 +359,14 @@ class DatabaseOptimizer {
         where: { createdAt: { gte: yesterday } }
       }),
 
-      // New projects
-      this.prisma.project.count({
-        where: { createdAt: { gte: yesterday } }
-      }),
+      // New projects (mock data - project model not implemented)
+      Promise.resolve(0),
 
-      // New expert applications
-      this.prisma.expertProfile.count({
-        where: { 
-          createdAt: { gte: yesterday },
-          verificationStatus: 'PENDING'
-        }
-      }),
+      // New expert applications (mock data - expertProfile model not implemented)
+      Promise.resolve(0),
 
-      // Completed evaluations
-      this.prisma.projectEvaluation.count({
-        where: { 
-          submittedAt: { gte: yesterday },
-          status: 'SUBMITTED'
-        }
-      })
+      // Completed evaluations (mock data - projectEvaluation model not implemented)
+      Promise.resolve(0)
     ]).then(([newUsers, newProjects, newExperts, completedEvaluations]) => ({
       newUsers,
       newProjects,
@@ -371,6 +387,11 @@ class DatabaseOptimizer {
       return
     }
 
+    // TODO: Implement when reputationPoints field is added to User model
+    console.warn('updateMultipleReputations called but reputationPoints field not implemented in User model')
+    return []
+    
+    /* Uncomment when reputationPoints field is added to User model:
     // Use transaction for batch updates
     return this.prisma.$transaction(
       updates.map(update => 
@@ -382,12 +403,21 @@ class DatabaseOptimizer {
         })
       )
     )
+    */
   }
 
   /**
-   * Update user reputation with cache invalidation
+   * Update user reputation with cache invalidation (disabled - reputationPoints field not in current schema)
    */
   async updateUserReputation(userId: string, points: number) {
+    // TODO: Implement when reputationPoints field is added to User model
+    console.warn('updateUserReputation called but reputationPoints field not implemented in User model')
+    
+    // Return a mock user object for now
+    const user = await this.prisma.user.findUnique({ where: { id: userId } })
+    return user
+    
+    /* Uncomment when reputationPoints field is added to User model:
     const result = await this.prisma.user.update({
       where: { id: userId },
       data: { reputationPoints: { increment: points } }
@@ -401,6 +431,7 @@ class DatabaseOptimizer {
     ])
 
     return result
+    */
   }
 
   /**
@@ -498,7 +529,7 @@ class DatabaseOptimizer {
       
       return slowQueries
     } catch (error) {
-      await logger.warn(LogCategory.DATABASE, 'Could not analyze slow queries', error)
+      await logger.warn(LogCategory.DATABASE, 'Could not analyze slow queries', error instanceof Error ? { message: error.message, stack: error.stack } : { error })
       return []
     }
   }
@@ -526,26 +557,28 @@ class DatabaseOptimizer {
           { ttl: CacheTTL.VERY_LONG }
         ),
 
-        // Cache project categories
+        // Cache project categories (mock data - project model not implemented)
         cache.cacheQuery(
           'project:categories',
           async () => {
-            return this.prisma.project.groupBy({
-              by: ['category'],
-              _count: { category: true }
-            })
+            return [
+              { category: 'DEFI', _count: { category: 0 } },
+              { category: 'NFT', _count: { category: 0 } },
+              { category: 'GAMING', _count: { category: 0 } }
+            ]
           },
           { ttl: CacheTTL.VERY_LONG }
         ),
 
-        // Cache expert tiers distribution
+        // Cache expert tiers distribution (mock data - expertProfile model not implemented)
         cache.cacheQuery(
           'experts:tier:distribution',
           async () => {
-            return this.prisma.expertProfile.groupBy({
-              by: ['expertTier'],
-              _count: { expertTier: true }
-            })
+            return [
+              { expertTier: 'JUNIOR', _count: { expertTier: 0 } },
+              { expertTier: 'SENIOR', _count: { expertTier: 0 } },
+              { expertTier: 'LEAD', _count: { expertTier: 0 } }
+            ]
           },
           { ttl: CacheTTL.LONG }
         )

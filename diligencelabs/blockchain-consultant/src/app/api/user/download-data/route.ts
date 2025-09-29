@@ -63,8 +63,7 @@ export async function GET(request: NextRequest) {
         accounts: {
           select: {
             type: true,
-            provider: true,
-            createdAt: true
+            provider: true
           }
         },
         activityLogs: {

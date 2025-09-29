@@ -8,6 +8,20 @@ const prisma = new PrismaClient()
 // GET /api/projects - Get all projects or user's projects
 export async function GET(request: NextRequest) {
   try {
+    // Note: Project model not implemented yet
+    return NextResponse.json({ 
+      message: 'Projects not accessible - Project model not implemented yet',
+      action: 'mock-response',
+      projects: [],
+      pagination: {
+        total: 0,
+        page: 1,
+        limit: 10,
+        pages: 0
+      }
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     const { searchParams } = new URL(request.url)
     const userOnly = searchParams.get('userOnly') === 'true'
     const status = searchParams.get('status')
@@ -84,6 +98,7 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit)
       }
     })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Projects fetch error:', error)
@@ -95,6 +110,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const authResult = await verifyAuthAndGetUser(request)
+    
+    if (authResult.error) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status })
+    }
+
+    // Note: Project model not implemented yet
+    return NextResponse.json({ 
+      message: 'Project submission not available - Project model not implemented yet',
+      action: 'mock-response'
+    })
+
+    /* COMMENTED OUT - UNREACHABLE CODE
     const user = authResult.error ? null : authResult.user
     
     if (!user) {
@@ -292,6 +319,7 @@ export async function POST(request: NextRequest) {
         remaining: userWithLimits.monthlyProjectLimit - (currentUsage + 1)
       }
     }, { status: 201 })
+    END COMMENTED OUT CODE */
 
   } catch (error) {
     console.error('Project submission error:', error)

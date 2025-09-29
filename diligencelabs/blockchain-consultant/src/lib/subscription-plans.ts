@@ -1,5 +1,5 @@
 // Hardcoded types to match Prisma schema until client generation is fixed
-type SubscriptionPlan = 'BASIC_MONTHLY' | 'PROFESSIONAL_MONTHLY' | 'ENTERPRISE_MONTHLY'
+type SubscriptionPlan = 'PROFESSIONAL_MONTHLY' | 'ENTERPRISE_MONTHLY'
 type BillingCycle = 'MONTHLY' | 'YEARLY'
 
 export interface PlanFeature {
@@ -66,11 +66,12 @@ export const FREE_CONSULTATION_PLAN: SubscriptionPlanConfig = {
 
 export const PAID_SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
   {
-    id: "BASIC_MONTHLY" as SubscriptionPlan,
+    id: "PROFESSIONAL_MONTHLY" as SubscriptionPlan,
     name: "Professional",
     description: "Perfect for growing businesses",
     price: {
       monthly: 299,
+      yearly: 2990,
     },
     features: [
       { name: "3 Monthly Consultations", included: true },
@@ -80,7 +81,8 @@ export const PAID_SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
       { name: "Team Access (2 members)", included: true },
     ],
     stripePriceId: {
-      monthly: "price_professional_monthly",
+      monthly: "price_test_professional_monthly",
+      yearly: "price_test_professional_yearly",
     },
     consultationCredits: {
       monthly: 3,
@@ -99,6 +101,7 @@ export const PAID_SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
     description: "For large organizations and VCs",
     price: {
       monthly: 699,
+      yearly: 6990,
     },
     features: [
       { name: "Unlimited Consultations", included: true },
@@ -109,7 +112,8 @@ export const PAID_SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
       { name: "Dedicated Account Manager", included: true },
     ],
     stripePriceId: {
-      monthly: "price_enterprise_monthly",
+      monthly: "price_test_enterprise_monthly",
+      yearly: "price_test_enterprise_yearly",
     },
     consultationCredits: {
       monthly: -1, // Unlimited
